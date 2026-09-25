@@ -1,0 +1,638 @@
+<title>Piggy Payday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --surface:#FFFFFF;
+    --surface-2:#FBFBFE;
+    --ink:#1E2233;
+    --ink-soft:#5B6079;
+    --border:#E3E5EF;
+    --shadow: rgba(30,34,51,0.10);
+
+    --save:#1E9B63; --save-soft:#E3F6EC; --save-ink:#0E6B41;
+    --gift:#D6376F; --gift-soft:#FBE6EE; --gift-ink:#A32657;
+    --spend:#DD8A21; --spend-soft:#FCF0DC; --spend-ink:#9C6110;
+
+    --font-display: 'Baloo 2', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161F;
+      --surface:#1B1E2C;
+      --surface-2:#20233A;
+      --ink:#EEF0FA;
+      --ink-soft:#A7ACC4;
+      --border:#2A2E42;
+      --shadow: rgba(0,0,0,0.45);
+
+      --save:#3BC98C; --save-soft:rgba(59,201,140,0.16); --save-ink:#8FEFC2;
+      --gift:#F2609A; --gift-soft:rgba(242,96,154,0.16); --gift-ink:#F9A9C7;
+      --spend:#F0A34E; --spend-soft:rgba(240,163,78,0.16); --spend-ink:#F8CB93;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161F;
+    --surface:#1B1E2C;
+    --surface-2:#20233A;
+    --ink:#EEF0FA;
+    --ink-soft:#A7ACC4;
+    --border:#2A2E42;
+    --shadow: rgba(0,0,0,0.45);
+
+    --save:#3BC98C; --save-soft:rgba(59,201,140,0.16); --save-ink:#8FEFC2;
+    --gift:#F2609A; --gift-soft:rgba(242,96,154,0.16); --gift-ink:#F9A9C7;
+    --spend:#F0A34E; --spend-soft:rgba(240,163,78,0.16); --spend-ink:#F8CB93;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    padding-inline:16px;
+    padding-block:28px 40px;
+    display:flex;
+    justify-content:center;
+  }
+  .page{ width:100%; max-width:760px; }
+
+  header{ margin-bottom:6px; }
+  .eyebrow{
+    font-size:12.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 6px;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:800; font-size:clamp(28px,6vw,38px);
+    margin:0 0 4px; text-wrap:balance; letter-spacing:.01em;
+  }
+  .tagline{ margin:0 0 18px; color:var(--ink-soft); font-size:14.5px; max-width:56ch; line-height:1.5; }
+
+  .total-strip{
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:16px 18px; margin-bottom:22px; box-shadow:0 1px 2px var(--shadow);
+  }
+  .total-strip .label{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .total-strip .value{
+    font-family:var(--font-display); font-weight:800; font-size:clamp(22px,5vw,30px);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .rule-note{
+    display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink-soft);
+    background:var(--surface-2); border:1px dashed var(--border); border-radius:12px;
+    padding:10px 14px; margin-bottom:22px; line-height:1.45;
+  }
+  .rule-note svg{ flex:none; width:16px; height:16px; margin-top:2px; color:var(--ink-soft); }
+
+  .banks{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px;
+    margin-bottom:20px;
+  }
+  .bank-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:18px;
+    padding:18px; display:flex; flex-direction:column; gap:12px;
+    box-shadow:0 1px 2px var(--shadow);
+    transition:transform .15s ease;
+  }
+  .bank-card.pulse{ animation:pop .5s ease; }
+  @keyframes pop{ 0%{transform:scale(1)} 35%{transform:scale(1.035)} 100%{transform:scale(1)} }
+  @media (prefers-reduced-motion: reduce){ .bank-card.pulse{ animation:none; } }
+
+  .bank-card.save{ --accent:var(--save); --accent-soft:var(--save-soft); --accent-ink:var(--save-ink); }
+  .bank-card.gift{ --accent:var(--gift); --accent-soft:var(--gift-soft); --accent-ink:var(--gift-ink); }
+  .bank-card.spend{ --accent:var(--spend); --accent-soft:var(--spend-soft); --accent-ink:var(--spend-ink); }
+
+  .bank-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .bank-name{
+    font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--accent-ink);
+  }
+  .piggy-icon{ width:56px; height:54px; color:var(--accent); flex:none; }
+
+  .bank-balance{
+    font-family:var(--font-display); font-weight:800; font-size:clamp(24px,6vw,28px);
+    font-variant-numeric:tabular-nums;
+  }
+  .bank-sub{ font-size:12.5px; color:var(--ink-soft); margin-top:-8px; }
+
+  .bank-actions{ margin-top:auto; }
+  .btn-withdraw{
+    width:100%; padding:9px 12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--accent-soft); color:var(--accent-ink); font-family:var(--font-body);
+    font-weight:800; font-size:13.5px; cursor:pointer;
+  }
+  .btn-withdraw:hover{ filter:brightness(0.97); }
+  .btn-withdraw:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .cta-row{ display:flex; justify-content:center; margin:6px 0 28px; }
+  .btn-primary{
+    font-family:var(--font-display); font-weight:700; font-size:15.5px;
+    background:var(--ink); color:var(--bg); border:none; border-radius:14px;
+    padding:14px 26px; cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+    box-shadow:0 2px 10px var(--shadow);
+  }
+  .btn-primary:hover{ transform:translateY(-1px); }
+  .btn-primary svg{ width:18px; height:18px; }
+
+  section.activity h2{
+    font-family:var(--font-display); font-size:17px; font-weight:700; margin:0 0 10px;
+  }
+  .activity-list{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    overflow:hidden;
+  }
+  .activity-row{
+    display:flex; align-items:center; gap:12px; padding:12px 16px;
+    border-bottom:1px solid var(--border); font-size:13.5px;
+  }
+  .activity-row:last-child{ border-bottom:none; }
+  .chip{
+    font-size:11px; font-weight:800; letter-spacing:.02em; padding:3px 9px; border-radius:999px;
+    flex:none; text-transform:uppercase;
+  }
+  .chip.save{ background:var(--save-soft); color:var(--save-ink); }
+  .chip.gift{ background:var(--gift-soft); color:var(--gift-ink); }
+  .chip.spend{ background:var(--spend-soft); color:var(--spend-ink); }
+  .activity-desc{ flex:1; min-width:0; }
+  .activity-desc .note{ color:var(--ink-soft); font-size:12px; display:block; margin-top:1px; }
+  .activity-amt{ font-weight:800; font-variant-numeric:tabular-nums; flex:none; }
+  .activity-amt.pos{ color:var(--save-ink); }
+  .activity-amt.neg{ color:var(--gift-ink); }
+  .activity-time{ color:var(--ink-soft); font-size:11.5px; flex:none; width:64px; text-align:right; }
+  .empty-state{ padding:26px 16px; text-align:center; color:var(--ink-soft); font-size:13.5px; }
+
+  .sync-note{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:16px; }
+
+  /* modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,17,26,.45); display:flex; align-items:flex-end;
+    justify-content:center; padding:16px; z-index:20;
+  }
+  @media (min-width:520px){ .overlay{ align-items:center; } }
+  .overlay[hidden]{ display:none; }
+  .modal{
+    background:var(--surface); border:1px solid var(--border); border-radius:20px 20px 0 0;
+    width:100%; max-width:440px; padding:22px; box-shadow:0 12px 40px var(--shadow);
+    max-height:88vh; overflow-y:auto;
+  }
+  @media (min-width:520px){ .modal{ border-radius:20px; } }
+  .modal h3{ font-family:var(--font-display); font-size:19px; margin:0 0 4px; }
+  .modal .sub{ font-size:13px; color:var(--ink-soft); margin:0 0 16px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em; }
+  .field input[type="number"], .field input[type="text"]{
+    width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--ink); font-size:15px; font-family:var(--font-body);
+    font-variant-numeric:tabular-nums;
+  }
+  .field input:focus{ outline:2px solid var(--ink); outline-offset:1px; }
+  .split-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .split-row .dot{ width:11px; height:11px; border-radius:50%; flex:none; }
+  .split-row .dot.save{ background:var(--save); } .split-row .dot.gift{ background:var(--gift); } .split-row .dot.spend{ background:var(--spend); }
+  .split-row label{ width:64px; font-weight:700; font-size:13.5px; color:var(--ink); text-transform:none; }
+  .split-row input{ flex:1; }
+  .remaining{
+    display:flex; justify-content:space-between; font-size:13px; font-weight:700; padding:10px 12px;
+    border-radius:10px; background:var(--surface-2); margin-bottom:16px;
+  }
+  .remaining.ok{ color:var(--save-ink); }
+  .remaining.bad{ color:var(--gift-ink); }
+  .modal-actions{ display:flex; gap:10px; }
+  .btn-ghost, .btn-confirm{
+    flex:1; padding:12px; border-radius:12px; font-family:var(--font-body); font-weight:800;
+    font-size:14.5px; cursor:pointer; border:1px solid var(--border);
+  }
+  .btn-ghost{ background:var(--surface); color:var(--ink); }
+  .btn-confirm{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .btn-confirm:disabled{ opacity:.45; cursor:not-allowed; }
+  .error-text{ color:var(--gift-ink); font-size:12.5px; margin:-6px 0 12px; }
+
+  /* toast */
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translate(-50%,12px); opacity:0;
+    background:var(--ink); color:var(--bg); padding:11px 18px; border-radius:999px;
+    font-size:13.5px; font-weight:700; box-shadow:0 6px 20px var(--shadow);
+    transition:opacity .2s ease, transform .2s ease; pointer-events:none; z-index:30;
+    max-width:90vw; text-align:center;
+  }
+  #toast.show{ opacity:1; transform:translate(-50%,0); }
+</style>
+
+<div class="page">
+  <header>
+    <p class="eyebrow">Chore Bank</p>
+    <h1>Piggy Payday</h1>
+    <p class="tagline">Every chore payday, split what he earns between three piggy banks. Balances update the moment he adds or takes money out.</p>
+  </header>
+
+  <div class="total-strip">
+    <span class="label">Total across all banks</span>
+    <span class="value" id="totalValue">$0.00</span>
+  </div>
+
+  <div class="rule-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/><path d="M9 12l2 2 4-4"/></svg>
+    <span>Money can be added at payday or withdrawn any time &mdash; but once it lands in a bank, it can't be moved to a different one.</span>
+  </div>
+
+  <div class="banks" id="banks"></div>
+
+  <div class="cta-row">
+    <button class="btn-primary" id="openDeposit" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8.5 10a2.5 2.5 0 0 1 3.5-2h.5a2 2 0 0 1 0 4h-1a2 2 0 0 0 0 4h.5a2.5 2.5 0 0 0 3.5-2"/></svg>
+      Add This Week's Earnings
+    </button>
+  </div>
+
+  <section class="activity">
+    <h2>Recent activity</h2>
+    <div class="activity-list" id="activityList">
+      <div class="empty-state">No activity yet &mdash; add this week's chore money to get started.</div>
+    </div>
+  </section>
+
+  <p class="sync-note" id="syncNote">Loading&hellip;</p>
+</div>
+
+<!-- Deposit modal -->
+<div class="overlay" id="depositOverlay" hidden>
+  <div class="modal">
+    <h3>Add This Week's Earnings</h3>
+    <p class="sub">Enter how much he earned, then decide how it's split between the banks.</p>
+    <div class="field">
+      <label for="earnedTotal">Total earned this week</label>
+      <input type="number" id="earnedTotal" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="split-row"><span class="dot save"></span><label for="splitSave">Save</label><input type="number" id="splitSave" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="split-row"><span class="dot gift"></span><label for="splitGift">Gift</label><input type="number" id="splitGift" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="split-row"><span class="dot spend"></span><label for="splitSpend">Spend</label><input type="number" id="splitSpend" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="remaining" id="remainingBox">Remaining to assign: $0.00</div>
+    <div class="field">
+      <label for="depositNote">What was it for? (optional)</label>
+      <input type="text" id="depositNote" maxlength="60" placeholder="e.g. dishes + trash all week">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelDeposit" type="button">Cancel</button>
+      <button class="btn-confirm" id="confirmDeposit" type="button" disabled>Add to banks</button>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw modal -->
+<div class="overlay" id="withdrawOverlay" hidden>
+  <div class="modal">
+    <h3 id="withdrawTitle">Withdraw</h3>
+    <p class="sub" id="withdrawSub">Available balance: $0.00</p>
+    <div class="field">
+      <label for="withdrawAmount">Amount to take out</label>
+      <input type="number" id="withdrawAmount" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label for="withdrawNote">What's it for? (optional)</label>
+      <input type="text" id="withdrawNote" maxlength="60" placeholder="e.g. new video game">
+    </div>
+    <p class="error-text" id="withdrawError" hidden></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelWithdraw" type="button">Cancel</button>
+      <button class="btn-confirm" id="confirmWithdraw" type="button">Withdraw</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var BUCKETS = [
+    { id:'save',  label:'Save',  verb:'Added to Save' },
+    { id:'gift',  label:'Gift',  verb:'Added to Gift' },
+    { id:'spend', label:'Spend', verb:'Added to Spend' }
+  ];
+
+  var PIGGY_SVG = '<svg class="piggy-icon" viewBox="0 0 120 116" aria-hidden="true">' +
+    '<line x1="40" y1="2" x2="40" y2="40" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<polygon points="40,4 40,17 61,10.5" fill="var(--ink)"/>' +
+    '<circle cx="47.5" cy="10.5" r="3.1" fill="var(--surface)"/>' +
+    '<circle cx="46.1" cy="9.6" r="0.6" fill="var(--ink)"/>' +
+    '<circle cx="48.9" cy="9.6" r="0.6" fill="var(--ink)"/>' +
+    '<path d="M45.7 12.3q1.8 1.1 3.6 0" fill="none" stroke="var(--ink)" stroke-width="0.6" stroke-linecap="round"/>' +
+    '<path d="M34 78q-7-5-2-12" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+    '<ellipse cx="62" cy="76" rx="46" ry="32" fill="currentColor"/>' +
+    '<circle cx="24" cy="54" r="11" fill="currentColor"/>' +
+    '<ellipse cx="98" cy="76" rx="17" ry="14" fill="currentColor"/>' +
+    '<ellipse cx="103" cy="76" rx="9" ry="7.5" fill="var(--surface)"/>' +
+    '<circle cx="100" cy="74" r="1.6" fill="var(--ink)"/>' +
+    '<circle cx="106" cy="74" r="1.6" fill="var(--ink)"/>' +
+    '<circle cx="46" cy="67" r="2.4" fill="var(--ink)"/>' +
+    '<rect x="34" y="38" width="12" height="4.5" rx="2.2" fill="var(--surface)"/>' +
+    '<rect x="24" y="100" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '<rect x="50" y="102" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '<rect x="72" y="102" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '<rect x="92" y="100" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '</svg>';
+
+  var state = {
+    buckets: { save:0, gift:0, spend:0 },
+    txns: [],
+    mode: 'local',
+    ready: false
+  };
+  var db = null;
+  var LOCAL_KEY = 'piggy-payday-state-v1';
+  var withdrawTarget = null;
+
+  function round2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+  function fmt(n){ var v = round2(n||0); return '$' + v.toFixed(2); }
+  function nowISO(){ return new Date().toISOString(); }
+  function relTime(iso){
+    try{
+      var d = new Date(iso), diff = (Date.now() - d.getTime())/1000;
+      if (diff < 60) return 'now';
+      if (diff < 3600) return Math.floor(diff/60) + 'm';
+      if (diff < 86400) return Math.floor(diff/3600) + 'h';
+      if (diff < 86400*7) return Math.floor(diff/86400) + 'd';
+      return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    } catch(e){ return ''; }
+  }
+
+  function loadLocal(){
+    try{
+      var raw = localStorage.getItem(LOCAL_KEY);
+      if (raw){
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.buckets) state.buckets = parsed.buckets;
+        if (parsed && parsed.txns) state.txns = parsed.txns;
+      }
+    } catch(e){}
+  }
+  function saveLocal(){
+    try{ localStorage.setItem(LOCAL_KEY, JSON.stringify({buckets:state.buckets, txns:state.txns})); } catch(e){}
+  }
+
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._h);
+    showToast._h = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+  }
+
+  function pulseCard(bucketId){
+    var el = document.querySelector('.bank-card.' + bucketId);
+    if (!el) return;
+    el.classList.remove('pulse');
+    void el.offsetWidth;
+    el.classList.add('pulse');
+  }
+
+  function render(){
+    var total = (state.buckets.save||0) + (state.buckets.gift||0) + (state.buckets.spend||0);
+    document.getElementById('totalValue').textContent = fmt(total);
+
+    var banksEl = document.getElementById('banks');
+    banksEl.innerHTML = BUCKETS.map(function(b){
+      var bal = state.buckets[b.id] || 0;
+      return '' +
+        '<div class="bank-card ' + b.id + '">' +
+          '<div class="bank-top">' +
+            '<span class="bank-name">' + b.label + '</span>' +
+            PIGGY_SVG +
+          '</div>' +
+          '<div class="bank-balance">' + fmt(bal) + '</div>' +
+          '<div class="bank-sub">piggy bank balance</div>' +
+          '<div class="bank-actions">' +
+            '<button class="btn-withdraw" type="button" data-withdraw="' + b.id + '" ' + (bal <= 0 ? 'disabled' : '') + '>Withdraw</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call(banksEl.querySelectorAll('[data-withdraw]'), function(btn){
+      btn.addEventListener('click', function(){ openWithdraw(btn.getAttribute('data-withdraw')); });
+    });
+
+    var listEl = document.getElementById('activityList');
+    if (!state.txns.length){
+      listEl.innerHTML = '<div class="empty-state">No activity yet &mdash; add this week\'s chore money to get started.</div>';
+    } else {
+      listEl.innerHTML = state.txns.slice(0,20).map(function(tx){
+        var bucket = BUCKETS.filter(function(b){ return b.id === tx.bucket; })[0] || {label:tx.bucket};
+        var isDeposit = tx.type === 'deposit';
+        var desc = isDeposit ? 'Earned into ' + bucket.label : 'Withdrew from ' + bucket.label;
+        return '' +
+          '<div class="activity-row">' +
+            '<span class="chip ' + tx.bucket + '">' + bucket.label + '</span>' +
+            '<span class="activity-desc">' + desc + (tx.note ? '<span class="note">' + escapeHtml(tx.note) + '</span>' : '') + '</span>' +
+            '<span class="activity-amt ' + (isDeposit ? 'pos' : 'neg') + '">' + (isDeposit ? '+' : '&minus;') + fmt(tx.amount).slice(1) + '</span>' +
+            '<span class="activity-time">' + relTime(tx.ts) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    var syncEl = document.getElementById('syncNote');
+    syncEl.textContent = state.mode === 'cloud'
+      ? 'Balances are saved and stay in sync everywhere this is opened.'
+      : 'Saving in this browser only on this device (sync isn’t available right now).';
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
+  // ---------- backend ----------
+  function initBackend(){
+    if (window.claude && typeof window.claude.use === 'function'){
+      window.claude.use('db').then(function(d){
+        if (d){ db = d; state.mode = 'cloud'; bootCloud(); }
+        else { fallbackLocal(); }
+      }).catch(function(){ fallbackLocal(); });
+    } else {
+      fallbackLocal();
+    }
+  }
+
+  function fallbackLocal(){
+    state.mode = 'local';
+    loadLocal();
+    state.ready = true;
+    render();
+  }
+
+  function bootCloud(){
+    var inits = BUCKETS.map(function(b){
+      var ref = db.collection('buckets').doc(b.id);
+      return ref.get().then(function(snap){
+        if (!snap.exists){
+          return ref.set({ balance: 0, label: b.label, updatedAt: nowISO() });
+        }
+      }).catch(function(){});
+    });
+    Promise.all(inits).then(function(){
+      db.collection('buckets').onSnapshot(function(qs){
+        qs.docs.forEach(function(d){
+          var data = d.data();
+          if (state.buckets.hasOwnProperty(d.id)){
+            state.buckets[d.id] = (data && typeof data.balance === 'number') ? data.balance : 0;
+          }
+        });
+        state.ready = true;
+        render();
+      }, function(){ fallbackLocal(); });
+
+      db.collection('transactions').orderBy('ts','desc').limit(30).onSnapshot(function(qs){
+        state.txns = qs.docs.map(function(d){ var data = d.data() || {}; data.id = d.id; return data; });
+        render();
+      }, function(){});
+    });
+  }
+
+  function applyDeposit(allocations, note){
+    var ts = nowISO();
+    var jobs = [];
+    BUCKETS.forEach(function(b){
+      var amt = round2(allocations[b.id] || 0);
+      if (amt <= 0) return;
+      var newBal = round2((state.buckets[b.id]||0) + amt);
+      if (state.mode === 'cloud'){
+        jobs.push(
+          db.collection('buckets').doc(b.id).set({ balance:newBal, label:b.label, updatedAt: ts })
+            .then(function(){ return db.collection('transactions').add({ type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts }); })
+        );
+      } else {
+        state.buckets[b.id] = newBal;
+        state.txns.unshift({ id:'local-'+Date.now()+'-'+b.id, type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts });
+      }
+      setTimeout(function(){ pulseCard(b.id); }, 60);
+    });
+    if (state.mode === 'cloud'){
+      return Promise.all(jobs);
+    } else {
+      state.txns = state.txns.slice(0,30);
+      saveLocal();
+      render();
+      return Promise.resolve();
+    }
+  }
+
+  function applyWithdraw(bucketId, amount, note){
+    var cur = state.buckets[bucketId] || 0;
+    amount = round2(amount);
+    if (amount <= 0 || amount > cur + 0.001){
+      return Promise.reject(new Error('insufficient'));
+    }
+    var newBal = round2(cur - amount);
+    var ts = nowISO();
+    var bucket = BUCKETS.filter(function(b){ return b.id === bucketId; })[0];
+    if (state.mode === 'cloud'){
+      return db.collection('buckets').doc(bucketId).set({ balance:newBal, label:bucket.label, updatedAt: ts })
+        .then(function(){ return db.collection('transactions').add({ type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts }); })
+        .then(function(){ pulseCard(bucketId); });
+    } else {
+      state.buckets[bucketId] = newBal;
+      state.txns.unshift({ id:'local-'+Date.now(), type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts });
+      state.txns = state.txns.slice(0,30);
+      saveLocal();
+      render();
+      pulseCard(bucketId);
+      return Promise.resolve();
+    }
+  }
+
+  // ---------- deposit modal ----------
+  var depositOverlay = document.getElementById('depositOverlay');
+  var earnedTotalEl = document.getElementById('earnedTotal');
+  var splitEls = { save: document.getElementById('splitSave'), gift: document.getElementById('splitGift'), spend: document.getElementById('splitSpend') };
+  var remainingBox = document.getElementById('remainingBox');
+  var confirmDepositBtn = document.getElementById('confirmDeposit');
+
+  function updateRemaining(){
+    var total = parseFloat(earnedTotalEl.value) || 0;
+    var assigned = (parseFloat(splitEls.save.value)||0) + (parseFloat(splitEls.gift.value)||0) + (parseFloat(splitEls.spend.value)||0);
+    var remaining = round2(total - assigned);
+    var ok = total > 0 && Math.abs(remaining) < 0.005;
+    remainingBox.textContent = 'Remaining to assign: ' + fmt(remaining);
+    remainingBox.className = 'remaining ' + (ok ? 'ok' : (remaining < 0 ? 'bad' : ''));
+    confirmDepositBtn.disabled = !ok;
+  }
+
+  document.getElementById('openDeposit').addEventListener('click', function(){
+    earnedTotalEl.value = '';
+    splitEls.save.value = ''; splitEls.gift.value = ''; splitEls.spend.value = '';
+    document.getElementById('depositNote').value = '';
+    updateRemaining();
+    depositOverlay.hidden = false;
+    earnedTotalEl.focus();
+  });
+  document.getElementById('cancelDeposit').addEventListener('click', function(){ depositOverlay.hidden = true; });
+  depositOverlay.addEventListener('click', function(e){ if (e.target === depositOverlay) depositOverlay.hidden = true; });
+
+  [earnedTotalEl, splitEls.save, splitEls.gift, splitEls.spend].forEach(function(el){
+    el.addEventListener('input', updateRemaining);
+  });
+
+  confirmDepositBtn.addEventListener('click', function(){
+    var allocations = {
+      save: parseFloat(splitEls.save.value) || 0,
+      gift: parseFloat(splitEls.gift.value) || 0,
+      spend: parseFloat(splitEls.spend.value) || 0
+    };
+    var note = document.getElementById('depositNote').value.trim();
+    confirmDepositBtn.disabled = true;
+    applyDeposit(allocations, note).then(function(){
+      depositOverlay.hidden = true;
+      showToast('This week’s earnings are in the banks!');
+    }).catch(function(){
+      showToast('Something went wrong — try again.');
+    }).then(function(){ confirmDepositBtn.disabled = false; });
+  });
+
+  // ---------- withdraw modal ----------
+  var withdrawOverlay = document.getElementById('withdrawOverlay');
+  var withdrawAmountEl = document.getElementById('withdrawAmount');
+  var withdrawError = document.getElementById('withdrawError');
+
+  function openWithdraw(bucketId){
+    withdrawTarget = bucketId;
+    var bucket = BUCKETS.filter(function(b){ return b.id === bucketId; })[0];
+    var bal = state.buckets[bucketId] || 0;
+    document.getElementById('withdrawTitle').textContent = 'Withdraw from ' + bucket.label;
+    document.getElementById('withdrawSub').textContent = 'Available balance: ' + fmt(bal);
+    withdrawAmountEl.value = '';
+    withdrawAmountEl.max = bal;
+    document.getElementById('withdrawNote').value = '';
+    withdrawError.hidden = true;
+    withdrawOverlay.hidden = false;
+    withdrawAmountEl.focus();
+  }
+  document.getElementById('cancelWithdraw').addEventListener('click', function(){ withdrawOverlay.hidden = true; });
+  withdrawOverlay.addEventListener('click', function(e){ if (e.target === withdrawOverlay) withdrawOverlay.hidden = true; });
+
+  document.getElementById('confirmWithdraw').addEventListener('click', function(){
+    var amount = parseFloat(withdrawAmountEl.value) || 0;
+    var bal = state.buckets[withdrawTarget] || 0;
+    if (amount <= 0){ withdrawError.textContent = 'Enter an amount greater than $0.'; withdrawError.hidden = false; return; }
+    if (amount > bal + 0.001){ withdrawError.textContent = 'That’s more than what’s in this bank.'; withdrawError.hidden = false; return; }
+    withdrawError.hidden = true;
+    var note = document.getElementById('withdrawNote').value.trim();
+    var btn = document.getElementById('confirmWithdraw');
+    btn.disabled = true;
+    applyWithdraw(withdrawTarget, amount, note).then(function(){
+      withdrawOverlay.hidden = true;
+      showToast(fmt(amount) + ' withdrawn — enjoy!');
+    }).catch(function(){
+      withdrawError.textContent = 'Something went wrong — try again.';
+      withdrawError.hidden = false;
+    }).then(function(){ btn.disabled = false; });
+  });
+
+  render();
+  initBackend();
+})();
+</script>

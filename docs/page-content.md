@@ -11,7 +11,7 @@
 **Building AI Products That Create Measurable Impact**
 
 ### Subheadline
-With over 19 years of experience leading AI product innovation across Healthcare, FinTech, Automotive, and Retail, I specialize in enterprise-grade AI solutions, Google Gemini integration, and unlocking value at scale. My mission: Deliver trustworthy, impactful AI products that drive real business results.
+With over 13 years of experience (19 Overall Enterprise) leading AI product innovation across Healthcare, FinTech, Automotive, and Retail, I specialize in enterprise-grade AI solutions, Google Gemini integration, and unlocking value at scale. My mission: Deliver trustworthy, impactful AI products that drive real business results.
 
 ### Primary CTAs
 - **View Projects**
@@ -75,12 +75,12 @@ I believe in servant leadership—empowering teams, fostering a culture of learn
 
 ## 9. Impact Metrics
 
-- **19+ Years Experience**
+- **13+ Years Experience**
 - **10,000+ Users Empowered**
 - **35% Time Saved in Key Workflows**
 - **80+ Engineers Led**
 - **5+ Industries Served**
-- **Enterprise Healthcare AI at Scale**
+- **19 Years of designg and Building Enterprise Products **
 
 ---
 
@@ -97,6 +97,8 @@ I believe in servant leadership—empowering teams, fostering a culture of learn
 - **Solution:** Built an AI document parser that extracts, validates, and structures data from unstructured documents using advanced machine learning models.
 - **Impact:** Increased data extraction accuracy to 98%, reduced processing time by 60%, enabled seamless integration with downstream systems.
 - **Technologies:** OCR, NLP, transformer models, Python, cloud APIs.
+
+### Product Management Operating System (PMOS)
 
 ### Cloud Pharmacy Platform
 - **Problem:** Traditional pharmacy systems are siloed and lack real-time data sharing, limiting patient care and operational efficiency.
@@ -178,6 +180,7 @@ Ready to build impactful AI products or need guidance on your AI journey? Let’
 ## 19. Placeholder Sections
 
 - **Demo Videos:** (Coming Soon)
+- *** ER Assist 
 - **GitHub Repositories:** (Coming Soon)
 - **Speaking:** (Coming Soon)
 - **Builder's Journal:** (Coming Soon)

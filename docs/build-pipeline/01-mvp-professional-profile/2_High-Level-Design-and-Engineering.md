@@ -8,13 +8,13 @@
 # PART A — HIGH-LEVEL DESIGN
 
 ## 1. Overview
-Veekay Labs Phase 1 is a statically-generated Next.js website, deployed on Vercel, that presents Venkat's professional profile, resume, and flagship project case studies. Content (bio, projects, page copy) lives as MDX/Markdown files in the repo — there is no CMS or database read-path in this phase. The only dynamic piece is the contact form, which posts to a single API route.
+Veekay Labs Phase 1 is a statically-generated Next.js website, deployed on Cloudfare, that presents Venkat's professional profile, resume, and flagship project case studies. Content (bio, projects, page copy) lives as MDX/Markdown files in the repo — there is no CMS or database read-path in this phase. The only dynamic piece is the contact form, which posts to a single API route.
 
 ## 2. System Context
 ```
 Visitor (browser)
       ↓
-Next.js Frontend (Vercel, SSG/ISR)
+Next.js Frontend (Cloudfare, SSG/ISR)
       ↓
    ┌──────────────┬───────────────────┬──────────────────┐
    ↓              ↓                   ↓                  ↓
@@ -32,12 +32,12 @@ Everything except the contact form and (optionally) the GitHub page is resolved 
 | Contact API Route | Receives contact form submissions, validates, forwards to storage/email | Venkat |
 | GitHub Data Fetcher (optional, V1) | Pulls repo metadata for the GitHub page — may be manually curated instead | Venkat |
 | Resume Delivery | Serves a static, versioned resume PDF for download | Venkat |
-| Deployment Pipeline | Builds and deploys the site on every push to `main`, with PR previews | Vercel |
+| Deployment Pipeline | Builds and deploys the site on every push to `main`, with PR previews | Cloudfare |
 
 ## 4. Component Interactions
 1. Build time: Content Engine reads all `.mdx` files under `/content` and `/projects`, validates frontmatter, and generates static params for each route.
 2. Next.js statically generates (SSG) all content pages at build time; project/article pages use `generateStaticParams`.
-3. Visitor requests a page → Vercel edge serves the pre-built static HTML (no server round-trip for content pages).
+3. Visitor requests a page → Cloudfare edge serves the pre-built static HTML (no server round-trip for content pages).
 4. Visitor submits the contact form → client calls `POST /api/contact` → API route validates input, writes to storage (Supabase table or forwards via email API) → returns success/error to client.
 5. (Optional) GitHub page either renders from a manually curated MDX file, or — if implemented — fetches repo data via ISR (revalidate every N hours) to avoid hitting GitHub API rate limits on every request.
 
@@ -59,13 +59,13 @@ Everything except the contact form and (optionally) the GitHub page is resolved 
 ## 7. Non-Functional Requirements
 - **Scale / load:** Low-traffic personal site; no special scaling needed at launch (hundreds, not thousands, of daily visitors expected)
 - **Performance:** Lighthouse performance score > 90 on Home and Build pages; images optimized via `next/image`
-- **Availability:** Matches Vercel's platform SLA; no custom uptime commitment needed for a personal site
+- **Availability:** Matches Cloudfare's platform SLA; no custom uptime commitment needed for a personal site
 - **Security & privacy:** Contact form inputs sanitized server-side; no secrets in client bundle; rate limiting on `/api/contact` to prevent spam/abuse
 - **SEO:** Meta tags, sitemap.xml, structured data (schema.org Person/Article) per page
 - **Accessibility:** WCAG 2.1 AA — keyboard navigation, contrast, ARIA labels (per Design-System.md)
 
 ## 8. External Dependencies
-- Vercel (hosting, CI/CD, preview deployments)
+- Cloudfare (hosting, CI/CD, preview deployments)
 - Supabase and/or a transactional email API (contact form backend — pending decision)
 - GitHub API (optional, for GitHub page)
 - PostHog and/or Google Analytics (client-side analytics)
@@ -138,7 +138,7 @@ created_at: timestamp
 | `/api/github/repos` *(optional, stretch)* | GET | — | `{ repos: RepoMeta[] }` | 502 GitHub API unavailable (falls back to cached/curated data) |
 
 ## 5. Tech Stack & Tooling
-Next.js 14+ (App Router), React, TypeScript, Tailwind CSS, shadcn/ui, Framer Motion (per Technical-Architecture.md). MDX parsing via `gray-matter` + `next-mdx-remote` (or Contentlayer if preferred for build-time type safety). Contact form backend: Supabase **or** a transactional email API (Resend) — decision pending, see §11. Deployment on Vercel. Analytics via PostHog and/or Google Analytics.
+Next.js 14+ (App Router), React, TypeScript, Tailwind CSS, shadcn/ui, Framer Motion (per Technical-Architecture.md). MDX parsing via `gray-matter` + `next-mdx-remote` (or Contentlayer if preferred for build-time type safety). Contact form backend: Supabase **or** a transactional email API (Resend) — decision pending, see §11. Deployment on Cloudfare. Analytics via PostHog and/or Google Analytics.
 
 ## 6. Error Handling & Edge Cases
 | Scenario | Expected Behavior |
@@ -150,13 +150,13 @@ Next.js 14+ (App Router), React, TypeScript, Tailwind CSS, shadcn/ui, Framer Mot
 | GitHub API unavailable (if live-fetch implemented) | Falls back to last cached/curated data, page still renders |
 
 ## 7. Security Considerations
-No secrets in client-side bundles — all API keys (Supabase, email provider, GitHub PAT if used) live in Vercel environment variables. Contact form input is sanitized and validated server-side before storage. Rate limiting applied to `/api/contact` to prevent abuse. No authentication/session handling exists in this phase, so there is no attack surface around auth.
+No secrets in client-side bundles — all API keys (Supabase, email provider, GitHub PAT if used) live in Cloudfare environment variables. Contact form input is sanitized and validated server-side before storage. Rate limiting applied to `/api/contact` to prevent abuse. No authentication/session handling exists in this phase, so there is no attack surface around auth.
 
 ## 8. Performance & Scalability Notes
 Content pages are statically generated at build time — no per-request database read, so performance is effectively CDN-bound. Images served via `next/image` for automatic optimization. If GitHub API integration is added, use ISR (e.g., revalidate every 6–12 hours) rather than fetching on every request, to stay within rate limits and keep pages fast.
 
 ## 9. Infra & Deployment
-Vercel project connected to the GitHub repo. Every PR gets a preview deployment; merges to `main` deploy to production. Environment variables (Supabase keys, email API key, analytics IDs) configured in the Vercel dashboard, not committed to the repo. Custom domain to be attached once purchased/configured (tracked as an open risk in Part A, §10).
+Cloudfare project connected to the GitHub repo. Every PR gets a preview deployment; merges to `main` deploy to production. Environment variables (Supabase keys, email API key, analytics IDs) configured in the Cloudfare dashboard, not committed to the repo. Custom domain to be attached once purchased/configured (tracked as an open risk in Part A, §10).
 
 ## 10. Engineering Constraints ("Constitution")
 - Must follow the repository structure defined in `/docs/technical-architecture.md`: `/src /components /app /content /projects /pmos /lib /services /public /styles /docs`
@@ -167,5 +167,8 @@ Vercel project connected to the GitHub repo. Every PR gets a preview deployment;
 
 ## 11. Open Technical Questions
 - **Contact form backend:** Supabase table, transactional email API, or both (write + notify)? Needs a decision before `spec.md` is written for the contact form.
+ The Contact form backend will be both supabase table and transaction email API. Please note the Supabase will capture contact information and timestamp only and not the content.The content will be managed through email.      
 - **GitHub page:** manually curated MDX for launch, or build the live API integration now? Affects whether `/api/github/repos` is in scope for this release.
+ Build the live API integration 
 - **Custom domain:** has it been purchased? Needed to finalize the Infra & Deployment section and the production launch checklist.
+The name of custom domain is still in discussion.

@@ -30,7 +30,7 @@ Venkat needs a live, public website that establishes his professional credibilit
 ## 4. User Stories & Acceptance Criteria
 | # | As a... | I want to... | So that... | Acceptance Criteria |
 |---|---------|--------------|------------|----------------------|
-| 1 | Recruiter | Download Veekay's resume from any page | I can screen him quickly | Resume link in nav/footer on every page; downloads a current PDF |
+| 1 | Recruiter | Show the profile and achievement and experience.| Share the information in Contact form or expanded form to add job description|
 | 2 | Hiring Manager | Read 3+ flagship project case studies | I can assess technical and product depth | Each project has overview, problem, decisions, architecture, outcome |
 | 3 | Founder | See real GitHub activity | I can validate hands-on technical involvement | GitHub page links to real repos with descriptions |
 | 4 | Any visitor | Contact Veekay directly | I can start a conversation | Contact form submits successfully and Veekay receives it |
@@ -39,19 +39,19 @@ Venkat needs a live, public website that establishes his professional credibilit
 ## 5. Success Metrics
 - Site publicly deployed on a custom domain
 - 3+ flagship projects published with full case-study structure
-- Resume downloadable from every page
 - Lighthouse performance score > 90 on Home and Build pages
 - Contact form delivers messages reliably (0 silent failures)
+-Contact form delivers expanded(included job description and contact information) messages reliably (0 silent failures)
 
 ## 6. Scope
 ### In Scope
-- Home, About, Resume, Contact pages
+- Home, About, Resume build into the webpage, Contact pages
 - Build section (flagship project case studies, min. 3)
 - Articles landing page (static links/aggregation to existing external posts)
 - Demo Videos page
 - GitHub page
 - Responsive navigation + footer
-- Deployment to production (Vercel) with custom domain
+- Deployment to production (Cloudfare) with custom domain
 
 ### Out of Scope
 - AI Assistant / chat interface
@@ -62,13 +62,13 @@ Venkat needs a live, public website that establishes his professional credibilit
 
 ## 7. Constraints
 - Single builder (Venkat) — implementation time is the primary constraint
-- Must follow the stack already decided in `/docs/technical-architecture.md` (Next.js, Tailwind, shadcn/ui, MDX, Vercel)
+- Must follow the stack already decided in `/docs/technical-architecture.md` (Next.js, Tailwind, shadcn/ui, MDX, Cloudfare)
 - No budget for a CMS or paid content tooling in this phase
 
 ## 8. Assumptions
 - Content (bio, project write-ups, resume) will be authored by Venkat as MDX/Markdown, not pulled from an external CMS
 - 3 flagship projects are already substantially built and can be documented (e.g., ER Triage AI Co-pilot)
-- Vercel free/hobby tier is sufficient for V1 traffic levels
+- Cloudfare free/hobby tier is sufficient for V1 traffic levels
 
 ## 9. Risks & Open Questions
 | Risk / Question | Impact | Owner | Resolution |
