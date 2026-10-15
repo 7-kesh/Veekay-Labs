@@ -173,7 +173,7 @@ Ready to build impactful AI products or need guidance on your AI journey? Let’
 
 ## 18. Footer
 
-© 2024 Veekay AI Product Management Platform. All rights reserved. | Built with passion for impactful AI.
+© 2026 Venara Inc. Veekay Labs is a Venara Inc site. All rights reserved. | Built with passion for impactful AI.
 
 ---
 

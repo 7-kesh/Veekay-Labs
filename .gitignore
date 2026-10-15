@@ -1,1 +1,6 @@
 .DS_Store
+
+# websites/venara (React + Vite sub-project)
+websites/venara/node_modules
+websites/venara/dist
+websites/venara/.vercel

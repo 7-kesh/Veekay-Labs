@@ -11,6 +11,19 @@ This document defines the visual language, interaction principles, and reusable 
 
 ---
 
+# Reference Assets (confirmed 2026-09-28)
+
+The principles below are realized concretely in `assets/`:
+
+- **`assets/image.png`** — the canonical Home page visual mockup. Navy Blue + Cyan Gradient + White, matching the palette below exactly.
+- **`assets/Build website from reference/src/app/App.tsx`** — an already-built React implementation of that Home page, with the actual hex/rgba values in use (e.g. `#22d3ee` cyan). This is the real source of truth for tokens, not `default_shadcn_theme.css` in the same folder, which is confirmed unused shadcn boilerplate.
+- **`assets/Veekay Labs Type and Color Pairings.html`** — the font/color exploration; the navy/blue/cyan pairing (`#0a1628`, `#1a3a7a`, `#2451ff`, `#2a78d6`, `#2fc4c9`) is the one actually used above. Other pairings in that file (warm coral/terracotta, teal) are rejected alternatives.
+- **`assets/Veekay_AI_Product_Website_Blueprint_v1.pdf`** — IA/content-strategy source for the sections and structure below.
+
+See `docs/build-pipeline/ROADMAP.md`'s "Reference Assets" table (under the Veekay Labs — Profile initiative) for the full breakdown and open items.
+
+---
+
 # Design Principles
 
 ## Clarity First
