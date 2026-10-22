@@ -199,6 +199,7 @@
   table.summary-table .dot.save{ background:var(--save); } table.summary-table .dot.gift{ background:var(--gift); } table.summary-table .dot.spend{ background:var(--spend); }
   td.pos{ color:var(--save-ink); } td.neg{ color:var(--gift-ink); }
 
+  .link-btn{ background:none; border:none; padding:0; font:inherit; color:var(--ink-soft); text-decoration:underline; cursor:pointer; }
   .sync-note{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:16px; }
 
   /* market investment */
@@ -373,6 +374,7 @@
   </section>
 
   <p class="sync-note" id="syncNote">Loading&hellip;</p>
+  <p class="sync-note"><button type="button" class="link-btn" id="exportBtn" hidden>Download a backup</button></p>
 </div>
 
 <!-- Deposit modal -->
@@ -624,10 +626,17 @@
 
     renderMarket();
 
+    document.getElementById('exportBtn').hidden = state.mode !== 'cloud';
     var syncEl = document.getElementById('syncNote');
     syncEl.textContent = state.mode === 'cloud'
       ? 'Balances are saved and stay in sync everywhere this is opened.'
       : 'Saving in this browser only on this device (sync isn’t available right now).';
+  }
+
+  // Money functions raise plain-English messages (e.g. "not enough money in save"); show those.
+  function errText(e){
+    var m = e && e.message;
+    return (m && /not enough|greater than|already sold|not found|not allowed/.test(m)) ? m.charAt(0).toUpperCase() + m.slice(1) + '.' : 'Something went wrong \u2014 try again.';
   }
 
   function escapeHtml(s){
@@ -638,9 +647,7 @@
 
   // ---------- backend ----------
   function initBackend(){
-    var viaClaude = window.claude && typeof window.claude.use === 'function';
-    var ready = viaClaude ? window.claude.use('db')
-      : (window.PiggyCloud ? window.PiggyCloud.start() : Promise.resolve(null));
+    var ready = window.PiggyCloud ? window.PiggyCloud.start() : Promise.resolve(null);
     ready.then(function(d){
       if (d){ db = d; state.mode = 'cloud'; bootCloud(); }
       else { fallbackLocal(); }
@@ -655,23 +662,8 @@
   }
 
   function bootCloud(){
-    var inits = BUCKETS.map(function(b){
-      var ref = db.collection('buckets').doc(b.id);
-      return ref.get().then(function(snap){
-        if (!snap.exists){
-          return ref.set({ balance: 0, totalEarned: 0, totalWithdrawn: 0, label: b.label, updatedAt: nowISO() });
-        }
-        var data = snap.data() || {};
-        // Backfill lifetime totals for banks created before this feature existed.
-        if (typeof data.totalEarned !== 'number' || typeof data.totalWithdrawn !== 'number'){
-          return ref.update({
-            totalEarned: typeof data.totalEarned === 'number' ? data.totalEarned : (data.balance || 0),
-            totalWithdrawn: typeof data.totalWithdrawn === 'number' ? data.totalWithdrawn : 0
-          });
-        }
-      }).catch(function(){});
-    });
-    Promise.all(inits).then(function(){
+    // Read-only: the database blocks direct writes. Banks are created on first use by the money functions.
+    (function(){
       db.collection('buckets').onSnapshot(function(qs){
         qs.docs.forEach(function(d){
           var data = d.data() || {};
@@ -697,37 +689,34 @@
         state.positions = qs.docs.map(function(d){ var data = d.data() || {}; data.id = d.id; return data; });
         render();
       }, function(){});
-    });
+    })();
   }
 
   function applyDeposit(allocations, note){
-    var ts = nowISO();
-    var jobs = [];
+    var alloc = {};
     BUCKETS.forEach(function(b){
       var amt = round2(allocations[b.id] || 0);
-      if (amt <= 0) return;
-      var cur = state.buckets[b.id] || emptyBucket();
-      var newBal = round2(cur.balance + amt);
-      var newEarned = round2(cur.totalEarned + amt);
-      if (state.mode === 'cloud'){
-        jobs.push(
-          db.collection('buckets').doc(b.id).set({ balance:newBal, totalEarned:newEarned, totalWithdrawn:cur.totalWithdrawn, marketNet:cur.marketNet||0, label:b.label, updatedAt: ts })
-            .then(function(){ return db.collection('transactions').add({ type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts }); })
-        );
-      } else {
-        state.buckets[b.id] = { balance:newBal, totalEarned:newEarned, totalWithdrawn:cur.totalWithdrawn, marketNet:cur.marketNet||0 };
-        state.txns.unshift({ id:'local-'+Date.now()+'-'+b.id, type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts });
-      }
-      setTimeout(function(){ pulseCard(b.id); }, 60);
+      if (amt > 0) alloc[b.id] = amt;
     });
     if (state.mode === 'cloud'){
-      return Promise.all(jobs);
-    } else {
-      state.txns = state.txns.slice(0,30);
-      saveLocal();
-      render();
-      return Promise.resolve();
+      return db.rpc('piggy_deposit', { p_alloc: alloc, p_note: note || '' }).then(function(){
+        Object.keys(alloc).forEach(function(id){ setTimeout(function(){ pulseCard(id); }, 60); });
+      });
     }
+    var ts = nowISO();
+    BUCKETS.forEach(function(b){
+      var amt = alloc[b.id];
+      if (!amt) return;
+      var cur = state.buckets[b.id] || emptyBucket();
+      var newBal = round2(cur.balance + amt);
+      state.buckets[b.id] = { balance:newBal, totalEarned:round2(cur.totalEarned + amt), totalWithdrawn:cur.totalWithdrawn, marketNet:cur.marketNet||0 };
+      state.txns.unshift({ id:'local-'+Date.now()+'-'+b.id, type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts });
+      setTimeout(function(){ pulseCard(b.id); }, 60);
+    });
+    state.txns = state.txns.slice(0,30);
+    saveLocal();
+    render();
+    return Promise.resolve();
   }
 
   function applyWithdraw(bucketId, amount, note){
@@ -736,23 +725,19 @@
     if (amount <= 0 || amount > cur.balance + 0.001){
       return Promise.reject(new Error('insufficient'));
     }
-    var newBal = round2(cur.balance - amount);
-    var newWithdrawn = round2(cur.totalWithdrawn + amount);
-    var ts = nowISO();
-    var bucket = BUCKETS.filter(function(b){ return b.id === bucketId; })[0];
     if (state.mode === 'cloud'){
-      return db.collection('buckets').doc(bucketId).set({ balance:newBal, totalEarned:cur.totalEarned, totalWithdrawn:newWithdrawn, marketNet:cur.marketNet||0, label:bucket.label, updatedAt: ts })
-        .then(function(){ return db.collection('transactions').add({ type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts }); })
+      return db.rpc('piggy_withdraw', { p_bucket: bucketId, p_amount: amount, p_note: note || '' })
         .then(function(){ pulseCard(bucketId); });
-    } else {
-      state.buckets[bucketId] = { balance:newBal, totalEarned:cur.totalEarned, totalWithdrawn:newWithdrawn, marketNet:cur.marketNet||0 };
-      state.txns.unshift({ id:'local-'+Date.now(), type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts });
-      state.txns = state.txns.slice(0,30);
-      saveLocal();
-      render();
-      pulseCard(bucketId);
-      return Promise.resolve();
     }
+    var newBal = round2(cur.balance - amount);
+    var ts = nowISO();
+    state.buckets[bucketId] = { balance:newBal, totalEarned:cur.totalEarned, totalWithdrawn:round2(cur.totalWithdrawn + amount), marketNet:cur.marketNet||0 };
+    state.txns.unshift({ id:'local-'+Date.now(), type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts });
+    state.txns = state.txns.slice(0,30);
+    saveLocal();
+    render();
+    pulseCard(bucketId);
+    return Promise.resolve();
   }
 
   // ---------- market investing ----------
@@ -1085,42 +1070,32 @@
     var curB = state.buckets.save || emptyBucket(), cur = curB.balance;
     amount = round2(amount);
     if (amount <= 0 || amount > cur + 0.001) return Promise.reject(new Error('insufficient'));
-    var level = currentLevel(ix.id), newBal = round2(cur - amount), ts = nowISO();
-    var nb = { balance:newBal, totalEarned:curB.totalEarned, totalWithdrawn:curB.totalWithdrawn, marketNet:round2((curB.marketNet || 0) + amount) };
-    var pos = { index:ix.id, amount:amount, units:amount / level, buyLevel:level, status:'open', ts:ts };
-    var note = 'Invested in ' + ix.label;
+    var level = currentLevel(ix.id);
     if (state.mode === 'cloud'){
-      return db.collection('buckets').doc('save').set(Object.assign({ label:'Save', updatedAt:ts }, nb))
-        .then(function(){ return db.collection('positions').add(pos); })
-        .then(function(){ return db.collection('transactions').add({ type:'invest', bucket:'save', amount:amount, balanceAfter:newBal, note:note, ts:ts }); })
+      return db.rpc('piggy_invest', { p_index: ix.id, p_amount: amount, p_level: level })
         .then(function(){ pulseCard('save'); });
     }
+    var newBal = round2(cur - amount), ts = nowISO();
+    var nb = { balance:newBal, totalEarned:curB.totalEarned, totalWithdrawn:curB.totalWithdrawn, marketNet:round2((curB.marketNet || 0) + amount) };
     state.buckets.save = nb;
-    pos.id = 'local-pos-' + Date.now();
-    state.positions.unshift(pos);
-    state.txns.unshift({ id:'local-' + Date.now(), type:'invest', bucket:'save', amount:amount, balanceAfter:newBal, note:note, ts:ts });
+    state.positions.unshift({ id:'local-pos-' + Date.now(), index:ix.id, amount:amount, units:amount / level, buyLevel:level, status:'open', ts:ts });
+    state.txns.unshift({ id:'local-' + Date.now(), type:'invest', bucket:'save', amount:amount, balanceAfter:newBal, note:'Invested in ' + ix.label, ts:ts });
     state.txns = state.txns.slice(0, 30);
     saveLocal(); render(); pulseCard('save');
     return Promise.resolve();
   }
 
   function applySell(p){
+    if (state.mode === 'cloud'){
+      return db.rpc('piggy_sell', { p_position_id: p.id, p_level: currentLevel(p.index) })
+        .then(function(){ pulseCard('save'); });
+    }
     var ix = indexById(p.index), value = posValue(p), ts = nowISO();
     var curB = state.buckets.save || emptyBucket();
     var newBal = round2(curB.balance + value), gain = round2(value - p.amount);
-    var nb = { balance:newBal, totalEarned:curB.totalEarned, totalWithdrawn:curB.totalWithdrawn, marketNet:round2((curB.marketNet || 0) - value) };
-    var note = 'Sold ' + ix.label + ' (' + fmtSigned(gain) + ')';
-    var sold = {}; Object.keys(p).forEach(function(k){ if (k !== 'id') sold[k] = p[k]; });
-    sold.status = 'sold'; sold.soldValue = value; sold.soldTs = ts;
-    if (state.mode === 'cloud'){
-      return db.collection('buckets').doc('save').set(Object.assign({ label:'Save', updatedAt:ts }, nb))
-        .then(function(){ return db.collection('positions').doc(p.id).set(sold); })
-        .then(function(){ return db.collection('transactions').add({ type:'divest', bucket:'save', amount:value, balanceAfter:newBal, note:note, ts:ts }); })
-        .then(function(){ pulseCard('save'); });
-    }
-    state.buckets.save = nb;
+    state.buckets.save = { balance:newBal, totalEarned:curB.totalEarned, totalWithdrawn:curB.totalWithdrawn, marketNet:round2((curB.marketNet || 0) - value) };
     p.status = 'sold'; p.soldValue = value; p.soldTs = ts;
-    state.txns.unshift({ id:'local-' + Date.now(), type:'divest', bucket:'save', amount:value, balanceAfter:newBal, note:note, ts:ts });
+    state.txns.unshift({ id:'local-' + Date.now(), type:'divest', bucket:'save', amount:value, balanceAfter:newBal, note:'Sold ' + ix.label + ' (' + fmtSigned(gain) + ')', ts:ts });
     state.txns = state.txns.slice(0, 30);
     saveLocal(); render(); pulseCard('save');
     return Promise.resolve();
@@ -1163,7 +1138,7 @@
     applyInvest(ix, amount).then(function(){
       investOverlay.hidden = true;
       showToast(fmt(amount) + ' invested in ' + ix.label + '!');
-    }).catch(function(){
+    }).catch(function(e){
       investError.textContent = 'Something went wrong — try again.'; investError.hidden = false;
     }).then(function(){ btn.disabled = false; });
   });
@@ -1202,6 +1177,23 @@
   });
   document.addEventListener('visibilitychange', function(){
     if (document.visibilityState === 'visible') loadMarket(false);
+  });
+
+  // ---------- backup ----------
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    var names = ['buckets', 'transactions', 'positions'];
+    Promise.all(names.map(function(c){ return db.collection(c).get(); })).then(function(res){
+      var out = { app:'piggy-payday', exportedAt:nowISO(), docs:[] };
+      names.forEach(function(c, i){
+        res[i].docs.forEach(function(d){ out.docs.push({ collection:c, id:d.id, data:d.data() }); });
+      });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], {type:'application/json'}));
+      a.download = 'piggy-payday-backup-' + dayKey(new Date()) + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+      showToast('Backup downloaded.');
+    }).catch(function(){ showToast('Couldn\u2019t make the backup \u2014 try again.'); });
   });
 
   // ---------- deposit modal ----------

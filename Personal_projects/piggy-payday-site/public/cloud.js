@@ -51,6 +51,7 @@
       var id = newId(), self = this;
       return new Doc(this.name, id).set(data).then(function(){ return new Doc(self.name, id); });
     };
+    Coll.prototype.get = function(){ return this._fetch(); };
     Coll.prototype._fetch = function(){
       var q = sb.from('docs').select('id,data').eq('collection', this.name);
       if (this.order) q = q.order('data->>' + this.order.field, { ascending: !this.order.desc });
@@ -78,7 +79,15 @@
       };
     };
 
-    return { collection: function(name){ return new Coll(name); } };
+    // Calls a database function (all money moves). The function does its whole job atomically.
+    function rpc(fn, args){
+      return sb.rpc(fn, args).then(check).then(function(r){
+        Object.keys(listeners).forEach(notify);
+        return r.data;
+      }, function(e){ throw e; });
+    }
+
+    return { collection: function(name){ return new Coll(name); }, rpc: rpc };
   }
 
   // ---------- sign-in screen ----------

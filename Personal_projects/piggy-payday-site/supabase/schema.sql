@@ -1,4 +1,4 @@
--- Piggy Payday: run this once in Supabase -> SQL Editor.
+-- Piggy Payday: run this once in Supabase -> SQL Editor (then atomic-writes.sql, then seed.sql).
 
 -- One generic document table; the app stores buckets / transactions / positions in it.
 create table if not exists public.docs (
@@ -30,11 +30,13 @@ $$;
 revoke all on function public.is_family() from public, anon;
 grant execute on function public.is_family() to authenticated;
 
+-- Signed-in family members can READ. All writes go through the functions in atomic-writes.sql.
 drop policy if exists "family only" on public.docs;
-create policy "family only" on public.docs
-  for all to authenticated
-  using (public.is_family())
-  with check (public.is_family());
+drop policy if exists "family read" on public.docs;
+create policy "family read" on public.docs
+  for select to authenticated
+  using (public.is_family());
+revoke insert, update, delete on public.docs from anon, authenticated;
 
 -- Live sync between devices.
 alter publication supabase_realtime add table public.docs;

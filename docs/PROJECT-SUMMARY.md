@@ -13,6 +13,7 @@
 - **Waiting on:** Venkat's review of the HLD/Engineering doc + answers to its 3 open questions (contact form backend, GitHub page approach, custom domain status)
 - **Next up:** Once open questions are answered → write `4_spec.md` for the contact form (first implementation-ready piece), then `5_execution.md` task breakdown
 - **Sub-project note:** `websites/venara/` (Venara Inc site) now lives in this repo — separate page/checklist, not part of these phase gates. See `websites/venara/docs/PROJECT-SUMMARY.md`.
+- **Side project note (Piggy Payday, 2026-10-22):** `Personal_projects/piggy-payday/` (single-file chore bank) was revived and extended with a **Market Investment** section; a deployable build lives in `Personal_projects/piggy-payday-site/` (Cloudflare Pages + Supabase) at https://piggy-payday.pages.dev. Still a side project, separate from the Phase 1–5 gates; see `Personal_projects/piggy-payday-site/README.md`.
 - **Corporate structure (confirmed 2026-09-28):** Venara Inc is the parent legal entity; "Veekay Labs" is a site name operated under it. Footer copy updated in `docs/page-content.md` §18 to credit Venara Inc.
 - **Agent note:** the project-scoped **PRO** agent is retired. Say **"co-builder"** instead — a universal build-partner agent at `~/.claude/agents/co-builder.md` that works across all of Veekay's projects. Its working notes for this project live at `.claude/agent-memory/co-builder/`.
 - **Assets confirmed as build inputs (2026-09-28):** `assets/image.png` (Home page mockup), `assets/Build website from reference/src/app/App.tsx` (a near-complete built implementation of it — real content, real design tokens), `assets/Veekay Labs Type and Color Pairings.html` (font/color exploration — navy/cyan pairing confirmed selected), `assets/Veekay_AI_Product_Website_Blueprint_v1.pdf` (IA/content source). Full breakdown in `docs/build-pipeline/ROADMAP.md`'s "Reference Assets" table and `docs/design-system.md`.
@@ -20,6 +21,20 @@
 ---
 
 ## Session Log
+
+### 2026-10-22 — Piggy Payday: Market Investment + Cloudflare/Supabase deployment (side project)
+
+**Did:**
+- Added a **Market Investment** section to Piggy Payday: invest from the Save bank into the S&P 500 or NASDAQ, daily growth/loss chart (1W/1M/3M/All, hover for any day), holdings with gain/loss, sell back to Save. Uses live Yahoo Finance data when reachable, otherwise a deterministic simulated "Practice market" (badge says which). Lifetime summary gained a **Net to market** column so investing/selling never distorts earned/withdrawn.
+- Moved the app off the Claude artifact to **`Personal_projects/piggy-payday-site/`**: static page + Cloudflare Pages Function `/api/market` (price proxy, only `^GSPC`/`^IXIC` allowed) on Cloudflare Pages; data in **Supabase** (one `docs` table) with email-link sign-in locked to an `allowed_emails` list. Existing balances/history migrated via `supabase/seed.sql` (lifetime totals corrected to match history). Old artifact deleted.
+- Hardening: database functions (`supabase/atomic-writes.sql`) make every deposit/withdraw/invest/sell one locked operation that refuses overdraws, and direct table writes are blocked for signed-in users. Added in-app **Download a backup** (JSON) with a restore query in the README.
+- Tested: 32 SQL checks + backup/restore round-trip in Postgres (PGlite); data-layer unit tests; headless-Chrome click-throughs in local and cloud modes.
+
+**Decided (Venkat):** use Supabase (not D1) for storage; skip parent/kid roles for now; turn off open signups and tighten email limits in the Supabase dashboard; backups via in-app export.
+
+**Open / for Venkat:**
+- Run `supabase/atomic-writes.sql` in the Supabase SQL Editor (the new page needs it), turn off "Allow new users to sign up", set email rate limits, add any other family emails (Authentication -> Users, plus `allowed_emails`).
+- Known limits: no parent/kid roles (everyone on the allow-list has full control); the database can't verify live prices; free Supabase has no auto-backups and pauses after ~1 week idle.
 
 ### 2026-09-28 — PRO session-start audit; Venara sub-project folded in; PRO retired for co-builder; "Veekay Labs — Profile" named + roadmapped
 
