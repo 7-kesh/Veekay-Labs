@@ -33,9 +33,11 @@
 
 **Decided (Venkat):** use Supabase (not D1) for storage; skip parent/kid roles for now; turn off open signups and tighten email limits in the Supabase dashboard; backups via in-app export.
 
+**Later the same day:** `atomic-writes.sql` was run and the updated site deployed (Venkat confirmed add, withdraw, invest and sell on the live site). Live data was then cleaned to **real money only** at Venkat's request (test history deleted; Save $3.70, Gift $2.00, Spend $6.00; 5 real transactions); `seed.sql` now holds only that data. Full detail in `Personal_projects/piggy-payday-site/docs/PROJECT-SUMMARY.md`.
+
 **Open / for Venkat:**
-- Run `supabase/atomic-writes.sql` in the Supabase SQL Editor (the new page needs it), turn off "Allow new users to sign up", set email rate limits, add any other family emails (Authentication -> Users, plus `allowed_emails`).
-- Known limits: no parent/kid roles (everyone on the allow-list has full control); the database can't verify live prices; free Supabase has no auto-backups and pauses after ~1 week idle.
+- Partner's first sign-in (Supabase email rate limit), then turn off "Allow new users to sign up"; verify the stray "Worth now $1.00" tile is gone.
+- Known limits: no parent/kid roles (everyone on the allow-list has full control), so no child login yet; the database can't verify live prices; free Supabase has no auto-backups (use the in-app Download a backup) and pauses after ~1 week idle.
 
 ### 2026-10-22 — Trading-Journal built (side project under Personal_projects)
 

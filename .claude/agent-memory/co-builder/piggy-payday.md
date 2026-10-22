@@ -11,9 +11,11 @@ metadata:
 
 **What it is:** Veekay's family chore bank. Weekly earnings are split into Save / Gift / Spend piggy banks; withdraw any time, never move between banks. **Market Investment** puts Save money into the S&P 500 or NASDAQ (live Yahoo prices through a Cloudflare Pages Function, else a deterministic simulated "Practice market"), with a growth chart, holdings, and sell-back to Save. Lives at https://piggy-payday.pages.dev/ ; data in Supabase (`wjlynndfylepjkbulwrv`); email-link sign-in locked to an `allowed_emails` list.
 
+**Data state (2026-10-22):** cleaned to real money only: Save $3.70, Gift $2.00, Spend $6.00, 5 transactions (Oct 4 and Oct 11 deposits), withdrawn 0, no investments. Test rounds from Sept 18-19 and the live-site tests were deleted at Veekay's request. Lifetime totals are derived from the transaction history (earned = deposits, withdrawn = withdrawals, marketNet = invest minus divest). Unverified: a "Worth now $1.00" tile Veekay saw before cleanup with no investment; check it's gone.
+
 **Decisions Veekay made:** Supabase (not Cloudflare D1) for storage because he already had an account; money moves as atomic DB functions with direct writes blocked; parent/kid roles deferred; turn off open signups; backups via in-app JSON export; delete the old Claude artifact; push once working.
 
-**Open (waiting on Veekay):** partner's first sign-in (Supabase built-in email hit its rate limit; retry later), then turn OFF "Allow new users to sign up" and verify via `/auth/v1/settings`; confirm the lifetime-totals correction SQL was run on the live DB (seed.sql is corrected but the live rows may still be stale); whether to build parent/kid roles before a child gets a login.
+**Open (waiting on Veekay):** partner's first sign-in (Supabase built-in email hit its rate limit; retry later), then turn OFF "Allow new users to sign up" and verify via `/auth/v1/settings`; whether to build parent/kid roles before a child gets a login.
 
 **Gotchas (learned the hard way):**
 - Supabase default **Site URL is localhost:3000**: emailed links break until Site URL + Redirect URL are set to the Pages URL.
@@ -21,8 +23,9 @@ metadata:
 - Probing PostgREST: send the function's real parameter names. `{}` returns PGRST202 "not found" even when it exists (caused a false alarm and a premature deploy decision).
 - Order of operations: SQL first, deploy immediately after; old and new app versions break against the other's database state.
 - `wrangler pages deploy` needs the project created first. The Cloudflare dashboard list can lag behind the CLI.
+- Keep tests off the live DB: lifetime totals include any test activity (we had to delete it by SQL, since the app can't delete rows).
 - Everyone on the allow-list has full control and the DB can't verify live prices. Don't give a child his own login yet.
 
-**Pick up next:** (1) ask if the partner signed in; verify signups are off; (2) confirm the totals-fix SQL ran; (3) offer parent/kid roles; (4) optional hardening: custom SMTP, SRI hash + CSP header, GitHub-connected Pages deploys; delete the superseded `piggy-payday/` copy.
+**Pick up next:** (1) ask if the partner signed in; verify signups are off; (2) confirm the "Worth now" tile is gone and the app shows real data; (3) offer parent/kid roles; (4) optional hardening: custom SMTP, SRI hash + CSP header, GitHub-connected Pages deploys; delete the superseded `piggy-payday/` copy.
 
 Related: [project-context](project-context.md) for the main platform; root `docs/PROJECT-SUMMARY.md` has a 2026-10-22 entry for this work.
