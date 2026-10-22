@@ -14,9 +14,9 @@ def _tag(s):
     return re.sub(r"\s*\(.*$", "", s).strip()  # drop notes like "(tag to confirm)"
 
 
-def _item(title, evidence, action, cost=None, n=0, kind="rule"):
+def _item(title, evidence, action, cost=None, n=0, kind="rule", directive=None):
     return {"title": title, "evidence": evidence, "action": action, "cost": round(cost, 2) if cost else None,
-            "n": n, "kind": kind}
+            "n": n, "kind": kind, "directive": directive or title}
 
 
 def _finish(items, total_loss):
@@ -24,8 +24,35 @@ def _finish(items, total_loss):
     for i, it in enumerate(items[:6], 1):
         it["rank"] = i
         c = it["cost"] or 0
-        it["severity"] = "high" if c >= 50 or (total_loss and c >= 0.25 * total_loss) else ("med" if c > 0 else "low")
+        share = c / total_loss if total_loss else 0
+        # Impact is judged on the data: dollars lost, and how much of all losses this one problem explains.
+        it["severity"] = "high" if c >= 100 or share >= 0.25 else ("med" if c >= 40 or share >= 0.10 else "low")
+        it["share"] = round(100 * share) if c else None
+        it["per"] = round(c / it["n"], 2) if c and it["n"] else None
     return items[:6]
+
+
+def focus(items, m, limit=3, area=None):
+    """The few specific things to stop or start now: behaviours that cost money, worst first.
+
+    Narrow on purpose: umbrella items (which just restate the sub-items) are skipped, so are items touching
+    more than 35% of all trades (too broad to be one habit), and items that repeat another item's trades.
+    """
+    out, seen = [], set()
+    for it in items:
+        if it["kind"] not in ("rule", "behaviour") or not it["cost"] or len(out) >= limit:
+            continue
+        if m["n"] and it["n"] > 0.35 * m["n"] and m["n"] >= 10:
+            continue
+        sig = (it["n"], it["cost"])
+        if sig in seen:
+            continue
+        seen.add(sig)
+        out.append({
+            "rank": len(out) + 1, "directive": it["directive"], "impact": it["severity"], "area": area,
+            "n": it["n"], "cost": it["cost"], "per": it["per"], "share": it["share"], "action": it["action"],
+            "after": round(m["net"] + it["cost"], 2), "net": m["net"]})
+    return out
 
 
 def scalp_areas(rows, settings, m):
@@ -44,7 +71,7 @@ def scalp_areas(rows, settings, m):
                 sum(1 for r in judged if r["entry_valid"] == "N"), len(judged), len(bad), _usd(net),
                 (", against %s over %d valid entries" % (_usd(sum(r["net_pnl"] for r in good)), len(good))) if good else ""),
             "Take a trade only when every gate passes. If one fails, skip it and wait for the next setup.",
-            cost=-net if net < 0 else None, n=len(bad)))
+            cost=-net if net < 0 else None, n=len(bad), kind="umbrella", directive="Skip any trade where a gate fails"))
 
     by_tag = defaultdict(list)
     for r in known:
@@ -55,7 +82,7 @@ def scalp_areas(rows, settings, m):
             items.append(_item(
                 "Violation: " + t, "Tagged on %d trades with results; together they netted %s." % (len(vals), _usd(sum(vals))),
                 config.VIOLATION_ACTIONS.get(t, "Review these trades and add a rule or checklist step that prevents the repeat."),
-                cost=-sum(vals), n=len(vals)))
+                cost=-sum(vals), n=len(vals), directive=config.VIOLATION_DIRECTIVES.get(t, "Stop: " + t.lower())))
 
     ex_bad = [r for r in known if r["exit_valid"] == "N"]
     ex_judged = [r for r in rows if r["exit_valid"] in ("Y", "N")]
@@ -66,7 +93,7 @@ def scalp_areas(rows, settings, m):
             "%d of %d judged exits were invalid (early, emotional or off-plan). Those trades netted %s." % (
                 sum(1 for r in ex_judged if r["exit_valid"] == "N"), len(ex_judged), _usd(net)),
             "Scale out about 25% of the remaining position at the peak, then manage candle by candle. Exit early only on objective deterioration.",
-            cost=-net if net < 0 else None, n=len(ex_bad)))
+            cost=-net if net < 0 else None, n=len(ex_bad), directive="Follow the exit plan: 25% scale-outs, then candle by candle"))
 
     risk = calc.num(settings.get("scalp_risk_dollars"), 20)
     big = [r for r in known if r["net_pnl"] < -risk]
@@ -76,7 +103,7 @@ def scalp_areas(rows, settings, m):
             "Losses bigger than 1R (%s)" % _usd(risk),
             "%d losses exceeded 1R, by %s in total. The worst was %s." % (len(big), _usd(excess), _usd(min(r["net_pnl"] for r in known))),
             "Put the stop order in at entry and size so a stop-out costs no more than 1R. Do not hold or average down through the stop.",
-            cost=excess, n=len(big)))
+            cost=excess, n=len(big), directive="Cap every loss at 1R (%s)" % _usd(risk)))
 
     emo = defaultdict(list)
     for r in known:
@@ -86,7 +113,7 @@ def scalp_areas(rows, settings, m):
         if len(vals) >= 3 and sum(vals) < 0 and t != "Calm / planned":
             items.append(_item("Emotion: " + t, "Tagged on %d trades; together they netted %s." % (len(vals), _usd(sum(vals))),
                                "Name the trigger before the next trade (a hard rule such as 'no re-entry for 5 minutes after a loss'), and stop for the day if it repeats.",
-                               cost=-sum(vals), n=len(vals), kind="behaviour"))
+                               cost=-sum(vals), n=len(vals), kind="behaviour", directive="Don't trade while feeling: " + t.lower()))
 
     by_setup = defaultdict(list)
     for r in known:
@@ -96,7 +123,7 @@ def scalp_areas(rows, settings, m):
         if len(vals) >= 5 and sum(vals) < 0:
             items.append(_item("Setup %s is losing money" % s, "%d trades, net %s." % (len(vals), _usd(sum(vals))),
                                "Review these trades against the setup definition. Trade it smaller, or pause it, until the entries match the rule.",
-                               cost=-sum(vals), n=len(vals)))
+                               cost=-sum(vals), n=len(vals), directive="Pause or shrink Setup %s until entries match the rule" % s))
 
     buckets = defaultdict(list)
     for r in known:
@@ -107,13 +134,13 @@ def scalp_areas(rows, settings, m):
     if worst and worst[0][0] < -30:
         items.append(_item("Time of day: entries from %s" % worst[0][1], "%d trades in that half hour netted %s." % (worst[0][2], _usd(worst[0][0])),
                            "Be pickier in that window, or sit it out. Check whether the setups there are lower quality.",
-                           cost=-worst[0][0], n=worst[0][2], kind="behaviour"))
+                           cost=-worst[0][0], n=worst[0][2], kind="behaviour", directive="Be selective with entries from %s" % worst[0][1]))
 
     if m.get("breakeven_win_pct") and m["win_pct"] < m["breakeven_win_pct"]:
         items.append(_item("Win rate is below break-even",
                            "You win %.0f%% but need %.0f%% at the current average win (%s) and loss (%s)." % (
                                m["win_pct"], m["breakeven_win_pct"], _usd(m["avg_win"]), _usd(m["avg_loss"])),
-                           "Raise the win rate by skipping invalid entries, or raise the average win with the scale-out plan.", n=m["n"]))
+                           "Raise the win rate by skipping invalid entries, or raise the average win with the scale-out plan.", n=m["n"], kind="outcome"))
 
     nostop = [r for r in rows if r["stop"] is None]
     if len(nostop) >= 5:
@@ -132,9 +159,9 @@ def plan_areas(kind, plans, settings, m):
         yes = [p for p in closed if p[col] == "Y"]
         return no, yes
 
-    for col, title, action in (
-            ("exit_followed", "Exits that break the plan", "Decide the exit before entering and set the stop and target orders at entry. If the setup is invalid, exit by the rule, not by feel."),
-            ("entry_followed", "Entries that skip the checklist", "Do not enter until every checklist item is ticked, including the entry trigger.")):
+    for col, title, action, directive in (
+            ("exit_followed", "Exits that break the plan", "Decide the exit before entering and set the stop and target orders at entry. If the setup is invalid, exit by the rule, not by feel.", "Exit only at target, stop or a written invalidation"),
+            ("entry_followed", "Entries that skip the checklist", "Do not enter until every checklist item is ticked, including the entry trigger.", "Tick the whole checklist before you enter")):
         no, yes = split(col)
         if no:
             net = sum(p["realized_pl"] for p in no)
@@ -143,7 +170,7 @@ def plan_areas(kind, plans, settings, m):
                 ev += ", against %s over %d that did." % (_usd(sum(p["realized_pl"] for p in yes)), len(yes))
             else:
                 ev += "."
-            items.append(_item(title, ev, action, cost=-net if net < 0 else None, n=len(no)))
+            items.append(_item(title, ev, action, cost=-net if net < 0 else None, n=len(no), directive=directive))
 
     bad_exit = defaultdict(list)
     for p in closed:
@@ -153,14 +180,14 @@ def plan_areas(kind, plans, settings, m):
     for k, vals in bad_exit.items():
         items.append(_item("Exit style: " + labels[k].lower(), "%d trade(s), net %s." % (len(vals), _usd(sum(vals))),
                            "Use predefined exits only: planned target, planned stop, or a written invalidation rule.",
-                           cost=-sum(vals) if sum(vals) < 0 else None, n=len(vals), kind="behaviour"))
+                           cost=-sum(vals) if sum(vals) < 0 else None, n=len(vals), kind="behaviour", directive="No exits by " + {"panic": "panic", "held": "holding past the stop", "early": "taking profit early out of comfort"}[k]))
 
     over = [p for p in closed if p["planned_loss"] and p["realized_pl"] < 0 and -p["realized_pl"] > p["planned_loss"]]
     if over:
         extra = sum(-p["realized_pl"] - p["planned_loss"] for p in over)
         items.append(_item("Losses bigger than planned", "%d trade(s) lost more than the planned loss, by %s in total." % (len(over), _usd(extra)),
                            "Honor the stop. If a stop is not going to be honored, size the trade smaller so the real risk matches the plan.",
-                           cost=extra, n=len(over)))
+                           cost=extra, n=len(over), directive="Honor the stop on every trade"))
 
     overbudget = []
     for p in plans:
@@ -170,7 +197,7 @@ def plan_areas(kind, plans, settings, m):
         items.append(_item("Plans over the risk budget", "%d of %d plans risk more than the %s%% budget (largest planned loss %s)." % (
             len(overbudget), len(plans), _usd(0) if False else "%g" % overbudget[0]["risk_pct"], _usd(max(p["planned_loss"] for p in overbudget))),
             "Use the Max %s figure in the forecast row, or move the stop, before you enter." % ("contracts" if kind == "options" else "shares"),
-            n=len(overbudget)))
+            n=len(overbudget), kind="data", directive="Size every plan within the risk budget"))
 
     if m.get("avg_win_r") is not None and closed:
         plan_rr = [p["rr"] for p in closed if p["rr"]]
@@ -179,7 +206,7 @@ def plan_areas(kind, plans, settings, m):
             items.append(_item("Realized R is far below planned R",
                                "You plan about %.2fR and realize about %.2fR on average." % (sum(plan_rr) / len(plan_rr), sum(real_r) / len(real_r)),
                                "Targets may be too far or exits too early. Compare the planned target with where price actually turned, and adjust the plan or hold to it.",
-                               n=len(closed)))
+                               n=len(closed), kind="outcome"))
 
     skipped = defaultdict(int)
     names = dict(config.OPTIONS_CHECKLIST if kind == "options" else config.SWING_CHECKLIST)
@@ -194,12 +221,12 @@ def plan_areas(kind, plans, settings, m):
     if skipped:
         k, c = max(skipped.items(), key=lambda kv: kv[1])
         items.append(_item("Checklist step skipped most often", "\"%s\" was not ticked on %d entered trade(s)." % (names.get(k, k), c),
-                           "Make this the step you do first, before the chart looks exciting.", n=c, kind="behaviour"))
+                           "Make this the step you do first, before the chart looks exciting.", n=c, kind="behaviour", directive="Never skip: " + names.get(k, k).split(":")[0].lower()))
 
     if m.get("breakeven_win_pct") and m["win_pct"] < m["breakeven_win_pct"]:
         items.append(_item("Win rate is below break-even", "You win %.0f%% but need %.0f%% at the current average win (%s) and loss (%s)." % (
             m["win_pct"], m["breakeven_win_pct"], _usd(m["avg_win"]), _usd(m["avg_loss"])),
-            "Either raise the win rate with stricter entries, or widen the reward-to-risk of each plan.", n=m["n"]))
+            "Either raise the win rate with stricter entries, or widen the reward-to-risk of each plan.", n=m["n"], kind="outcome"))
 
     stale = [p for p in plans if p["status"] in ("planned", "open") and p["plan_date"]]
     from datetime import date

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_stats_macros.html" import rate, usd, filters, kpis, focus_block, areas_block, chart_block with context %}
+{% block title %}{{ kind_label[kind] }} stats{% endblock %}
+{% block body %}
+<div class="head"><h1>{{ kind_label[kind] }} stats</h1>{{ filters() }}</div>
+
+{{ focus_block(kind) }}
+{{ areas_block(kind) }}
+{{ chart_block(kind, kind_label[kind]) }}
+
+{% if kind == 'scalp' %}
+<section class="card"><h2>Scalp detail</h2>
+  <div class="tiles">
+    <div class="tile"><span>Entries valid</span><b>{{ rate(scalp.entry_ok) }}</b></div>
+    <div class="tile"><span>Exits valid</span><b>{{ rate(scalp.exit_ok) }}</b></div>
+    <div class="tile"><span>Average R</span><b>{{ scalp.avg_r|num if scalp.avg_r is not none else '–' }}</b></div>
+    <div class="tile"><span>Trades without P&amp;L</span><b>{{ scalp.n - scalp.known }}</b></div>
+  </div>
+  <div class="cols">
+    <div><h3>By category</h3><table class="dense"><tbody>{% for k, v in scalp.categories %}<tr><td>{{ cfg.CATEGORIES.get(k, k) }}</td><td>{{ v }}</td></tr>{% endfor %}</tbody></table></div>
+    <div><h3>By setup</h3><table class="dense"><thead><tr><th>Setup</th><th>Trades</th><th>Wins</th><th>Net</th></tr></thead><tbody>
+      {% for k, (cnt, w, net) in by_setup %}<tr><td>{{ k }}</td><td>{{ cnt }}</td><td>{{ w }}</td><td class="{{ net|signclass }}">{{ net|money }}</td></tr>{% endfor %}</tbody></table></div>
+    <div><h3>Top violations</h3><table class="dense"><tbody>{% for k, v in scalp.violations %}<tr><td>{{ k }}</td><td>{{ v }}</td></tr>{% else %}<tr><td class="muted">none tagged</td></tr>{% endfor %}</tbody></table></div>
+    <div><h3>Emotions</h3><table class="dense"><tbody>{% for k, v in scalp.emotions %}<tr><td>{{ k }}</td><td>{{ v }}</td></tr>{% else %}<tr><td class="muted">none tagged</td></tr>{% endfor %}</tbody></table></div>
+  </div>
+  <h3>By week</h3>
+  <table class="dense"><thead><tr><th>Week of</th><th>Trades</th><th>Net</th><th></th></tr></thead><tbody>
+  {% set mx = (by_week|map(attribute='1.1')|map('abs')|list|max) if by_week else 1 %}
+  {% for wk, (cnt, net) in by_week %}<tr><td>{{ wk }}</td><td>{{ cnt }}</td><td class="{{ net|signclass }}">{{ net|money }}</td>
+  <td class="barcell"><span class="bar {{ 'neg' if net < 0 else 'pos' }}" style="width: {{ (100 * (net|abs) / (mx or 1))|round|int }}%"></span></td></tr>{% endfor %}</tbody></table>
+</section>
+{% else %}{% set s = plans[kind] %}
+<section class="card"><h2>{{ kind_label[kind] }} detail</h2>
+  <div class="tiles">
+    <div class="tile"><span>Plans</span><b>{{ s.n }}</b><small>{{ s.open }} waiting for actuals</small></div>
+    <div class="tile"><span>Planned vs realized R</span><b>{{ s.avg_plan_rr|num if s.avg_plan_rr is not none else '–' }} → {{ s.avg_r|num if s.avg_r is not none else '–' }}</b></div>
+    <div class="tile"><span>Entry followed</span><b>{{ rate(s.entry_ok) }}</b></div>
+    <div class="tile"><span>Exit followed</span><b>{{ rate(s.exit_ok) }}</b></div>
+  </div>
+  {% if s.scenarios %}<h3>How exits happened</h3><table class="dense"><tbody>{% for k, v in s.scenarios %}<tr><td>{{ scenario_label.get(k, k) }}</td><td>{{ v }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+</section>
+{% endif %}
+
+<script id="chartdata" type="application/json">{{ charts|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='charts.js') }}"></script>{% endblock %}

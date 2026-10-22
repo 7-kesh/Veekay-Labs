@@ -39,11 +39,12 @@ Single user, a hands-on AI PM who paper-trades small-cap scalps (1-minute charts
 | Swing | Plan before entry | Same as options |
 | Futures | n/a | "Coming soon" placeholder |
 
-Supporting pages: Today (what is waiting for actuals), Stats, Settings.
+Navigation is a left sidebar: Today (what is waiting for actuals); Journal (Scalp, Options, Swing, Futures); Stats (Portfolio plus one page per trade type); Settings.
 
 ## 6. Functional requirements
 
 **Entry (all sections)**
+- F0. Sidebar navigation with a colour per area; collapses to a top bar on narrow screens.
 - F1. Rows laid out left to right, numbered, with a label rail; Tab moves along a row; Cmd/Ctrl+Enter saves; sticky save bar; sticky in-page jump tabs.
 - F2. Every entry has an Account field: Paper or Live (default Paper).
 - F3. Section colours: Scalp blue, Options violet, Swing teal, Futures amber.
@@ -59,10 +60,12 @@ Supporting pages: Today (what is waiting for actuals), Stats, Settings.
 - F9. Entry checklist from the sheet; actuals for entry and exit; exit scenario (target, stop, invalidated, panic, held past stop, early) suggests "exit followed".
 - F10. Status derives from the data: planned, open, closed (or cancelled). A plan-vs-actual table shows entry slippage, where the exit landed against stop/target, realized P/L, ROI and R, and flags losses beyond the plan.
 
-**Stats**
-- F11. Tabs per section. Per tab: tiles (net, win %, loss %, average win/loss, win-to-loss size, profit factor, expectancy); cumulative P&L; P&L per trade; win/loss split; win rate vs break-even rate; winning-vs-losing margins; size distribution; written analysis; table view.
-- F12. Filters: period (week, month, 30 days, all) and account (paper, live, both).
-- F13. "Key areas to improve" at the top of each tab: up to six items ranked by dollar cost, each with evidence and an action drawn from the rules; costs overlap and are labelled as not additive.
+**Stats** (Portfolio and one page per trade type, each its own URL)
+- F11. Per-type page: tiles (net, win %, loss %, average win/loss, win-to-loss size, profit factor, expectancy); cumulative P&L; P&L per trade; win/loss split; win rate vs break-even rate; winning-vs-losing margins; size distribution; written analysis; table view.
+- F12. Filters: period (week, month, 30 days, all) and account (paper, live, both); both carry across stats pages.
+- F13. **Focus now** at the top of each page: up to three narrow, specific habits to stop or start (for example "Avoid extended entries"), each with impact (High/Medium/Low) judged from the data: trades affected, dollars lost, share of all losses, and net if those trades had been skipped. Umbrella items, items touching more than 35% of trades, and items repeating another item's trades are excluded.
+- F13b. **Key areas to improve** below it: the broader ranked list (up to six), with evidence and an action drawn from the rules; costs overlap and are labelled as not additive.
+- F13c. **Portfolio page**: combined result, biggest leaks across all areas, a table with every area side by side plus an all-areas total, cumulative P&L by area, net P&L and trade count by area, and a summary card per area.
 
 **Claude review**
 - F14. Per trade: paste screenshots (paste, drop or pick; shrunk in the browser), paste broker order text, then "Review with Claude" (API) or "Copy review packet" (no key). The review uses `rules/*.md` as the rubric and is saved with the trade.

@@ -1,0 +1,93 @@
+{# Import with context: these read charts/areas/focus from the page. #}
+{% macro rate(r) %}{{ (r.pct ~ '%  (' ~ r.y ~ '/' ~ r.of ~ ')') if r.pct is not none else '–' }}{% endmacro %}
+{% macro usd(v) %}{{ v|money if v is not none else '–' }}{% endmacro %}
+
+{% macro filters() %}
+<form method="get" class="filters" style="margin:0">
+  <select name="account" onchange="this.form.submit()">
+    {% for v, l in (('all','Paper + live'),('paper','Paper only'),('live','Live only')) %}<option value="{{ v }}" {{ 'selected' if account == v }}>{{ l }}</option>{% endfor %}</select>
+  <select name="period" onchange="this.form.submit()">
+    {% for v, t in (('week','This week'),('month','This month'),('30d','Last 30 days'),('all','All time')) %}<option value="{{ v }}" {{ 'selected' if period == v }}>{{ t }}</option>{% endfor %}</select>
+</form>
+{% endmacro %}
+
+{% macro kpis(m) %}
+<div class="tiles">
+  <div class="tile {{ 'k-pos' if m.net > 0 else ('k-neg' if m.net < 0 else '') }}"><span>Net P&amp;L</span><b class="{{ m.net|signclass }}">{{ m.net|money or '$0.00' }}</b><small>{{ m.n }} closed trades</small></div>
+  <div class="tile k-pos"><span>Win %</span><b>{{ (m.win_pct|num ~ '%') if m.win_pct is not none else '–' }}</b><small>▲ {{ m.wins }} wins</small></div>
+  <div class="tile k-neg"><span>Loss %</span><b>{{ (m.loss_pct|num ~ '%') if m.loss_pct is not none else '–' }}</b><small>▼ {{ m.losses }} losses{{ ' · ' ~ m.flat ~ ' flat' if m.flat }}</small></div>
+  <div class="tile k-pos"><span>Average win</span><b>{{ usd(m.avg_win) }}</b><small>best {{ usd(m.best) }}</small></div>
+  <div class="tile k-neg"><span>Average loss</span><b>{{ usd(m.avg_loss) }}</b><small>worst {{ usd(m.worst) }}</small></div>
+  <div class="tile"><span>Win ÷ loss size</span><b>{{ (m.payoff|num ~ '×') if m.payoff is not none else '–' }}</b><small>avg win vs avg loss</small></div>
+  <div class="tile"><span>Profit factor</span><b>{{ m.profit_factor|num if m.profit_factor is not none else '–' }}</b><small>gross profit ÷ gross loss</small></div>
+  <div class="tile"><span>Expectancy</span><b class="{{ (m.expectancy or 0)|signclass }}">{{ usd(m.expectancy) }}</b><small>per trade</small></div>
+</div>
+{% endmacro %}
+
+{# The narrow list: specific things to stop or start, with impact judged from the data. #}
+{% macro focus_list(items, show_area=false) %}
+<ol class="focuslist">
+  {% for f in items %}
+  <li class="focus-item imp-{{ f.impact }}">
+    <div class="rk">{{ f.rank }}</div>
+    <div class="fb">
+      <div class="fd">{% if show_area and f.area %}<span class="areatag at-{{ f.area }}">{{ kind_label[f.area] }}</span>{% endif %}{{ f.directive }}</div>
+      <div class="fm"><span class="impact imp-{{ f.impact }}">{{ {'high':'High','med':'Medium','low':'Low'}[f.impact] }} impact</span>
+        {{ f.n }} trade{{ 's' if f.n != 1 }} · <b>{{ f.cost|money }}</b> lost{% if f.per %} · {{ f.per|money }} per trade{% endif %}{% if f.share %} · {{ f.share }}% of all losses{% endif %}</div>
+      <div class="fx">Had you skipped these: net {{ f.net|money }} → <b>{{ f.after|money }}</b></div>
+      <div class="fa"><b>How:</b> {{ f.action }}</div>
+    </div>
+  </li>{% endfor %}
+</ol>
+{% endmacro %}
+
+{% macro focus_block(kind) %}
+<section class="card focus"><h2>Focus now <small class="muted">the specific things costing you most, judged from your own data</small></h2>
+  {% if focus[kind] %}{{ focus_list(focus[kind]) }}
+  <p class="muted note">Each item is measured on its own trades, so the savings overlap and should not be added together.</p>
+  {% else %}<p class="muted">No single behaviour stands out yet. This fills in once there are about 5 or more closed, tagged trades.</p>{% endif %}
+</section>
+{% endmacro %}
+
+{% macro areas_block(kind) %}{% set a = areas[kind] %}
+<section class="card areas"><h2>Key areas to improve <small class="muted">overall, ranked by what they cost you</small></h2>
+{% if a %}<div class="areagrid">
+  {% for it in a %}<article class="area-card sev-{{ it.severity }}">
+    <div class="rk">{{ it.rank }}</div>
+    <div class="body"><h4>{{ it.title }}</h4>
+      <p class="ev">{{ it.evidence }}</p><p class="ac"><b>Do this:</b> {{ it.action }}</p></div>
+    {% if it.cost %}<div class="cost"><span>costs</span><b>{{ it.cost|money }}</b></div>{% endif %}
+  </article>{% endfor %}
+</div>{% else %}<p class="muted">Nothing flagged yet. This fills in once there are enough closed, tagged trades (about 5 or more).</p>{% endif %}
+</section>{% endmacro %}
+
+{% macro chart_block(kind, title) %}
+{% set c = charts[kind] %}
+{% if c.m.n == 0 %}
+<section class="card"><p class="muted">No closed {{ title|lower }} trades with a P&amp;L in this period yet. Charts appear once trades have results.</p></section>
+{% else %}
+{{ kpis(c.m) }}
+<div class="chartgrid">
+  <section class="card wide"><h2>Cumulative P&amp;L <small class="muted">running total, trade by trade</small></h2>
+    <div class="chart" data-chart="equity" data-kind="{{ kind }}" role="img" aria-label="Cumulative P&amp;L line chart for {{ title }}"></div></section>
+  <section class="card wide"><h2>P&amp;L per trade <small class="muted">▲ wins above the line, ▼ losses below</small></h2>
+    <div class="chart" data-chart="bars" data-kind="{{ kind }}" role="img" aria-label="Profit and loss of each {{ title }} trade"></div></section>
+  <section class="card"><h2>Win % and loss %</h2>
+    <div class="chart" data-chart="split" data-kind="{{ kind }}" role="img" aria-label="Share of winning and losing trades"></div>
+    <h3>Win rate: yours vs the rate you need</h3>
+    <div class="chart" data-chart="needed" data-kind="{{ kind }}" role="img" aria-label="Actual win rate versus break-even win rate"></div></section>
+  <section class="card"><h2>Winning vs losing margins</h2>
+    <div class="chart" data-chart="margins" data-kind="{{ kind }}" role="img" aria-label="Average and largest win compared with average and largest loss"></div></section>
+  <section class="card wide"><h2>How big are the wins and losses? <small class="muted">trades grouped by P&amp;L size</small></h2>
+    <div class="chart" data-chart="hist" data-kind="{{ kind }}" role="img" aria-label="Distribution of trade results"></div></section>
+</div>
+<section class="card"><h2>Analysis</h2>
+  <ul class="insights">{% for line in c.insights %}<li>{{ line }}</li>{% endfor %}</ul>
+  <details><summary>Table view</summary>
+    <div class="scroll" style="max-height:340px;overflow:auto"><table class="dense"><thead><tr><th>#</th><th>Date</th><th>Trade</th><th>P&amp;L</th><th>Cumulative</th></tr></thead><tbody>
+    {% for p in c.points %}<tr class="{{ 'win' if p.pnl > 0 else ('loss' if p.pnl < 0 else '') }}"><td>{{ p.i }}</td><td>{{ p.date }}</td><td>{{ p.label }}</td>
+      <td class="{{ p.pnl|signclass }}">{{ p.pnl|money }}</td><td class="{{ p.cum|signclass }}">{{ p.cum|money }}</td></tr>{% endfor %}
+    </tbody></table></div></details>
+</section>
+{% endif %}
+{% endmacro %}

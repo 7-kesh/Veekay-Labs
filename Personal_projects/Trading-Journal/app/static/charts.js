@@ -35,7 +35,7 @@
       var line = document.createElement('div');
       var v = document.createElement('span'); v.className = 'tv'; v.textContent = r.value; line.appendChild(v);
       var l = document.createElement('span'); l.className = 'tl';
-      if (keyed) { var k = document.createElement('i'); k.className = 'tk'; l.appendChild(k); }
+      if (keyed) { var k = document.createElement('i'); k.className = 'tk'; if (r.color) k.style.borderTopColor = r.color; l.appendChild(k); }
       l.appendChild(document.createTextNode(r.label)); line.appendChild(l);
       tip.appendChild(line);
     });
@@ -178,6 +178,81 @@
     }
   };
 
+
+  var AREA = { scalp: ['Scalp', 'var(--c-scalp)'], options: ['Options', 'var(--c-options)'], swing: ['Swing', 'var(--c-swing)'], total: ['All areas', 'var(--ink)'] };
+  function dayMs(d) { return Date.parse(d + 'T00:00:00'); }
+  Object.assign(charts, {
+    // One line per trade type plus the combined total, on a shared date axis.
+    multi: function (host, d) {
+      var keys = ['scalp', 'options', 'swing', 'total'].filter(function (k) { return d.series[k] && d.series[k].length; });
+      var all = [].concat.apply([], keys.map(function (k) { return d.series[k]; }));
+      var t0 = Math.min.apply(null, all.map(function (p) { return dayMs(p.date); })), t1 = Math.max.apply(null, all.map(function (p) { return dayMs(p.date); }));
+      var vals = all.map(function (p) { return p.cum; });
+      var ticks = niceTicks(Math.min(0, Math.min.apply(null, vals)), Math.max(0, Math.max.apply(null, vals)), 4);
+      var f = frame(host, 290, { l: 56, r: 76, t: 14, b: 30 }), svg = f.svg, ymin = ticks[0], ymax = ticks[ticks.length - 1];
+      var y = function (v) { return f.m.t + f.ih - (v - ymin) / (ymax - ymin) * f.ih; };
+      var x = function (ms) { return f.m.l + (t1 > t0 ? (ms - t0) / (t1 - t0) : 0.5) * f.iw; };
+      yAxis(f, svg, ticks, y, compact);
+      [t0, t0 + (t1 - t0) / 2, t1].forEach(function (ms, i) {
+        el('text', { x: x(ms), y: f.H - 8, 'text-anchor': i === 0 ? 'start' : (i === 2 ? 'end' : 'middle') }, svg, new Date(ms).toISOString().slice(5, 10));
+      });
+      var lastY = [];
+      keys.forEach(function (k) {
+        var pts = d.series[k], path = pts.map(function (p, i) { return (i ? 'L' : 'M') + x(dayMs(p.date)).toFixed(1) + ',' + y(p.cum).toFixed(1); }).join('');
+        el('path', { d: path, class: 'ln', style: 'stroke:' + AREA[k][1] + (k === 'total' ? ';stroke-width:3' : '') }, svg);
+        var last = pts[pts.length - 1], ly = y(last.cum);
+        el('circle', { cx: x(dayMs(last.date)), cy: ly, r: 4, class: 'dot', style: 'fill:' + AREA[k][1] }, svg);
+        if (lastY.every(function (v) { return Math.abs(v - ly) > 13; })) {   // direct label only where it does not collide
+          lastY.push(ly); el('text', { x: x(dayMs(last.date)) + 9, y: ly + 4, class: 'val' }, svg, usd(last.cum, 0));
+        }
+      });
+      var cross = el('line', { y1: f.m.t, y2: f.m.t + f.ih, class: 'cross' }, svg); cross.style.display = 'none';
+      var hit = el('rect', { x: f.m.l, y: f.m.t, width: f.iw, height: f.ih, class: 'hit' }, svg);
+      var dates = Array.from(new Set(all.map(function (p) { return p.date; }))).sort();
+      function valueAt(k, date) { var v = null; d.series[k].forEach(function (p) { if (p.date <= date) v = p.cum; }); return v; }
+      hit.addEventListener('pointermove', function (e) {
+        var r = svg.getBoundingClientRect(), px = (e.clientX - r.left) * (f.W / r.width), ms = t0 + (px - f.m.l) / f.iw * (t1 - t0);
+        var best = dates.reduce(function (a, b) { return Math.abs(dayMs(b) - ms) < Math.abs(dayMs(a) - ms) ? b : a; });
+        cross.setAttribute('x1', x(dayMs(best))); cross.setAttribute('x2', x(dayMs(best))); cross.style.display = '';
+        showTip(e, keys.map(function (k) { var v = valueAt(k, best); return { value: v === null ? '–' : usd(v), label: AREA[k][0] + ' · ' + best, color: AREA[k][1] }; }), true);
+      });
+      hit.addEventListener('pointerleave', function () { cross.style.display = 'none'; hideTip(); });
+      host.appendChild(svg);
+      var lg = document.createElement('div'); lg.className = 'legend';
+      keys.forEach(function (k) {
+        var s = document.createElement('span'), i = document.createElement('i'); i.className = 'ln-key'; i.style.borderTopColor = AREA[k][1]; s.appendChild(i);
+        s.appendChild(document.createTextNode(AREA[k][0])); lg.appendChild(s);
+      });
+      host.appendChild(lg);
+    },
+    // Net result per area: bars grow right for profit and left for loss from a shared zero line.
+    areabars: function (host, d) {
+      var rows = d.areas.filter(function (a) { return a.n > 0; });
+      if (!rows.length) { host.textContent = 'No closed trades yet.'; return; }
+      var W = Math.max(300, host.clientWidth), rowH = 40, H = rows.length * rowH + 8, lw = 78;
+      var vs = rows.map(function (a) { return a.net; }), lo = Math.min(0, Math.min.apply(null, vs)), hi = Math.max(0, Math.max.apply(null, vs));
+      var left = lw + (lo < 0 ? 70 : 8), right = W - (hi > 0 ? 76 : 16), span = (hi - lo) || 1;
+      var x = function (v) { return left + (v - lo) / span * (right - left); };
+      var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H });
+      rows.forEach(function (a, i) {
+        var yy = 4 + i * rowH, x0 = x(0), x1 = x(a.net), pos = a.net >= 0, bx = Math.min(x0, x1), bw = Math.max(2, Math.abs(x1 - x0));
+        el('text', { x: 0, y: yy + 24 }, svg, AREA[a.kind][0]);
+        var b = el('rect', { x: bx, y: yy + 7, width: bw, height: 24, rx: 4, class: 'mark ' + (pos ? 'pos' : 'neg') }, svg);
+        el('text', { x: pos ? x1 + 8 : x1 - 8, y: yy + 24, 'text-anchor': pos ? 'start' : 'end', class: 'val' }, svg, (pos ? '▲ ' : '▼ ') + usd(a.net));
+        b.addEventListener('pointermove', function (e) { showTip(e, [{ value: usd(a.net), label: AREA[a.kind][0] + ' · ' + a.n + ' trades' }]); });
+        b.addEventListener('pointerleave', hideTip);
+      });
+      el('line', { x1: x(0), x2: x(0), y1: 0, y2: H, class: 'zero' }, svg);
+      host.appendChild(svg);
+    },
+    areacount: function (host, d) {
+      var rows = d.areas.filter(function (a) { return a.n > 0; });
+      if (!rows.length) { host.textContent = 'No closed trades yet.'; return; }
+      hbars(host, rows.map(function (a) { return { name: AREA[a.kind][0], v: a.n, cls: 'a-' + a.kind }; }),
+        Math.max.apply(null, rows.map(function (a) { return a.n; })) * 1.05, function (v) { return v + ' trades'; }, 'Closed trades with a result');
+    }
+  });
+
   // Horizontal bars from a zero baseline with the value at the tip.
   function hbars(host, rows, max, fmt, note) {
     var W = Math.max(300, host.clientWidth), rowH = 34, H = rows.length * rowH + 6, lw = 150, svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H });
@@ -194,25 +269,13 @@
     if (note) { var p = document.createElement('div'); p.className = 'legend'; p.textContent = note; host.appendChild(p); }
   }
 
-  var drawn = {};
-  function render(kind) {
-    var panel = document.querySelector('[data-panel="' + kind + '"]');
-    panel.querySelectorAll('.chart').forEach(function (host) {
+  function renderAll() {
+    document.querySelectorAll('.chart').forEach(function (host) {
       host.textContent = '';
-      var d = DATA[kind]; if (d && d.m.n) charts[host.dataset.chart](host, d);
+      var kind = host.dataset.kind, d = kind === 'portfolio' ? DATA : DATA[kind];
+      if (d && (kind === 'portfolio' || d.m.n)) charts[host.dataset.chart](host, d);
     });
-    drawn[kind] = panel.clientWidth;
   }
-  function show(kind) {
-    document.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = p.dataset.panel !== kind; });
-    document.querySelectorAll('[data-tab]').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === kind); b.setAttribute('aria-selected', b.dataset.tab === kind); });
-    try { localStorage.setItem('tj.statsTab', kind); } catch (e) {}
-    render(kind);
-  }
-  document.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { hideTip(); show(b.dataset.tab); }); });
-  var start = 'scalp';
-  try { start = location.hash.slice(1) || localStorage.getItem('tj.statsTab') || 'scalp'; } catch (e) {}
-  if (!document.querySelector('[data-panel="' + start + '"]')) start = 'scalp';
-  show(start);
-  var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { var k = document.querySelector('[data-panel]:not([hidden])').dataset.panel; render(k); }, 150); });
+  renderAll();
+  var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(renderAll, 150); });
 })();

@@ -388,8 +388,7 @@ def _win(v):
     return v is not None and v > 0
 
 
-@bp.route("/stats")
-def stats():
+def _stats_data():
     period, account = request.args.get("period", "all"), request.args.get("account", "all")
     lo, hi = period_bounds(period)
     c = conn()
@@ -443,9 +442,49 @@ def stats():
             "entry_ok": _rate(pr, "entry_followed"), "exit_ok": _rate(pr, "exit_followed"),
             "scenarios": Counter(r["exit_scenario"] for r in closed if r["exit_scenario"]).most_common(),
         }
-    return render_template("stats.html", period=period, account=account, charts=charts, areas=areas, scalp=scalp, by_setup=sorted(by_setup.items()),
-                           by_week=sorted(by_week.items(), reverse=True)[:12], plans=plans,
-                           scenario_label={k: t for k, t, _ in config.EXIT_SCENARIOS})
+    focus = {k: improve.focus(areas[k], charts[k]["m"], 3, area=k) for k in ("scalp",) + KINDS}
+    return dict(period=period, account=account, charts=charts, areas=areas, focus=focus, scalp=scalp,
+                by_setup=sorted(by_setup.items()), by_week=sorted(by_week.items(), reverse=True)[:12], plans=plans,
+                scenario_label={k: t for k, t, _ in config.EXIT_SCENARIOS})
+
+
+def _portfolio(d):
+    """Every area side by side, plus the combined result and the biggest leaks across all of them."""
+    kinds = ("scalp",) + KINDS
+    merged = [{"label": "%s %s" % (_kind_label(k), p["label"]), "date": p["date"], "pnl": p["pnl"], "r": None}
+              for k in kinds for p in d["charts"][k]["points"]]
+    merged.sort(key=lambda x: x["date"] or "")
+    total = perf.analyse(merged)
+
+    def by_day(points):
+        days = {}
+        for p in points:
+            days[p["date"]] = p["cum"]
+        return [{"date": k, "cum": v} for k, v in sorted(days.items())]
+
+    series = {k: by_day(d["charts"][k]["points"]) for k in kinds}
+    series["total"] = by_day(total["points"])
+    leaks = sorted((f for k in kinds for f in d["focus"][k]), key=lambda f: -f["cost"])[:5]
+    return dict(total=total, series=series, leaks=leaks, kinds=kinds,
+                chartjson={"series": series, "areas": [{"kind": k, "net": d["charts"][k]["m"]["net"], "n": d["charts"][k]["m"]["n"]} for k in kinds]})
+
+
+def _kind_label(k):
+    return {"scalp": "Scalp", "options": "Options", "swing": "Swing"}[k]
+
+
+@bp.route("/stats")
+def stats():
+    keep = {k: request.args[k] for k in ("period", "account") if request.args.get(k)}
+    return redirect(url_for("main.stats_view", which="portfolio", **keep))
+
+
+@bp.route("/stats/<any(portfolio,scalp,options,swing):which>")
+def stats_view(which):
+    d = _stats_data()
+    if which == "portfolio":
+        return render_template("stats_portfolio.html", which=which, **d, **_portfolio(d))
+    return render_template("stats_kind.html", which=which, kind=which, **d)
 
 
 def _avg(vals):

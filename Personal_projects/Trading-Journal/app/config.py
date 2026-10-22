@@ -75,3 +75,18 @@ VIOLATION_ACTIONS = {
     "Early exit": "Exit only on objective deterioration or the planned 25% scale-outs.",
     "Held past stop": "Exit at the stop. A stop that moves is not a stop.",
 }
+
+# One-line "do/don't" for each violation tag, shown in the Focus now block.
+VIOLATION_DIRECTIVES = {
+    "No established support": "Don't enter without established support",
+    "Inadequate room to resistance": "Don't enter without 1R of room to resistance",
+    "Extended / chase": "Avoid extended entries (no chasing above the 8 EMA)",
+    "Anticipated trigger": "Wait for C2 to cross C1's high before buying",
+    "MOM/TTM not confirming": "Don't enter when MOM and TTM aren't improving",
+    "Late entry / setup expired": "Don't take a setup after C2 is gone",
+    "Planned risk over $20": "Size every trade to $20 of risk or less",
+    "No stop set before entry": "Set the stop before you enter",
+    "Moved or removed stop": "Don't move or remove the stop",
+    "Early exit": "Don't exit early without a chart reason",
+    "Held past stop": "Exit at the stop, every time",
+}

@@ -43,7 +43,8 @@ def analyse(items):
     losses = [-it["pnl"] for it in items if it["pnl"] < 0]
     n = len(items)
     m = {"n": n, "wins": len(wins), "losses": len(losses), "flat": n - len(wins) - len(losses),
-         "net": round(cum, 2), "max_drawdown": round(max_dd, 2)}
+         "net": round(cum, 2), "max_drawdown": round(max_dd, 2),
+         "win_pct": None, "loss_pct": None, "expectancy": None}  # None, not missing, when there are no trades
     if n:
         m["win_pct"] = round(100 * len(wins) / n, 1)
         m["loss_pct"] = round(100 * len(losses) / n, 1)

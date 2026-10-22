@@ -7,27 +7,38 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 </head>
 {% set ep = request.endpoint or '' %}
-{% set vk = (request.view_args or {}).get('kind') %}
-{% set sec = vk if vk in ('options','swing') else ('scalp' if ep.startswith('main.scalp') else ('futures' if ep == 'main.futures' else 'home')) %}
+{% set va = request.view_args or {} %}
+{% set which = va.get('which') %}
+{% set vk = va.get('kind') %}
+{% set on_stats = ep in ('main.stats_view', 'main.stats') %}
+{% set sec = which if (on_stats and which in ('scalp','options','swing')) else (vk if vk in ('options','swing') else ('scalp' if ep.startswith('main.scalp') else ('futures' if ep == 'main.futures' else 'home'))) %}
+{% set keep = {'period': request.args.get('period'), 'account': request.args.get('account')} %}
 <body class="sec-{{ sec }}">
-<header class="top">
+<div class="shell">
+<aside class="side" aria-label="Main navigation">
   <a class="brand" href="{{ url_for('main.today_view') }}">Trading Journal</a>
-  <nav class="tabs" aria-label="Sections">
-    <a class="tab t-scalp {{ 'on' if sec == 'scalp' }}" href="{{ url_for('main.scalp_list') }}">Scalp</a>
-    <a class="tab t-options {{ 'on' if sec == 'options' }}" href="{{ url_for('main.plans_list', kind='options') }}">Options</a>
-    <a class="tab t-swing {{ 'on' if sec == 'swing' }}" href="{{ url_for('main.plans_list', kind='swing') }}">Swing</a>
-    <a class="tab t-futures {{ 'on' if sec == 'futures' }}" href="{{ url_for('main.futures') }}">Futures <span class="soon">soon</span></a>
-  </nav>
-  <nav class="util">
-    <a href="{{ url_for('main.today_view') }}" class="{{ 'on' if ep == 'main.today_view' }}">Today</a>
-    <a href="{{ url_for('main.stats') }}" class="{{ 'on' if ep == 'main.stats' }}">Stats</a>
-    <a href="{{ url_for('main.settings_view') }}" class="{{ 'on' if ep == 'main.settings_view' }}">Settings</a>
-  </nav>
-</header>
+  <a class="sn s-home {{ 'on' if ep == 'main.today_view' }}" href="{{ url_for('main.today_view') }}">Today</a>
+
+  <div class="sg">Journal</div>
+  <a class="sn s-scalp {{ 'on' if not on_stats and sec == 'scalp' }}" href="{{ url_for('main.scalp_list') }}">Scalp</a>
+  <a class="sn s-options {{ 'on' if not on_stats and sec == 'options' }}" href="{{ url_for('main.plans_list', kind='options') }}">Options</a>
+  <a class="sn s-swing {{ 'on' if not on_stats and sec == 'swing' }}" href="{{ url_for('main.plans_list', kind='swing') }}">Swing</a>
+  <a class="sn s-futures {{ 'on' if sec == 'futures' }}" href="{{ url_for('main.futures') }}">Futures <span class="soon">soon</span></a>
+
+  <div class="sg">Stats</div>
+  <a class="sn s-home {{ 'on' if on_stats and which == 'portfolio' }}" href="{{ url_for('main.stats_view', which='portfolio', **keep) }}">Portfolio</a>
+  <a class="sn sub s-scalp {{ 'on' if on_stats and which == 'scalp' }}" href="{{ url_for('main.stats_view', which='scalp', **keep) }}">Scalp stats</a>
+  <a class="sn sub s-options {{ 'on' if on_stats and which == 'options' }}" href="{{ url_for('main.stats_view', which='options', **keep) }}">Options stats</a>
+  <a class="sn sub s-swing {{ 'on' if on_stats and which == 'swing' }}" href="{{ url_for('main.stats_view', which='swing', **keep) }}">Swing stats</a>
+
+  <span class="grow"></span>
+  <a class="sn s-home {{ 'on' if ep == 'main.settings_view' }}" href="{{ url_for('main.settings_view') }}">Settings</a>
+</aside>
 <main>
   {% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}
   {% block body %}{% endblock %}
 </main>
+</div>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 {% block scripts %}{% endblock %}
 </body>

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_stats_macros.html" import rate, usd, filters, kpis, focus_list with context %}
+{% block title %}Portfolio stats{% endblock %}
+{% block body %}
+<div class="head"><h1>Portfolio <small>all trade types</small></h1>{{ filters() }}</div>
+
+{% if total.m.n == 0 %}
+<section class="card"><p class="muted">No closed trades with a P&amp;L in this period yet.</p></section>
+{% else %}
+{{ kpis(total.m) }}
+
+<section class="card focus"><h2>Biggest leaks across everything <small class="muted">the specific habits costing you most, from all areas</small></h2>
+  {% if leaks %}{{ focus_list(leaks, true) }}
+  <p class="muted note">Measured per habit on its own trades, so the savings overlap and should not be added together.</p>
+  {% else %}<p class="muted">No single behaviour stands out yet.</p>{% endif %}
+</section>
+
+<section class="card"><h2>Areas side by side <small class="muted">each trade type on its own</small></h2>
+  <div class="scroll"><table class="dense areas-table"><thead><tr>
+    <th>Area</th><th>Trades</th><th>Win %</th><th>Loss %</th><th>Net P&amp;L</th><th>Avg win</th><th>Avg loss</th><th>Win ÷ loss</th><th>Profit factor</th><th>Expectancy</th><th>Best</th><th>Worst</th><th></th></tr></thead><tbody>
+  {% for k in kinds %}{% set m = charts[k].m %}
+  <tr class="arow ar-{{ k }}"><td><span class="areatag at-{{ k }}">{{ kind_label[k] }}</span></td>
+    <td>{{ m.n }}</td><td>{{ (m.win_pct|num ~ '%') if m.win_pct is not none else '–' }}</td><td>{{ (m.loss_pct|num ~ '%') if m.loss_pct is not none else '–' }}</td>
+    <td class="{{ m.net|signclass }}"><b>{{ m.net|money or '$0.00' }}</b></td><td>{{ usd(m.avg_win) }}</td><td>{{ usd(m.avg_loss) }}</td>
+    <td>{{ (m.payoff|num ~ '×') if m.payoff is not none else '–' }}</td><td>{{ m.profit_factor|num if m.profit_factor is not none else '–' }}</td>
+    <td class="{{ (m.expectancy or 0)|signclass }}">{{ usd(m.expectancy) }}</td><td>{{ usd(m.best) }}</td><td>{{ usd(m.worst) }}</td>
+    <td><a href="{{ url_for('main.stats_view', which=k, period=period, account=account) }}">open</a></td></tr>
+  {% endfor %}
+  <tr class="arow"><td><span class="areatag at-futures">Futures</span></td><td colspan="12" class="muted">Coming soon</td></tr>
+  {% set t = total.m %}
+  <tr class="total"><td><b>All areas</b></td><td>{{ t.n }}</td><td>{{ (t.win_pct|num ~ '%') if t.win_pct is not none else '–' }}</td><td>{{ (t.loss_pct|num ~ '%') if t.loss_pct is not none else '–' }}</td>
+    <td class="{{ t.net|signclass }}"><b>{{ t.net|money or '$0.00' }}</b></td><td>{{ usd(t.avg_win) }}</td><td>{{ usd(t.avg_loss) }}</td>
+    <td>{{ (t.payoff|num ~ '×') if t.payoff is not none else '–' }}</td><td>{{ t.profit_factor|num if t.profit_factor is not none else '–' }}</td>
+    <td class="{{ (t.expectancy or 0)|signclass }}">{{ usd(t.expectancy) }}</td><td>{{ usd(t.best) }}</td><td>{{ usd(t.worst) }}</td><td></td></tr>
+  </tbody></table></div>
+</section>
+
+<div class="chartgrid">
+  <section class="card wide"><h2>Cumulative P&amp;L by area <small class="muted">each trade type, and all areas combined</small></h2>
+    <div class="chart" data-chart="multi" data-kind="portfolio" role="img" aria-label="Cumulative P&amp;L over time for each trade type and combined"></div></section>
+  <section class="card"><h2>Net P&amp;L by area</h2>
+    <div class="chart" data-chart="areabars" data-kind="portfolio" role="img" aria-label="Net profit and loss for each trade type"></div></section>
+  <section class="card"><h2>Trades by area</h2>
+    <div class="chart" data-chart="areacount" data-kind="portfolio" role="img" aria-label="Number of closed trades for each trade type"></div></section>
+</div>
+
+<h2 class="sect">Area summaries</h2>
+<div class="sumgrid">
+  {% for k in kinds %}{% set m = charts[k].m %}{% set f = focus[k][0] if focus[k] else none %}
+  <section class="card sumcard ar-{{ k }}">
+    <div class="sumhead"><h2>{{ kind_label[k] }}</h2><a href="{{ url_for('main.stats_view', which=k, period=period, account=account) }}">Full {{ kind_label[k]|lower }} stats →</a></div>
+    {% if m.n %}
+    <div class="mini">
+      <div><span>Net</span><b class="{{ m.net|signclass }}">{{ m.net|money or '$0.00' }}</b></div>
+      <div><span>Trades</span><b>{{ m.n }}</b></div>
+      <div><span>Win %</span><b>{{ (m.win_pct|num ~ '%') if m.win_pct is not none else '–' }}</b></div>
+      <div><span>Profit factor</span><b>{{ m.profit_factor|num if m.profit_factor is not none else '–' }}</b></div>
+    </div>
+    <p class="ev">{{ charts[k].insights[0] }}</p>
+    {% if f %}<div class="focus-item imp-{{ f.impact }} one"><div class="fb"><div class="fm"><span class="impact imp-{{ f.impact }}">{{ {'high':'High','med':'Medium','low':'Low'}[f.impact] }} impact</span> top focus</div>
+      <div class="fd">{{ f.directive }}</div><div class="fm">{{ f.n }} trades · <b>{{ f.cost|money }}</b> lost</div></div></div>
+    {% else %}<p class="muted">No single behaviour stands out yet.</p>{% endif %}
+    {% else %}<p class="muted">No closed {{ kind_label[k]|lower }} trades with a P&amp;L in this period yet.</p>{% endif %}
+  </section>{% endfor %}
+  <section class="card sumcard ar-futures"><div class="sumhead"><h2>Futures</h2></div><p class="muted">Coming soon.</p></section>
+</div>
+{% endif %}
+
+<script id="chartdata" type="application/json">{{ chartjson|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='charts.js') }}"></script>{% endblock %}

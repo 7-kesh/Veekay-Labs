@@ -64,3 +64,20 @@ def test_migration_adds_account_column(tmp_path, monkeypatch):
     db.init()
     with db.connect() as c:
         assert c.execute("SELECT account FROM scalp_trades").fetchone()[0] == "paper"
+
+
+def test_focus_is_narrow():
+    from app import improve
+    m = {"n": 100, "net": -170.0}
+    def it(title, cost, n, kind="rule"):
+        return {"title": title, "directive": title, "cost": cost, "n": n, "kind": kind, "severity": "high", "per": 1, "share": 10, "action": "x"}
+    items = [it("umbrella", 300, 68, "umbrella"), it("broad window", 190, 55, "behaviour"), it("extended", 270, 15),
+             it("support", 110, 18), it("dup of support", 110, 18), it("outcome", 50, 10, "outcome"), it("room", 64, 16)]
+    got = [f["directive"] for f in improve.focus(items, m, 3)]
+    assert got == ["extended", "support", "room"]
+
+
+def test_empty_series_has_none_metrics():
+    from app import perf
+    m = perf.analyse([])["m"]
+    assert m["n"] == 0 and m["win_pct"] is None and m["expectancy"] is None and m["avg_win"] is None
