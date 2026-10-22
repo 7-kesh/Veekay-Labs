@@ -1,0 +1,1300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piggy Payday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+  :root{
+    --bg:#F5F6FB;
+    --surface:#FFFFFF;
+    --surface-2:#FBFBFE;
+    --ink:#1E2233;
+    --ink-soft:#5B6079;
+    --border:#E3E5EF;
+    --shadow: rgba(30,34,51,0.10);
+
+    --save:#1E9B63; --save-soft:#E3F6EC; --save-ink:#0E6B41;
+    --gift:#D6376F; --gift-soft:#FBE6EE; --gift-ink:#A32657;
+    --spend:#DD8A21; --spend-soft:#FCF0DC; --spend-ink:#9C6110;
+    --mkt-a:#3A6FF0; --mkt-a-soft:#E5ECFD; --mkt-a-ink:#2349A8;
+    --mkt-b:#8A4FE0; --mkt-b-soft:#F0E8FB; --mkt-b-ink:#5E2DA8;
+
+    --font-display: 'Baloo 2', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161F;
+      --surface:#1B1E2C;
+      --surface-2:#20233A;
+      --ink:#EEF0FA;
+      --ink-soft:#A7ACC4;
+      --border:#2A2E42;
+      --shadow: rgba(0,0,0,0.45);
+
+      --save:#3BC98C; --save-soft:rgba(59,201,140,0.16); --save-ink:#8FEFC2;
+      --gift:#F2609A; --gift-soft:rgba(242,96,154,0.16); --gift-ink:#F9A9C7;
+      --spend:#F0A34E; --spend-soft:rgba(240,163,78,0.16); --spend-ink:#F8CB93;
+      --mkt-a:#6F9BFF; --mkt-a-soft:rgba(111,155,255,0.16); --mkt-a-ink:#AFC8FF;
+      --mkt-b:#B58CF2; --mkt-b-soft:rgba(181,140,242,0.16); --mkt-b-ink:#D9C2F8;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161F;
+    --surface:#1B1E2C;
+    --surface-2:#20233A;
+    --ink:#EEF0FA;
+    --ink-soft:#A7ACC4;
+    --border:#2A2E42;
+    --shadow: rgba(0,0,0,0.45);
+
+    --save:#3BC98C; --save-soft:rgba(59,201,140,0.16); --save-ink:#8FEFC2;
+    --gift:#F2609A; --gift-soft:rgba(242,96,154,0.16); --gift-ink:#F9A9C7;
+    --spend:#F0A34E; --spend-soft:rgba(240,163,78,0.16); --spend-ink:#F8CB93;
+      --mkt-a:#6F9BFF; --mkt-a-soft:rgba(111,155,255,0.16); --mkt-a-ink:#AFC8FF;
+      --mkt-b:#B58CF2; --mkt-b-soft:rgba(181,140,242,0.16); --mkt-b-ink:#D9C2F8;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    padding-inline:16px;
+    padding-block:28px 40px;
+    display:flex;
+    justify-content:center;
+  }
+  .page{ width:100%; max-width:760px; }
+
+  header{ margin-bottom:6px; }
+  .eyebrow{
+    font-size:12.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 6px;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:800; font-size:clamp(28px,6vw,38px);
+    margin:0 0 4px; text-wrap:balance; letter-spacing:.01em;
+  }
+  .tagline{ margin:0 0 18px; color:var(--ink-soft); font-size:14.5px; max-width:56ch; line-height:1.5; }
+
+  .total-strip{
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:16px 18px; margin-bottom:22px; box-shadow:0 1px 2px var(--shadow);
+  }
+  .total-strip .label{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .total-strip .value{
+    font-family:var(--font-display); font-weight:800; font-size:clamp(22px,5vw,30px);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .rule-note{
+    display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink-soft);
+    background:var(--surface-2); border:1px dashed var(--border); border-radius:12px;
+    padding:10px 14px; margin-bottom:22px; line-height:1.45;
+  }
+  .rule-note svg{ flex:none; width:16px; height:16px; margin-top:2px; color:var(--ink-soft); }
+
+  .banks{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px;
+    margin-bottom:20px;
+  }
+  .bank-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:18px;
+    padding:18px; display:flex; flex-direction:column; gap:12px;
+    box-shadow:0 1px 2px var(--shadow);
+    transition:transform .15s ease;
+  }
+  .bank-card.pulse{ animation:pop .5s ease; }
+  @keyframes pop{ 0%{transform:scale(1)} 35%{transform:scale(1.035)} 100%{transform:scale(1)} }
+  @media (prefers-reduced-motion: reduce){ .bank-card.pulse{ animation:none; } }
+
+  .bank-card.save{ --accent:var(--save); --accent-soft:var(--save-soft); --accent-ink:var(--save-ink); }
+  .bank-card.gift{ --accent:var(--gift); --accent-soft:var(--gift-soft); --accent-ink:var(--gift-ink); }
+  .bank-card.spend{ --accent:var(--spend); --accent-soft:var(--spend-soft); --accent-ink:var(--spend-ink); }
+
+  .bank-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .bank-name{
+    font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--accent-ink);
+  }
+  .piggy-icon{ width:56px; height:54px; color:var(--accent); flex:none; }
+
+  .bank-balance{
+    font-family:var(--font-display); font-weight:800; font-size:clamp(24px,6vw,28px);
+    font-variant-numeric:tabular-nums;
+  }
+  .bank-sub{ font-size:12.5px; color:var(--ink-soft); margin-top:-8px; }
+
+  .bank-actions{ margin-top:auto; }
+  .btn-withdraw{
+    width:100%; padding:9px 12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--accent-soft); color:var(--accent-ink); font-family:var(--font-body);
+    font-weight:800; font-size:13.5px; cursor:pointer;
+  }
+  .btn-withdraw:hover{ filter:brightness(0.97); }
+  .btn-withdraw:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .cta-row{ display:flex; justify-content:center; margin:6px 0 28px; }
+  .btn-primary{
+    font-family:var(--font-display); font-weight:700; font-size:15.5px;
+    background:var(--ink); color:var(--bg); border:none; border-radius:14px;
+    padding:14px 26px; cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+    box-shadow:0 2px 10px var(--shadow);
+  }
+  .btn-primary:hover{ transform:translateY(-1px); }
+  .btn-primary svg{ width:18px; height:18px; }
+
+  section.activity h2{
+    font-family:var(--font-display); font-size:17px; font-weight:700; margin:0 0 10px;
+  }
+  .activity-list{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    overflow:hidden;
+  }
+  .activity-row{
+    display:flex; align-items:center; gap:12px; padding:12px 16px;
+    border-bottom:1px solid var(--border); font-size:13.5px;
+  }
+  .activity-row:last-child{ border-bottom:none; }
+  .chip{
+    font-size:11px; font-weight:800; letter-spacing:.02em; padding:3px 9px; border-radius:999px;
+    flex:none; text-transform:uppercase;
+  }
+  .chip.save{ background:var(--save-soft); color:var(--save-ink); }
+  .chip.gift{ background:var(--gift-soft); color:var(--gift-ink); }
+  .chip.spend{ background:var(--spend-soft); color:var(--spend-ink); }
+  .activity-desc{ flex:1; min-width:0; }
+  .activity-desc .note{ color:var(--ink-soft); font-size:12px; display:block; margin-top:1px; }
+  .activity-amt{ font-weight:800; font-variant-numeric:tabular-nums; flex:none; }
+  .activity-amt.pos{ color:var(--save-ink); }
+  .activity-amt.neg{ color:var(--gift-ink); }
+  .activity-time{ color:var(--ink-soft); font-size:11.5px; flex:none; width:64px; text-align:right; }
+  .empty-state{ padding:26px 16px; text-align:center; color:var(--ink-soft); font-size:13.5px; }
+
+  section.summary{ margin-top:26px; }
+  section.summary h2{
+    font-family:var(--font-display); font-size:17px; font-weight:700; margin:0 0 4px;
+  }
+  section.summary .sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 10px; }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:16px; background:var(--surface); }
+  table.summary-table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:540px; }
+  table.summary-table th, table.summary-table td{
+    padding:11px 14px; text-align:right; border-bottom:1px solid var(--border);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  table.summary-table th:first-child, table.summary-table td:first-child{ text-align:left; white-space:normal; }
+  table.summary-table thead th{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em;
+    color:var(--ink-soft); background:var(--surface-2);
+  }
+  table.summary-table tbody tr:last-child td{ border-bottom:none; }
+  table.summary-table tr.total-row td{ font-weight:800; background:var(--surface-2); border-top:1px solid var(--border); }
+  table.summary-table .bucket-name{ display:flex; align-items:center; gap:8px; font-weight:700; }
+  table.summary-table .dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  table.summary-table .dot.save{ background:var(--save); } table.summary-table .dot.gift{ background:var(--gift); } table.summary-table .dot.spend{ background:var(--spend); }
+  td.pos{ color:var(--save-ink); } td.neg{ color:var(--gift-ink); }
+
+  .sync-note{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:16px; }
+
+  /* market investment */
+  section.market{ margin-bottom:28px; }
+  .mkt-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  section.market h2{ font-family:var(--font-display); font-size:17px; font-weight:700; margin:0; }
+  .mkt-badge{ font-size:11.5px; font-weight:800; padding:3px 10px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); color:var(--ink-soft); }
+  .mkt-badge.live{ background:var(--save-soft); color:var(--save-ink); border-color:transparent; }
+  .mkt-badge.sim{ background:var(--spend-soft); color:var(--spend-ink); border-color:transparent; }
+  .mkt-card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 1px 2px var(--shadow); margin-bottom:14px; }
+  .mkt-intro{ font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0 0 12px; }
+  .mkt-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:14px; }
+  .mkt-stat{ background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:10px 12px; }
+  .mkt-stat .k{ font-size:11.5px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; }
+  .mkt-stat .v{ font-family:var(--font-display); font-weight:800; font-size:20px; font-variant-numeric:tabular-nums; margin-top:2px; }
+  .mkt-stat .s{ font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .up{ color:var(--save-ink); } .down{ color:var(--gift-ink); } .flat{ color:var(--ink-soft); }
+  .chart-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .range-tabs{ display:inline-flex; gap:4px; }
+  .range-tabs button{ border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); font-family:var(--font-body); font-weight:800; font-size:12px; padding:5px 11px; border-radius:999px; cursor:pointer; }
+  .range-tabs button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .chart-readout{ font-size:12.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums; min-height:18px; display:flex; flex-wrap:wrap; gap:4px 14px; }
+  .chart-readout b{ color:var(--ink); }
+  .legend{ display:inline-flex; align-items:center; gap:5px; }
+  .legend i{ width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .legend i.dash{ border-radius:0; height:0; width:14px; border-top:2px dashed var(--ink-soft); background:none; }
+  svg.chart{ width:100%; height:auto; display:block; touch-action:pan-y; }
+  svg.chart text{ font-family:var(--font-body); font-size:11px; fill:var(--ink-soft); }
+  .mkt-note{ font-size:11.5px; color:var(--ink-soft); margin:10px 0 0; line-height:1.45; }
+  .holdings{ background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:14px; }
+  .holding{ display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .holding:last-child{ border-bottom:none; }
+  .chip.mkt-sp{ background:var(--mkt-a-soft); color:var(--mkt-a-ink); }
+  .chip.mkt-nas{ background:var(--mkt-b-soft); color:var(--mkt-b-ink); }
+  .holding .h-main{ flex:1; min-width:0; }
+  .holding .h-sub{ color:var(--ink-soft); font-size:12px; display:block; margin-top:1px; }
+  .holding .h-val{ text-align:right; font-weight:800; font-variant-numeric:tabular-nums; flex:none; }
+  .holding .h-val small{ display:block; font-size:12px; }
+  .btn-sell{ border:1px solid var(--border); background:var(--surface-2); color:var(--ink); font-family:var(--font-body); font-weight:800; font-size:12.5px; padding:7px 12px; border-radius:10px; cursor:pointer; flex:none; }
+  .btn-sell:hover{ filter:brightness(0.97); }
+  .mkt-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn-secondary{ font-family:var(--font-display); font-weight:700; font-size:14.5px; background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:14px; padding:12px 20px; cursor:pointer; }
+  .btn-secondary:hover{ transform:translateY(-1px); }
+  .btn-secondary:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+  .idx-picker{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .idx-opt{ border:2px solid var(--border); background:var(--surface-2); border-radius:12px; padding:10px 12px; cursor:pointer; text-align:left; font-family:var(--font-body); color:var(--ink); }
+  .idx-opt strong{ display:block; font-family:var(--font-display); font-size:15px; }
+  .idx-opt span{ font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .idx-opt[aria-pressed="true"]{ border-color:var(--ink); background:var(--surface); }
+
+  /* modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,17,26,.45); display:flex; align-items:flex-end;
+    justify-content:center; padding:16px; z-index:20;
+  }
+  @media (min-width:520px){ .overlay{ align-items:center; } }
+  .overlay[hidden]{ display:none; }
+  .modal{
+    background:var(--surface); border:1px solid var(--border); border-radius:20px 20px 0 0;
+    width:100%; max-width:440px; padding:22px; box-shadow:0 12px 40px var(--shadow);
+    max-height:88vh; overflow-y:auto;
+  }
+  @media (min-width:520px){ .modal{ border-radius:20px; } }
+  .modal h3{ font-family:var(--font-display); font-size:19px; margin:0 0 4px; }
+  .modal .sub{ font-size:13px; color:var(--ink-soft); margin:0 0 16px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; font-weight:800; color:var(--ink-soft); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em; }
+  .field input[type="number"], .field input[type="text"]{
+    width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--ink); font-size:15px; font-family:var(--font-body);
+    font-variant-numeric:tabular-nums;
+  }
+  .field input:focus{ outline:2px solid var(--ink); outline-offset:1px; }
+  .split-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .split-row .dot{ width:11px; height:11px; border-radius:50%; flex:none; }
+  .split-row .dot.save{ background:var(--save); } .split-row .dot.gift{ background:var(--gift); } .split-row .dot.spend{ background:var(--spend); }
+  .split-row label{ width:64px; font-weight:700; font-size:13.5px; color:var(--ink); text-transform:none; }
+  .split-row input{ flex:1; }
+  .remaining{
+    display:flex; justify-content:space-between; font-size:13px; font-weight:700; padding:10px 12px;
+    border-radius:10px; background:var(--surface-2); margin-bottom:16px;
+  }
+  .remaining.ok{ color:var(--save-ink); }
+  .remaining.bad{ color:var(--gift-ink); }
+  .modal-actions{ display:flex; gap:10px; }
+  .btn-ghost, .btn-confirm{
+    flex:1; padding:12px; border-radius:12px; font-family:var(--font-body); font-weight:800;
+    font-size:14.5px; cursor:pointer; border:1px solid var(--border);
+  }
+  .btn-ghost{ background:var(--surface); color:var(--ink); }
+  .btn-confirm{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .btn-confirm:disabled{ opacity:.45; cursor:not-allowed; }
+  .error-text{ color:var(--gift-ink); font-size:12.5px; margin:-6px 0 12px; }
+
+  /* toast */
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translate(-50%,12px); opacity:0;
+    background:var(--ink); color:var(--bg); padding:11px 18px; border-radius:999px;
+    font-size:13.5px; font-weight:700; box-shadow:0 6px 20px var(--shadow);
+    transition:opacity .2s ease, transform .2s ease; pointer-events:none; z-index:30;
+    max-width:90vw; text-align:center;
+  }
+  #toast.show{ opacity:1; transform:translate(-50%,0); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="eyebrow">Chore Bank</p>
+    <h1>Piggy Payday</h1>
+    <p class="tagline">Every chore payday, split what he earns between three piggy banks. Balances update the moment he adds or takes money out.</p>
+  </header>
+
+  <div class="total-strip">
+    <span class="label">Total across all banks</span>
+    <span class="value" id="totalValue">$0.00</span>
+  </div>
+
+  <div class="rule-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/><path d="M9 12l2 2 4-4"/></svg>
+    <span>Money can be added at payday or withdrawn any time &mdash; but once it lands in a bank, it can't be moved to a different one.</span>
+  </div>
+
+  <div class="banks" id="banks"></div>
+
+  <div class="cta-row">
+    <button class="btn-primary" id="openDeposit" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8.5 10a2.5 2.5 0 0 1 3.5-2h.5a2 2 0 0 1 0 4h-1a2 2 0 0 0 0 4h.5a2.5 2.5 0 0 0 3.5-2"/></svg>
+      Add This Week's Earnings
+    </button>
+  </div>
+
+  <section class="market" id="marketSection">
+    <div class="mkt-head">
+      <h2>Market Investment</h2>
+      <span class="mkt-badge" id="mktBadge">Checking the market&hellip;</span>
+    </div>
+    <p class="mkt-intro">Put some Save money to work in the stock market. His investment rises and falls with the S&amp;P 500 or NASDAQ &mdash; check back to see how it's growing. Selling sends the money back to Save.</p>
+    <div class="mkt-stats" id="mktStats" hidden></div>
+    <div class="mkt-card">
+      <div class="chart-bar">
+        <div class="range-tabs" id="rangeTabs" role="group" aria-label="Chart range"></div>
+        <div class="chart-readout" id="chartLegend"></div>
+      </div>
+      <div id="chartWrap"></div>
+      <div class="chart-readout" id="chartReadout" aria-live="off"></div>
+      <p class="mkt-note" id="mktNote"></p>
+    </div>
+    <div class="holdings" id="holdings" hidden></div>
+    <div class="mkt-actions">
+      <button class="btn-secondary" id="openInvest" type="button">Invest from Save</button>
+      <button class="btn-secondary" id="refreshMarket" type="button">Refresh market</button>
+    </div>
+  </section>
+
+  <section class="activity">
+    <h2>Recent activity</h2>
+    <div class="activity-list" id="activityList">
+      <div class="empty-state">No activity yet &mdash; add this week's chore money to get started.</div>
+    </div>
+  </section>
+
+  <section class="summary">
+    <h2>Lifetime summary</h2>
+    <p class="sub">Running totals for budgeting and look-backs &mdash; these never shrink when older activity rows fall off the list above. &ldquo;Net to market&rdquo; is money put into investments minus what came back from selling.</p>
+    <div class="table-wrap">
+      <table class="summary-table" id="summaryTable">
+        <thead><tr><th>Bank</th><th>Total earned</th><th>Total withdrawn</th><th>Net to market</th><th>Current balance</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="sync-note" id="syncNote">Loading&hellip;</p>
+</div>
+
+<!-- Deposit modal -->
+<div class="overlay" id="depositOverlay" hidden>
+  <div class="modal">
+    <h3>Add This Week's Earnings</h3>
+    <p class="sub">Enter how much he earned, then decide how it's split between the banks.</p>
+    <div class="field">
+      <label for="earnedTotal">Total earned this week</label>
+      <input type="number" id="earnedTotal" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="split-row"><span class="dot save"></span><label for="splitSave">Save</label><input type="number" id="splitSave" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="split-row"><span class="dot gift"></span><label for="splitGift">Gift</label><input type="number" id="splitGift" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="split-row"><span class="dot spend"></span><label for="splitSpend">Spend</label><input type="number" id="splitSpend" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="remaining" id="remainingBox">Remaining to assign: $0.00</div>
+    <div class="field">
+      <label for="depositNote">What was it for? (optional)</label>
+      <input type="text" id="depositNote" maxlength="60" placeholder="e.g. dishes + trash all week">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelDeposit" type="button">Cancel</button>
+      <button class="btn-confirm" id="confirmDeposit" type="button" disabled>Add to banks</button>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw modal -->
+<div class="overlay" id="withdrawOverlay" hidden>
+  <div class="modal">
+    <h3 id="withdrawTitle">Withdraw</h3>
+    <p class="sub" id="withdrawSub">Available balance: $0.00</p>
+    <div class="field">
+      <label for="withdrawAmount">Amount to take out</label>
+      <input type="number" id="withdrawAmount" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label for="withdrawNote">What's it for? (optional)</label>
+      <input type="text" id="withdrawNote" maxlength="60" placeholder="e.g. new video game">
+    </div>
+    <p class="error-text" id="withdrawError" hidden></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelWithdraw" type="button">Cancel</button>
+      <button class="btn-confirm" id="confirmWithdraw" type="button">Withdraw</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invest modal -->
+<div class="overlay" id="investOverlay" hidden>
+  <div class="modal">
+    <h3>Invest from Save</h3>
+    <p class="sub" id="investSub">Available in Save: $0.00</p>
+    <div class="field">
+      <label>Pick a market</label>
+      <div class="idx-picker" id="idxPicker"></div>
+    </div>
+    <div class="field">
+      <label for="investAmount">Amount to invest</label>
+      <input type="number" id="investAmount" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <p class="mkt-note" style="margin:-6px 0 14px">Markets go up <em>and</em> down &mdash; he could get back more or less than he puts in.</p>
+    <p class="error-text" id="investError" hidden></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelInvest" type="button">Cancel</button>
+      <button class="btn-confirm" id="confirmInvest" type="button">Invest</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sell modal -->
+<div class="overlay" id="sellOverlay" hidden>
+  <div class="modal">
+    <h3 id="sellTitle">Sell investment</h3>
+    <p class="sub" id="sellSub"></p>
+    <div class="remaining" id="sellBox"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelSell" type="button">Keep it</button>
+      <button class="btn-confirm" id="confirmSell" type="button">Sell &amp; send to Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="cloud.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var BUCKETS = [
+    { id:'save',  label:'Save',  verb:'Added to Save' },
+    { id:'gift',  label:'Gift',  verb:'Added to Gift' },
+    { id:'spend', label:'Spend', verb:'Added to Spend' }
+  ];
+
+  var PIGGY_SVG = '<svg class="piggy-icon" viewBox="0 0 120 116" aria-hidden="true">' +
+    '<line x1="40" y1="2" x2="40" y2="40" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<polygon points="40,4 40,17 61,10.5" fill="var(--ink)"/>' +
+    '<circle cx="47.5" cy="10.5" r="3.1" fill="var(--surface)"/>' +
+    '<circle cx="46.1" cy="9.6" r="0.6" fill="var(--ink)"/>' +
+    '<circle cx="48.9" cy="9.6" r="0.6" fill="var(--ink)"/>' +
+    '<path d="M45.7 12.3q1.8 1.1 3.6 0" fill="none" stroke="var(--ink)" stroke-width="0.6" stroke-linecap="round"/>' +
+    '<path d="M34 78q-7-5-2-12" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+    '<ellipse cx="62" cy="76" rx="46" ry="32" fill="currentColor"/>' +
+    '<circle cx="24" cy="54" r="11" fill="currentColor"/>' +
+    '<ellipse cx="98" cy="76" rx="17" ry="14" fill="currentColor"/>' +
+    '<ellipse cx="103" cy="76" rx="9" ry="7.5" fill="var(--surface)"/>' +
+    '<circle cx="100" cy="74" r="1.6" fill="var(--ink)"/>' +
+    '<circle cx="106" cy="74" r="1.6" fill="var(--ink)"/>' +
+    '<circle cx="46" cy="67" r="2.4" fill="var(--ink)"/>' +
+    '<rect x="34" y="38" width="12" height="4.5" rx="2.2" fill="var(--surface)"/>' +
+    '<rect x="24" y="100" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '<rect x="50" y="102" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '<rect x="72" y="102" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '<rect x="92" y="100" width="10" height="12" rx="4" fill="currentColor"/>' +
+    '</svg>';
+
+  function emptyBucket(){ return { balance:0, totalEarned:0, totalWithdrawn:0, marketNet:0 }; }
+
+  var state = {
+    buckets: { save: emptyBucket(), gift: emptyBucket(), spend: emptyBucket() },
+    txns: [],
+    positions: [],
+    marketReady: false,
+    mode: 'local',
+    ready: false
+  };
+  var db = null;
+  var LOCAL_KEY = 'piggy-payday-state-v2';
+  var withdrawTarget = null;
+
+  function bal(id){ return (state.buckets[id] && state.buckets[id].balance) || 0; }
+
+  function round2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+  function fmt(n){ var v = round2(n||0); return '$' + v.toFixed(2); }
+  function nowISO(){ return new Date().toISOString(); }
+  function relTime(iso){
+    try{
+      var d = new Date(iso), diff = (Date.now() - d.getTime())/1000;
+      if (diff < 60) return 'now';
+      if (diff < 3600) return Math.floor(diff/60) + 'm';
+      if (diff < 86400) return Math.floor(diff/3600) + 'h';
+      if (diff < 86400*7) return Math.floor(diff/86400) + 'd';
+      return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    } catch(e){ return ''; }
+  }
+
+  function loadLocal(){
+    try{
+      var raw = localStorage.getItem(LOCAL_KEY);
+      if (raw){
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.buckets) state.buckets = parsed.buckets;
+        if (parsed && parsed.txns) state.txns = parsed.txns;
+        if (parsed && parsed.positions) state.positions = parsed.positions;
+      }
+    } catch(e){}
+  }
+  function saveLocal(){
+    try{ localStorage.setItem(LOCAL_KEY, JSON.stringify({buckets:state.buckets, txns:state.txns, positions:state.positions})); } catch(e){}
+  }
+
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._h);
+    showToast._h = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+  }
+
+  function pulseCard(bucketId){
+    var el = document.querySelector('.bank-card.' + bucketId);
+    if (!el) return;
+    el.classList.remove('pulse');
+    void el.offsetWidth;
+    el.classList.add('pulse');
+  }
+
+  function render(){
+    var total = bal('save') + bal('gift') + bal('spend');
+    document.getElementById('totalValue').textContent = fmt(total);
+
+    var banksEl = document.getElementById('banks');
+    banksEl.innerHTML = BUCKETS.map(function(b){
+      var balance = bal(b.id);
+      return '' +
+        '<div class="bank-card ' + b.id + '">' +
+          '<div class="bank-top">' +
+            '<span class="bank-name">' + b.label + '</span>' +
+            PIGGY_SVG +
+          '</div>' +
+          '<div class="bank-balance">' + fmt(balance) + '</div>' +
+          '<div class="bank-sub">piggy bank balance</div>' +
+          '<div class="bank-actions">' +
+            '<button class="btn-withdraw" type="button" data-withdraw="' + b.id + '" ' + (balance <= 0 ? 'disabled' : '') + '>Withdraw</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call(banksEl.querySelectorAll('[data-withdraw]'), function(btn){
+      btn.addEventListener('click', function(){ openWithdraw(btn.getAttribute('data-withdraw')); });
+    });
+
+    var totalEarnedAll = 0, totalWithdrawnAll = 0, totalMarketAll = 0;
+    var summaryRows = BUCKETS.map(function(b){
+      var bk = state.buckets[b.id] || emptyBucket();
+      totalEarnedAll += bk.totalEarned || 0;
+      totalWithdrawnAll += bk.totalWithdrawn || 0;
+      totalMarketAll += bk.marketNet || 0;
+      return '' +
+        '<tr>' +
+          '<td><span class="bucket-name"><span class="dot ' + b.id + '"></span>' + b.label + '</span></td>' +
+          '<td class="pos">' + fmt(bk.totalEarned || 0) + '</td>' +
+          '<td class="neg">' + fmt(bk.totalWithdrawn || 0) + '</td>' +
+          '<td>' + fmt(bk.marketNet || 0) + '</td>' +
+          '<td>' + fmt(bk.balance || 0) + '</td>' +
+        '</tr>';
+    }).join('') +
+      '<tr class="total-row">' +
+        '<td>Total</td>' +
+        '<td class="pos">' + fmt(totalEarnedAll) + '</td>' +
+        '<td class="neg">' + fmt(totalWithdrawnAll) + '</td>' +
+        '<td>' + fmt(totalMarketAll) + '</td>' +
+        '<td>' + fmt(total) + '</td>' +
+      '</tr>';
+    document.querySelector('#summaryTable tbody').innerHTML = summaryRows;
+
+    var listEl = document.getElementById('activityList');
+    if (!state.txns.length){
+      listEl.innerHTML = '<div class="empty-state">No activity yet &mdash; add this week\'s chore money to get started.</div>';
+    } else {
+      listEl.innerHTML = state.txns.slice(0,20).map(function(tx){
+        var bucket = BUCKETS.filter(function(b){ return b.id === tx.bucket; })[0] || {label:tx.bucket};
+        var isDeposit = tx.type === 'deposit' || tx.type === 'divest';
+        var desc = tx.type === 'deposit' ? 'Earned into ' + bucket.label
+          : tx.type === 'invest' ? 'Invested from ' + bucket.label
+          : tx.type === 'divest' ? 'Sold investment into ' + bucket.label
+          : 'Withdrew from ' + bucket.label;
+        return '' +
+          '<div class="activity-row">' +
+            '<span class="chip ' + tx.bucket + '">' + bucket.label + '</span>' +
+            '<span class="activity-desc">' + desc + (tx.note ? '<span class="note">' + escapeHtml(tx.note) + '</span>' : '') + '</span>' +
+            '<span class="activity-amt ' + (isDeposit ? 'pos' : 'neg') + '">' + (isDeposit ? '+' : '&minus;') + fmt(tx.amount).slice(1) + '</span>' +
+            '<span class="activity-time">' + relTime(tx.ts) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    renderMarket();
+
+    var syncEl = document.getElementById('syncNote');
+    syncEl.textContent = state.mode === 'cloud'
+      ? 'Balances are saved and stay in sync everywhere this is opened.'
+      : 'Saving in this browser only on this device (sync isn’t available right now).';
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
+  // ---------- backend ----------
+  function initBackend(){
+    var viaClaude = window.claude && typeof window.claude.use === 'function';
+    var ready = viaClaude ? window.claude.use('db')
+      : (window.PiggyCloud ? window.PiggyCloud.start() : Promise.resolve(null));
+    ready.then(function(d){
+      if (d){ db = d; state.mode = 'cloud'; bootCloud(); }
+      else { fallbackLocal(); }
+    }).catch(function(){ fallbackLocal(); });
+  }
+
+  function fallbackLocal(){
+    state.mode = 'local';
+    loadLocal();
+    state.ready = true;
+    render();
+  }
+
+  function bootCloud(){
+    var inits = BUCKETS.map(function(b){
+      var ref = db.collection('buckets').doc(b.id);
+      return ref.get().then(function(snap){
+        if (!snap.exists){
+          return ref.set({ balance: 0, totalEarned: 0, totalWithdrawn: 0, label: b.label, updatedAt: nowISO() });
+        }
+        var data = snap.data() || {};
+        // Backfill lifetime totals for banks created before this feature existed.
+        if (typeof data.totalEarned !== 'number' || typeof data.totalWithdrawn !== 'number'){
+          return ref.update({
+            totalEarned: typeof data.totalEarned === 'number' ? data.totalEarned : (data.balance || 0),
+            totalWithdrawn: typeof data.totalWithdrawn === 'number' ? data.totalWithdrawn : 0
+          });
+        }
+      }).catch(function(){});
+    });
+    Promise.all(inits).then(function(){
+      db.collection('buckets').onSnapshot(function(qs){
+        qs.docs.forEach(function(d){
+          var data = d.data() || {};
+          if (state.buckets.hasOwnProperty(d.id)){
+            state.buckets[d.id] = {
+              balance: typeof data.balance === 'number' ? data.balance : 0,
+              totalEarned: typeof data.totalEarned === 'number' ? data.totalEarned : (data.balance || 0),
+              totalWithdrawn: typeof data.totalWithdrawn === 'number' ? data.totalWithdrawn : 0,
+              marketNet: typeof data.marketNet === 'number' ? data.marketNet : 0
+            };
+          }
+        });
+        state.ready = true;
+        render();
+      }, function(){ fallbackLocal(); });
+
+      db.collection('transactions').orderBy('ts','desc').limit(30).onSnapshot(function(qs){
+        state.txns = qs.docs.map(function(d){ var data = d.data() || {}; data.id = d.id; return data; });
+        render();
+      }, function(){});
+
+      db.collection('positions').orderBy('ts','desc').onSnapshot(function(qs){
+        state.positions = qs.docs.map(function(d){ var data = d.data() || {}; data.id = d.id; return data; });
+        render();
+      }, function(){});
+    });
+  }
+
+  function applyDeposit(allocations, note){
+    var ts = nowISO();
+    var jobs = [];
+    BUCKETS.forEach(function(b){
+      var amt = round2(allocations[b.id] || 0);
+      if (amt <= 0) return;
+      var cur = state.buckets[b.id] || emptyBucket();
+      var newBal = round2(cur.balance + amt);
+      var newEarned = round2(cur.totalEarned + amt);
+      if (state.mode === 'cloud'){
+        jobs.push(
+          db.collection('buckets').doc(b.id).set({ balance:newBal, totalEarned:newEarned, totalWithdrawn:cur.totalWithdrawn, marketNet:cur.marketNet||0, label:b.label, updatedAt: ts })
+            .then(function(){ return db.collection('transactions').add({ type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts }); })
+        );
+      } else {
+        state.buckets[b.id] = { balance:newBal, totalEarned:newEarned, totalWithdrawn:cur.totalWithdrawn, marketNet:cur.marketNet||0 };
+        state.txns.unshift({ id:'local-'+Date.now()+'-'+b.id, type:'deposit', bucket:b.id, amount:amt, balanceAfter:newBal, note: note||'', ts: ts });
+      }
+      setTimeout(function(){ pulseCard(b.id); }, 60);
+    });
+    if (state.mode === 'cloud'){
+      return Promise.all(jobs);
+    } else {
+      state.txns = state.txns.slice(0,30);
+      saveLocal();
+      render();
+      return Promise.resolve();
+    }
+  }
+
+  function applyWithdraw(bucketId, amount, note){
+    var cur = state.buckets[bucketId] || emptyBucket();
+    amount = round2(amount);
+    if (amount <= 0 || amount > cur.balance + 0.001){
+      return Promise.reject(new Error('insufficient'));
+    }
+    var newBal = round2(cur.balance - amount);
+    var newWithdrawn = round2(cur.totalWithdrawn + amount);
+    var ts = nowISO();
+    var bucket = BUCKETS.filter(function(b){ return b.id === bucketId; })[0];
+    if (state.mode === 'cloud'){
+      return db.collection('buckets').doc(bucketId).set({ balance:newBal, totalEarned:cur.totalEarned, totalWithdrawn:newWithdrawn, marketNet:cur.marketNet||0, label:bucket.label, updatedAt: ts })
+        .then(function(){ return db.collection('transactions').add({ type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts }); })
+        .then(function(){ pulseCard(bucketId); });
+    } else {
+      state.buckets[bucketId] = { balance:newBal, totalEarned:cur.totalEarned, totalWithdrawn:newWithdrawn, marketNet:cur.marketNet||0 };
+      state.txns.unshift({ id:'local-'+Date.now(), type:'withdraw', bucket:bucketId, amount:amount, balanceAfter:newBal, note: note||'', ts: ts });
+      state.txns = state.txns.slice(0,30);
+      saveLocal();
+      render();
+      pulseCard(bucketId);
+      return Promise.resolve();
+    }
+  }
+
+  // ---------- market investing ----------
+  var INDEXES = [
+    { id:'sp',  label:'S&P 500', sym:'^GSPC', base:5900,  vol:0.009, color:'var(--mkt-a)' },
+    { id:'nas', label:'NASDAQ',  sym:'^IXIC', base:19400, vol:0.012, color:'var(--mkt-b)' }
+  ];
+  var RANGES = [ {id:'1W', days:7}, {id:'1M', days:30}, {id:'3M', days:90}, {id:'All', days:Infinity} ];
+  // Browsers block Yahoo directly (no CORS), so quotes come through our own /api/market function
+  // (functions/api/market.js). If it's unreachable the app falls back to the simulated market.
+  var MARKET_PROXY = '/api/market?url=';
+  var MKT_KEY = 'piggy-payday-market-v1';
+  var MKT_TTL = 10 * 60 * 1000;
+  var market = {};
+  var chartRange = '1M';
+  var investIndex = 'sp';
+  var sellTargetId = null;
+
+  function indexById(id){ return INDEXES.filter(function(i){ return i.id === id; })[0]; }
+  function dayKey(dt){
+    var m = dt.getMonth() + 1, d = dt.getDate();
+    return dt.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+  }
+  function fmtDay(d){
+    return new Date(d + 'T00:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric'});
+  }
+  function fmtSigned(n){ var v = round2(n); return (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(2); }
+  function fmtPct(n){ var v = Math.round(n * 100) / 100; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + '%'; }
+  function tone(n){ return round2(n) > 0 ? 'up' : round2(n) < 0 ? 'down' : 'flat'; }
+  function fmtLevel(n){ return n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+  // Deterministic simulated market: the same dates always produce the same prices,
+  // so it looks consistent across devices and reloads without storing anything.
+  function hashSeed(str){
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+  function rng(seed){
+    return function(){
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function gauss(r){ var u = r() || 1e-9, v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+  function simBars(ix){
+    var bars = [], lvl = ix.base, dt = new Date(2025, 0, 2), end = new Date();
+    end.setHours(23, 59, 59, 999);
+    while (dt <= end){
+      var wd = dt.getDay();
+      if (wd !== 0 && wd !== 6){
+        var k = dayKey(dt);
+        lvl *= 1 + 0.0004 + ix.vol * gauss(rng(hashSeed(ix.id + k)));
+        bars.push({ d:k, c:round2(lvl) });
+      }
+      dt.setDate(dt.getDate() + 1);
+    }
+    return bars;
+  }
+
+  function fetchLive(ix){
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = setTimeout(function(){ if (ctl) ctl.abort(); }, 7000);
+    var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ix.sym) + '?range=1y&interval=1d';
+    if (MARKET_PROXY) url = MARKET_PROXY + encodeURIComponent(url);
+    return fetch(url, ctl ? {signal:ctl.signal} : undefined).then(function(r){
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function(j){
+      clearTimeout(timer);
+      var res = j.chart.result[0], ts = res.timestamp, q = res.indicators.quote[0].close;
+      var off = res.meta.gmtoffset || 0, bars = [];
+      for (var i = 0; i < ts.length; i++){
+        if (q[i] != null) bars.push({ d:new Date((ts[i] + off) * 1000).toISOString().slice(0, 10), c:round2(q[i]) });
+      }
+      if (bars.length < 5) throw new Error('too few bars');
+      var px = res.meta.regularMarketPrice;
+      if (typeof px === 'number' && res.meta.regularMarketTime){
+        var last = bars[bars.length - 1];
+        var td = new Date((res.meta.regularMarketTime + off) * 1000).toISOString().slice(0, 10);
+        if (td === last.d) last.c = round2(px);
+        else if (td > last.d) bars.push({ d:td, c:round2(px) });
+      }
+      return bars;
+    }, function(e){ clearTimeout(timer); throw e; });
+  }
+
+  function loadMarket(force){
+    var cached = null;
+    try{ cached = JSON.parse(localStorage.getItem(MKT_KEY)); }catch(e){}
+    return Promise.all(INDEXES.map(function(ix){
+      var c = cached && cached[ix.id];
+      if (!force && c && Date.now() - c.at < MKT_TTL) return c;
+      return fetchLive(ix).then(
+        function(bars){ return { bars:bars, at:Date.now() }; },
+        function(){ return (c && Date.now() - c.at < 3 * 86400000) ? c : null; }
+      );
+    })).then(function(results){
+      var store = {};
+      INDEXES.forEach(function(ix, i){
+        var r = results[i];
+        if (r){ store[ix.id] = r; market[ix.id] = { src:'live', bars:r.bars, at:r.at }; }
+        else { market[ix.id] = { src:'sim', bars:simBars(ix), at:Date.now() }; }
+      });
+      try{ localStorage.setItem(MKT_KEY, JSON.stringify(store)); }catch(e){}
+      state.marketReady = true;
+      renderMarket();
+    });
+  }
+
+  function currentLevel(id){ var b = market[id].bars; return b[b.length - 1].c; }
+
+  function openPositions(){
+    return state.positions.filter(function(p){ return p.status === 'open' && market[p.index]; });
+  }
+  function posValue(p){ return round2(p.units * currentLevel(p.index)); }
+
+  // Union of trading dates across indexes, with each index's close carried forward onto it.
+  function alignBars(ids){
+    var seen = {};
+    ids.forEach(function(id){ market[id].bars.forEach(function(b){ seen[b.d] = 1; }); });
+    var dates = Object.keys(seen).sort(), aligned = {};
+    ids.forEach(function(id){
+      var bars = market[id].bars, j = 0, last = bars[0].c, arr = [];
+      dates.forEach(function(d){
+        while (j < bars.length && bars[j].d <= d){ last = bars[j].c; j++; }
+        arr.push(last);
+      });
+      aligned[id] = arr;
+    });
+    return { dates:dates, aligned:aligned };
+  }
+  function lastIdxOnOrBefore(dates, day){
+    var idx = 0;
+    for (var i = 0; i < dates.length; i++){ if (dates[i] <= day) idx = i; else break; }
+    return idx;
+  }
+  function rangeStart(dates, from, rangeId){
+    var r = RANGES.filter(function(x){ return x.id === rangeId; })[0];
+    var start = from;
+    if (r && isFinite(r.days)){
+      var cut = new Date(); cut.setDate(cut.getDate() - r.days);
+      var ck = dayKey(cut);
+      for (var i = from; i < dates.length; i++){ if (dates[i] >= ck){ start = i; break; } start = i; }
+    }
+    return Math.min(start, dates.length - 2);
+  }
+
+  function portfolioSeries(){
+    var ps = openPositions();
+    if (!ps.length) return null;
+    var ids = [], seen = {};
+    ps.forEach(function(p){ if (!seen[p.index]){ seen[p.index] = 1; ids.push(p.index); } });
+    var al = alignBars(ids), dates = al.dates, lastI = dates.length - 1;
+    var eff = ps.map(function(p){ return lastIdxOnOrBefore(dates, dayKey(new Date(p.ts))); });
+    var minE = Math.min.apply(null, eff);
+    var pseudo = (minE === lastI);
+    var startI = pseudo ? Math.max(0, lastI - 1) : minE;
+    var from = rangeStart(dates, startI, chartRange);
+    var vals = [], inv = [], ds = [];
+    for (var i = from; i <= lastI; i++){
+      var v = 0, iv = 0;
+      ps.forEach(function(p, k){
+        var e = eff[k];
+        if (i < e){
+          if (pseudo && e === lastI){ v += p.amount; iv += p.amount; }
+          return;
+        }
+        iv += p.amount;
+        v += (i === e && e !== lastI) ? p.amount : p.units * al.aligned[p.index][i];
+      });
+      ds.push(dates[i]); vals.push(round2(v)); inv.push(round2(iv));
+    }
+    return { dates:ds, vals:vals, inv:inv };
+  }
+
+  function dayChange(){
+    var chg = 0, base = 0;
+    openPositions().forEach(function(p){
+      var bars = market[p.index].bars, n = bars.length;
+      var e = lastIdxOnOrBefore(bars.map(function(b){ return b.d; }), dayKey(new Date(p.ts)));
+      var now = p.units * bars[n - 1].c;
+      var prev = (e >= n - 1) ? p.amount : p.units * bars[n - 2].c;
+      chg += now - prev; base += prev;
+    });
+    return { amt:chg, pct: base > 0 ? chg / base * 100 : 0 };
+  }
+
+  // ---------- chart ----------
+  function drawChart(series, dates, opts){
+    var W = 640, H = 250, L = 52, R = 12, T = 12, B = 26, n = dates.length;
+    var all = [];
+    series.forEach(function(s){ all = all.concat(s.vals); });
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+    if (hi - lo < 0.01){ hi += 1; lo -= 1; }
+    var pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+    function x(i){ return L + (W - L - R) * (n < 2 ? 0 : i / (n - 1)); }
+    function y(v){ return T + (H - T - B) * (1 - (v - lo) / (hi - lo)); }
+    var out = '<svg class="chart" id="chartSvg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + escapeHtml(opts.label) + '">';
+    for (var t = 0; t < 4; t++){
+      var tv = lo + (hi - lo) * t / 3, ty = y(tv);
+      out += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + ty + '" y2="' + ty + '" stroke="var(--border)" stroke-width="1"/>' +
+             '<text x="' + (L - 8) + '" y="' + (ty + 4) + '" text-anchor="end">$' + tv.toFixed(hi - lo < 10 ? 2 : 0) + '</text>';
+    }
+    [0, Math.floor((n - 1) / 2), n - 1].forEach(function(i, k){
+      if (k > 0 && i === 0) return;
+      out += '<text x="' + x(i) + '" y="' + (H - 7) + '" text-anchor="' + (k === 0 ? 'start' : k === 2 ? 'end' : 'middle') + '">' + fmtDay(dates[i]) + '</text>';
+    });
+    series.forEach(function(s){
+      var pts = s.vals.map(function(v, i){ return x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(' ');
+      if (s.area){
+        out += '<polygon points="' + x(0).toFixed(1) + ',' + (H - B) + ' ' + pts + ' ' + x(n - 1).toFixed(1) + ',' + (H - B) + '" fill="' + s.color + '" opacity="0.12"/>';
+      }
+      out += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.dashed ? 1.6 : 2.6) + '"' +
+             (s.dashed ? ' stroke-dasharray="5 4"' : '') + ' stroke-linejoin="round" stroke-linecap="round"/>';
+    });
+    out += '<line id="chartCursor" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--ink-soft)" stroke-width="1" visibility="hidden"/>';
+    series.forEach(function(s, k){
+      if (s.dashed) return;
+      out += '<circle id="chartDot' + k + '" r="4.5" fill="' + s.color + '" stroke="var(--surface)" stroke-width="2" cx="' + x(n - 1) + '" cy="' + y(s.vals[n - 1]) + '"/>';
+    });
+    out += '</svg>';
+    document.getElementById('chartWrap').innerHTML = out;
+
+    var readout = document.getElementById('chartReadout');
+    function show(i){
+      readout.innerHTML = '<span>' + fmtDay(dates[i]) + '</span>' + series.map(function(s){
+        return '<span>' + escapeHtml(s.name) + ' <b>$' + s.vals[i].toFixed(2) + '</b></span>';
+      }).join('');
+      series.forEach(function(s, k){
+        var dot = document.getElementById('chartDot' + k);
+        if (dot){ dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(s.vals[i])); }
+      });
+      var cur = document.getElementById('chartCursor');
+      cur.setAttribute('x1', x(i)); cur.setAttribute('x2', x(i));
+    }
+    var svg = document.getElementById('chartSvg'), cursor = document.getElementById('chartCursor');
+    function onMove(e){
+      var rect = svg.getBoundingClientRect();
+      var px = (e.clientX - rect.left) / rect.width * W;
+      var i = Math.round((px - L) / (W - L - R) * (n - 1));
+      show(Math.max(0, Math.min(n - 1, i)));
+      cursor.setAttribute('visibility', 'visible');
+    }
+    svg.addEventListener('pointermove', onMove);
+    svg.addEventListener('pointerdown', onMove);
+    svg.addEventListener('pointerleave', function(){ cursor.setAttribute('visibility', 'hidden'); show(n - 1); });
+    show(n - 1);
+  }
+
+  function renderMarket(){
+    var badge = document.getElementById('mktBadge');
+    if (!state.marketReady){ badge.textContent = 'Checking the market…'; badge.className = 'mkt-badge'; return; }
+
+    var srcs = INDEXES.map(function(i){ return market[i.id].src; });
+    var live = srcs.filter(function(s){ return s === 'live'; }).length;
+    var asof = Math.max.apply(null, INDEXES.map(function(i){ return market[i.id].at; }));
+    var timeStr = new Date(asof).toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+    badge.className = 'mkt-badge ' + (live === INDEXES.length ? 'live' : 'sim');
+    badge.textContent = live === INDEXES.length ? 'Live market · ' + timeStr
+      : live > 0 ? 'Partly live · ' + timeStr : 'Practice market (simulated)';
+
+    // range tabs
+    var tabs = document.getElementById('rangeTabs');
+    tabs.innerHTML = RANGES.map(function(r){
+      return '<button type="button" data-range="' + r.id + '" aria-pressed="' + (r.id === chartRange) + '">' + r.id + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(tabs.querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){ chartRange = b.getAttribute('data-range'); renderMarket(); });
+    });
+
+    var ps = openPositions();
+    var statsEl = document.getElementById('mktStats'), holdEl = document.getElementById('holdings');
+    var legend = document.getElementById('chartLegend'), note = document.getElementById('mktNote');
+
+    if (ps.length){
+      var invested = 0, value = 0;
+      ps.forEach(function(p){ invested += p.amount; value += posValue(p); });
+      var gain = round2(value - invested), gainPct = invested > 0 ? gain / invested * 100 : 0;
+      var dc = dayChange();
+      statsEl.hidden = false;
+      statsEl.innerHTML =
+        '<div class="mkt-stat"><div class="k">Worth now</div><div class="v">' + fmt(value) + '</div><div class="s flat">put in ' + fmt(invested) + '</div></div>' +
+        '<div class="mkt-stat"><div class="k">Total ' + (gain < 0 ? 'loss' : 'growth') + '</div><div class="v ' + tone(gain) + '">' + fmtSigned(gain) + '</div><div class="s ' + tone(gain) + '">' + fmtPct(gainPct) + '</div></div>' +
+        '<div class="mkt-stat"><div class="k">Latest day</div><div class="v ' + tone(dc.amt) + '">' + fmtSigned(dc.amt) + '</div><div class="s ' + tone(dc.amt) + '">' + fmtPct(dc.pct) + '</div></div>';
+
+      var ser = portfolioSeries();
+      var color = gain >= 0 ? 'var(--save)' : 'var(--gift)';
+      legend.innerHTML = '<span class="legend"><i style="background:' + color + '"></i>Investment value</span><span class="legend"><i class="dash"></i>Money put in</span>';
+      drawChart([
+        { name:'Value', vals:ser.vals, color:color, area:true },
+        { name:'Put in', vals:ser.inv, color:'var(--ink-soft)', dashed:true }
+      ], ser.dates, { label:'Investment value over time. Now ' + fmt(value) + ', ' + fmtSigned(gain) + ' compared with the ' + fmt(invested) + ' put in.' });
+      note.textContent = 'Move your finger or mouse over the chart to see any day. When the line is above the dashed one, the investment has grown.';
+
+      holdEl.hidden = false;
+      holdEl.innerHTML = ps.map(function(p){
+        var ix = indexById(p.index), v = posValue(p), g = round2(v - p.amount), gp = p.amount > 0 ? g / p.amount * 100 : 0;
+        return '<div class="holding">' +
+          '<span class="chip mkt-' + ix.id + '">' + ix.label + '</span>' +
+          '<span class="h-main">Put in ' + fmt(p.amount) + '<span class="h-sub">since ' + fmtDay(dayKey(new Date(p.ts))) + '</span></span>' +
+          '<span class="h-val">' + fmt(v) + '<small class="' + tone(g) + '">' + fmtSigned(g) + ' (' + fmtPct(gp) + ')</small></span>' +
+          '<button class="btn-sell" type="button" data-sell="' + escapeHtml(p.id) + '">Sell</button>' +
+          '</div>';
+      }).join('');
+      Array.prototype.forEach.call(holdEl.querySelectorAll('[data-sell]'), function(btn){
+        btn.addEventListener('click', function(){ openSell(btn.getAttribute('data-sell')); });
+      });
+    } else {
+      statsEl.hidden = true; holdEl.hidden = true;
+      var al = alignBars(INDEXES.map(function(i){ return i.id; }));
+      var from = rangeStart(al.dates, 0, chartRange);
+      var ds = al.dates.slice(from);
+      var lines = INDEXES.map(function(ix){
+        var arr = al.aligned[ix.id].slice(from), c0 = arr[0];
+        return { name:ix.label, color:ix.color, vals:arr.map(function(c){ return round2(100 * c / c0); }) };
+      });
+      legend.innerHTML = INDEXES.map(function(ix){ return '<span class="legend"><i style="background:' + ix.color + '"></i>' + ix.label + '</span>'; }).join('');
+      drawChart(lines, ds, { label:'What $100 would have become in the S&P 500 and NASDAQ over this period.' });
+      note.textContent = 'Nothing invested yet. This shows what $100 would have turned into in each market over this time — tap "Invest from Save" to try it for real.';
+    }
+    document.getElementById('openInvest').disabled = (bal('save')) <= 0;
+  }
+
+  // ---------- invest / sell ----------
+  function applyInvest(ix, amount){
+    var curB = state.buckets.save || emptyBucket(), cur = curB.balance;
+    amount = round2(amount);
+    if (amount <= 0 || amount > cur + 0.001) return Promise.reject(new Error('insufficient'));
+    var level = currentLevel(ix.id), newBal = round2(cur - amount), ts = nowISO();
+    var nb = { balance:newBal, totalEarned:curB.totalEarned, totalWithdrawn:curB.totalWithdrawn, marketNet:round2((curB.marketNet || 0) + amount) };
+    var pos = { index:ix.id, amount:amount, units:amount / level, buyLevel:level, status:'open', ts:ts };
+    var note = 'Invested in ' + ix.label;
+    if (state.mode === 'cloud'){
+      return db.collection('buckets').doc('save').set(Object.assign({ label:'Save', updatedAt:ts }, nb))
+        .then(function(){ return db.collection('positions').add(pos); })
+        .then(function(){ return db.collection('transactions').add({ type:'invest', bucket:'save', amount:amount, balanceAfter:newBal, note:note, ts:ts }); })
+        .then(function(){ pulseCard('save'); });
+    }
+    state.buckets.save = nb;
+    pos.id = 'local-pos-' + Date.now();
+    state.positions.unshift(pos);
+    state.txns.unshift({ id:'local-' + Date.now(), type:'invest', bucket:'save', amount:amount, balanceAfter:newBal, note:note, ts:ts });
+    state.txns = state.txns.slice(0, 30);
+    saveLocal(); render(); pulseCard('save');
+    return Promise.resolve();
+  }
+
+  function applySell(p){
+    var ix = indexById(p.index), value = posValue(p), ts = nowISO();
+    var curB = state.buckets.save || emptyBucket();
+    var newBal = round2(curB.balance + value), gain = round2(value - p.amount);
+    var nb = { balance:newBal, totalEarned:curB.totalEarned, totalWithdrawn:curB.totalWithdrawn, marketNet:round2((curB.marketNet || 0) - value) };
+    var note = 'Sold ' + ix.label + ' (' + fmtSigned(gain) + ')';
+    var sold = {}; Object.keys(p).forEach(function(k){ if (k !== 'id') sold[k] = p[k]; });
+    sold.status = 'sold'; sold.soldValue = value; sold.soldTs = ts;
+    if (state.mode === 'cloud'){
+      return db.collection('buckets').doc('save').set(Object.assign({ label:'Save', updatedAt:ts }, nb))
+        .then(function(){ return db.collection('positions').doc(p.id).set(sold); })
+        .then(function(){ return db.collection('transactions').add({ type:'divest', bucket:'save', amount:value, balanceAfter:newBal, note:note, ts:ts }); })
+        .then(function(){ pulseCard('save'); });
+    }
+    state.buckets.save = nb;
+    p.status = 'sold'; p.soldValue = value; p.soldTs = ts;
+    state.txns.unshift({ id:'local-' + Date.now(), type:'divest', bucket:'save', amount:value, balanceAfter:newBal, note:note, ts:ts });
+    state.txns = state.txns.slice(0, 30);
+    saveLocal(); render(); pulseCard('save');
+    return Promise.resolve();
+  }
+
+  var investOverlay = document.getElementById('investOverlay');
+  var investAmountEl = document.getElementById('investAmount');
+  var investError = document.getElementById('investError');
+
+  function renderIdxPicker(){
+    var el = document.getElementById('idxPicker');
+    el.innerHTML = INDEXES.map(function(ix){
+      return '<button type="button" class="idx-opt" data-idx="' + ix.id + '" aria-pressed="' + (ix.id === investIndex) + '">' +
+        '<strong>' + ix.label + '</strong><span>Level ' + fmtLevel(currentLevel(ix.id)) + '</span></button>';
+    }).join('');
+    Array.prototype.forEach.call(el.querySelectorAll('[data-idx]'), function(b){
+      b.addEventListener('click', function(){ investIndex = b.getAttribute('data-idx'); renderIdxPicker(); });
+    });
+  }
+
+  document.getElementById('openInvest').addEventListener('click', function(){
+    if (!state.marketReady) return;
+    document.getElementById('investSub').textContent = 'Available in Save: ' + fmt(bal('save'));
+    investAmountEl.value = '';
+    investAmountEl.max = bal('save');
+    investError.hidden = true;
+    renderIdxPicker();
+    investOverlay.hidden = false;
+    investAmountEl.focus();
+  });
+  document.getElementById('cancelInvest').addEventListener('click', function(){ investOverlay.hidden = true; });
+  investOverlay.addEventListener('click', function(e){ if (e.target === investOverlay) investOverlay.hidden = true; });
+  document.getElementById('confirmInvest').addEventListener('click', function(){
+    var amount = parseFloat(investAmountEl.value) || 0, saveBal = bal('save');
+    if (amount <= 0){ investError.textContent = 'Enter an amount greater than $0.'; investError.hidden = false; return; }
+    if (amount > saveBal + 0.001){ investError.textContent = 'That’s more than what’s in Save.'; investError.hidden = false; return; }
+    investError.hidden = true;
+    var btn = document.getElementById('confirmInvest'), ix = indexById(investIndex);
+    btn.disabled = true;
+    applyInvest(ix, amount).then(function(){
+      investOverlay.hidden = true;
+      showToast(fmt(amount) + ' invested in ' + ix.label + '!');
+    }).catch(function(){
+      investError.textContent = 'Something went wrong — try again.'; investError.hidden = false;
+    }).then(function(){ btn.disabled = false; });
+  });
+
+  var sellOverlay = document.getElementById('sellOverlay');
+  function openSell(id){
+    var p = state.positions.filter(function(x){ return x.id === id; })[0];
+    if (!p) return;
+    sellTargetId = id;
+    var ix = indexById(p.index), v = posValue(p), g = round2(v - p.amount);
+    document.getElementById('sellTitle').textContent = 'Sell ' + ix.label + ' investment';
+    document.getElementById('sellSub').textContent = 'He put in ' + fmt(p.amount) + '. It’s worth ' + fmt(v) + ' right now.';
+    var box = document.getElementById('sellBox');
+    box.className = 'remaining ' + (g >= 0 ? 'ok' : 'bad');
+    box.innerHTML = '<span>' + (g >= 0 ? 'Growth' : 'Loss') + ' so far</span><span>' + fmtSigned(g) + '</span>';
+    sellOverlay.hidden = false;
+  }
+  document.getElementById('cancelSell').addEventListener('click', function(){ sellOverlay.hidden = true; });
+  sellOverlay.addEventListener('click', function(e){ if (e.target === sellOverlay) sellOverlay.hidden = true; });
+  document.getElementById('confirmSell').addEventListener('click', function(){
+    var p = state.positions.filter(function(x){ return x.id === sellTargetId; })[0];
+    if (!p || p.status !== 'open'){ sellOverlay.hidden = true; return; }
+    var btn = document.getElementById('confirmSell'), v = posValue(p);
+    btn.disabled = true;
+    applySell(p).then(function(){
+      sellOverlay.hidden = true;
+      showToast(fmt(v) + ' is back in Save.');
+    }).catch(function(){
+      showToast('Something went wrong — try again.');
+    }).then(function(){ btn.disabled = false; });
+  });
+
+  document.getElementById('refreshMarket').addEventListener('click', function(){
+    var btn = this; btn.disabled = true;
+    loadMarket(true).then(function(){ showToast('Market updated.'); }).then(function(){ btn.disabled = false; });
+  });
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') loadMarket(false);
+  });
+
+  // ---------- deposit modal ----------
+  var depositOverlay = document.getElementById('depositOverlay');
+  var earnedTotalEl = document.getElementById('earnedTotal');
+  var splitEls = { save: document.getElementById('splitSave'), gift: document.getElementById('splitGift'), spend: document.getElementById('splitSpend') };
+  var remainingBox = document.getElementById('remainingBox');
+  var confirmDepositBtn = document.getElementById('confirmDeposit');
+
+  function updateRemaining(){
+    var total = parseFloat(earnedTotalEl.value) || 0;
+    var assigned = (parseFloat(splitEls.save.value)||0) + (parseFloat(splitEls.gift.value)||0) + (parseFloat(splitEls.spend.value)||0);
+    var remaining = round2(total - assigned);
+    var ok = total > 0 && Math.abs(remaining) < 0.005;
+    remainingBox.textContent = 'Remaining to assign: ' + fmt(remaining);
+    remainingBox.className = 'remaining ' + (ok ? 'ok' : (remaining < 0 ? 'bad' : ''));
+    confirmDepositBtn.disabled = !ok;
+  }
+
+  document.getElementById('openDeposit').addEventListener('click', function(){
+    earnedTotalEl.value = '';
+    splitEls.save.value = ''; splitEls.gift.value = ''; splitEls.spend.value = '';
+    document.getElementById('depositNote').value = '';
+    updateRemaining();
+    depositOverlay.hidden = false;
+    earnedTotalEl.focus();
+  });
+  document.getElementById('cancelDeposit').addEventListener('click', function(){ depositOverlay.hidden = true; });
+  depositOverlay.addEventListener('click', function(e){ if (e.target === depositOverlay) depositOverlay.hidden = true; });
+
+  [earnedTotalEl, splitEls.save, splitEls.gift, splitEls.spend].forEach(function(el){
+    el.addEventListener('input', updateRemaining);
+  });
+
+  confirmDepositBtn.addEventListener('click', function(){
+    var allocations = {
+      save: parseFloat(splitEls.save.value) || 0,
+      gift: parseFloat(splitEls.gift.value) || 0,
+      spend: parseFloat(splitEls.spend.value) || 0
+    };
+    var note = document.getElementById('depositNote').value.trim();
+    confirmDepositBtn.disabled = true;
+    applyDeposit(allocations, note).then(function(){
+      depositOverlay.hidden = true;
+      showToast('This week’s earnings are in the banks!');
+    }).catch(function(){
+      showToast('Something went wrong — try again.');
+    }).then(function(){ confirmDepositBtn.disabled = false; });
+  });
+
+  // ---------- withdraw modal ----------
+  var withdrawOverlay = document.getElementById('withdrawOverlay');
+  var withdrawAmountEl = document.getElementById('withdrawAmount');
+  var withdrawError = document.getElementById('withdrawError');
+
+  function openWithdraw(bucketId){
+    withdrawTarget = bucketId;
+    var bucket = BUCKETS.filter(function(b){ return b.id === bucketId; })[0];
+    var curBal = bal(bucketId);
+    document.getElementById('withdrawTitle').textContent = 'Withdraw from ' + bucket.label;
+    document.getElementById('withdrawSub').textContent = 'Available balance: ' + fmt(curBal);
+    withdrawAmountEl.value = '';
+    withdrawAmountEl.max = curBal;
+    document.getElementById('withdrawNote').value = '';
+    withdrawError.hidden = true;
+    withdrawOverlay.hidden = false;
+    withdrawAmountEl.focus();
+  }
+  document.getElementById('cancelWithdraw').addEventListener('click', function(){ withdrawOverlay.hidden = true; });
+  withdrawOverlay.addEventListener('click', function(e){ if (e.target === withdrawOverlay) withdrawOverlay.hidden = true; });
+
+  document.getElementById('confirmWithdraw').addEventListener('click', function(){
+    var amount = parseFloat(withdrawAmountEl.value) || 0;
+    var curBal = bal(withdrawTarget);
+    if (amount <= 0){ withdrawError.textContent = 'Enter an amount greater than $0.'; withdrawError.hidden = false; return; }
+    if (amount > curBal + 0.001){ withdrawError.textContent = 'That’s more than what’s in this bank.'; withdrawError.hidden = false; return; }
+    withdrawError.hidden = true;
+    var note = document.getElementById('withdrawNote').value.trim();
+    var btn = document.getElementById('confirmWithdraw');
+    btn.disabled = true;
+    applyWithdraw(withdrawTarget, amount, note).then(function(){
+      withdrawOverlay.hidden = true;
+      showToast(fmt(amount) + ' withdrawn — enjoy!');
+    }).catch(function(){
+      withdrawError.textContent = 'Something went wrong — try again.';
+      withdrawError.hidden = false;
+    }).then(function(){ btn.disabled = false; });
+  });
+
+  render();
+  initBackend();
+  loadMarket(false);
+})();
+</script>
+</body>
+</html>
