@@ -9,11 +9,12 @@
 - **Active phase:** Phase 1 — Foundation (MVP / Professional Profile)
 - **Active initiative:** **Veekay Labs — Profile** (named 2026-09-28) — `docs/build-pipeline/01-mvp-professional-profile/`. See the milestone-sequenced Build Roadmap (M0–M7) in `docs/build-pipeline/ROADMAP.md`.
 - **Pipeline doc status:** `1_PRD.md` ✅ drafted · `2_High-Level-Design-and-Engineering.md` ✅ drafted, pending Venkat's review · `4_spec.md` ⬜ not started · `5_execution.md` ⬜ not started
-- **Last session:** 2026-09-28
+- **Last session:** 2026-10-22 (Trading-Journal side project only; Phase 1 untouched since 2026-09-28)
 - **Waiting on:** Venkat's review of the HLD/Engineering doc + answers to its 3 open questions (contact form backend, GitHub page approach, custom domain status)
 - **Next up:** Once open questions are answered → write `4_spec.md` for the contact form (first implementation-ready piece), then `5_execution.md` task breakdown
 - **Sub-project note:** `websites/venara/` (Venara Inc site) now lives in this repo — separate page/checklist, not part of these phase gates. See `websites/venara/docs/PROJECT-SUMMARY.md`.
-- **Side project note (Piggy Payday, 2026-10-22):** `Personal_projects/piggy-payday/` (single-file chore bank) was revived and extended with a **Market Investment** section; a deployable build lives in `Personal_projects/piggy-payday-site/` (Cloudflare Pages + Supabase) at https://piggy-payday.pages.dev. Still a side project, separate from the Phase 1–5 gates; see `Personal_projects/piggy-payday-site/README.md`.
+- **Side project note:** `Personal_projects/Trading-Journal/` (local trade-logging web app, built 2026-10-22) lives in this repo but is separate from the Phase 1–5 gates. It has its own `README.md`; its database and screenshots are git-ignored and sync through the cloud folder.
+- **Side project note (Piggy Payday, 2026-10-22):** `Personal_projects/piggy-payday/` (single-file chore bank) was revived and extended with a **Market Investment** section; a deployable build lives in `Personal_projects/piggy-payday-site/` (Cloudflare Pages + Supabase) at https://piggy-payday.pages.dev. Still a side project, separate from the Phase 1–5 gates; see `Personal_projects/piggy-payday-site/docs/PROJECT-SUMMARY.md` (build summary, runbook, open items) and its `CLAUDE.md`.
 - **Corporate structure (confirmed 2026-09-28):** Venara Inc is the parent legal entity; "Veekay Labs" is a site name operated under it. Footer copy updated in `docs/page-content.md` §18 to credit Venara Inc.
 - **Agent note:** the project-scoped **PRO** agent is retired. Say **"co-builder"** instead — a universal build-partner agent at `~/.claude/agents/co-builder.md` that works across all of Veekay's projects. Its working notes for this project live at `.claude/agent-memory/co-builder/`.
 - **Assets confirmed as build inputs (2026-09-28):** `assets/image.png` (Home page mockup), `assets/Build website from reference/src/app/App.tsx` (a near-complete built implementation of it — real content, real design tokens), `assets/Veekay Labs Type and Color Pairings.html` (font/color exploration — navy/cyan pairing confirmed selected), `assets/Veekay_AI_Product_Website_Blueprint_v1.pdf` (IA/content source). Full breakdown in `docs/build-pipeline/ROADMAP.md`'s "Reference Assets" table and `docs/design-system.md`.
@@ -35,6 +36,38 @@
 **Open / for Venkat:**
 - Run `supabase/atomic-writes.sql` in the Supabase SQL Editor (the new page needs it), turn off "Allow new users to sign up", set email rate limits, add any other family emails (Authentication -> Users, plus `allowed_emails`).
 - Known limits: no parent/kid roles (everyone on the allow-list has full control); the database can't verify live prices; free Supabase has no auto-backups and pauses after ~1 week idle.
+
+### 2026-10-22 — Trading-Journal built (side project under Personal_projects)
+
+**Did:**
+- Built **Trading-Journal** at `Personal_projects/Trading-Journal/`: a local Flask + SQLite web app for Veekay's daily trade logging, linked to the `TradeVenture/` folder. Sections: **Scalp** (log after the trade), **Options** and **Swing** (plan first, come back for actuals, plan-vs-actual comparison), **Futures** ("Coming soon"), plus Today, Stats and Settings.
+- Modeled the fields and calculators on the "Live Trade Journal" Google Sheet export (`Downloads/Live Trade Journal/`): scalp columns from `Paper Live Journal`, options and swing risk calculators and result blocks, entry/exit-followed checklists. Unit tests reproduce the sheet's numbers (options example: $109.96 P/L, 21.56% ROI, 3.27 R:R).
+- Imported the 103 trades in `TradeVenture/Trade_Log.csv` (T001–T103; free-text cells kept verbatim in `legacy_json`; import is idempotent).
+- Added **Claude trade review**: paste screenshots and order details on a trade, review runs against `rules/scalp.md`, `options.md`, `swing.md`; or "Copy review packet" to paste into Claude without an API key.
+- Cross-machine design: DB in `data/journal.db` (rollback-journal mode, not WAL, so sync tools cannot corrupt it), a heartbeat lock file allows one running machine at a time, daily backups (14 kept), Python environment per machine at `~/.venvs/trading-journal`, API key per machine at `~/.trading-journal.env`.
+
+**UI pass (same day, Venkat's request):** section colors (Scalp blue, Options violet, Swing teal, Futures amber) on a tab bar; entry forms rebuilt as numbered left-to-right rows (labels in a left rail, Tab moves along the row, whole scalp form fits one screen); sticky in-page jump tabs per form with scrollspy; Cmd/Ctrl+Enter saves; green/red Y/N, violation and emotion chips; win/loss row tints in lists.
+
+**Later the same day:** Stats page got charts per section (cumulative P&L, P&L per trade, win/loss %, win rate vs break-even, winning vs losing margins, size distribution, written analysis, table view) and a ranked **Key areas to improve** block per tab, built from the journal's own data (`app/improve.py`, `app/perf.py`). Every entry now carries an **Account: Paper / Live** field (default Paper; all 103 imported scalp trades are paper); lists and Stats can filter by account so paper and live results are not mixed.
+
+**End of day:** navigation moved to a left sidebar; Stats split into a Portfolio summary plus one page per trade type; each has a narrow "Focus now" list (specific habits to stop, impact judged from the data) above the broader key areas. Committed and pushed.
+
+**Decided (Venkat):**
+- SQLite in rollback mode; Python/Flask stack; `Trade_Log.csv` is the scalp source of truth; project lives in this repo, own folder.
+- Futures stays a placeholder until Venkat supplies the fields.
+
+**Open / for Venkat:**
+- API key not yet set up on any machine (reviews return a clear error until it is; the copy-packet route works now).
+- Options risk budget conflict in the sheet: calculator uses 5% of $1,500 ($75), checklist text says $30. Set the real value in Settings; the app flags the sheet's own example ($150 planned loss) as over budget.
+- The rules files in `rules/` were seeded from the journal's section 1.1 and `Strategy_Change_Log.md`; Venkat should confirm they match the strategy in force. Category codes D and E in `Trade_Log.csv` have no definition in the journal and were kept as-is.
+- Not yet run on the laptop (first launch builds its venv).
+
+**Next session should:**
+- Ask whether Venkat has used it for a trading day; collect friction points in the entry forms.
+- Get the Futures field list if he wants that section built.
+- Consider an optional nightly CSV export if he wants a git-friendly record.
+
+---
 
 ### 2026-09-28 — PRO session-start audit; Venara sub-project folded in; PRO retired for co-builder; "Veekay Labs — Profile" named + roadmapped
 
