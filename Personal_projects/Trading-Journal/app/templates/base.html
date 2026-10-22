@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Trading Journal{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+{% set ep = request.endpoint or '' %}
+{% set vk = (request.view_args or {}).get('kind') %}
+{% set sec = vk if vk in ('options','swing') else ('scalp' if ep.startswith('main.scalp') else ('futures' if ep == 'main.futures' else 'home')) %}
+<body class="sec-{{ sec }}">
+<header class="top">
+  <a class="brand" href="{{ url_for('main.today_view') }}">Trading Journal</a>
+  <nav class="tabs" aria-label="Sections">
+    <a class="tab t-scalp {{ 'on' if sec == 'scalp' }}" href="{{ url_for('main.scalp_list') }}">Scalp</a>
+    <a class="tab t-options {{ 'on' if sec == 'options' }}" href="{{ url_for('main.plans_list', kind='options') }}">Options</a>
+    <a class="tab t-swing {{ 'on' if sec == 'swing' }}" href="{{ url_for('main.plans_list', kind='swing') }}">Swing</a>
+    <a class="tab t-futures {{ 'on' if sec == 'futures' }}" href="{{ url_for('main.futures') }}">Futures <span class="soon">soon</span></a>
+  </nav>
+  <nav class="util">
+    <a href="{{ url_for('main.today_view') }}" class="{{ 'on' if ep == 'main.today_view' }}">Today</a>
+    <a href="{{ url_for('main.stats') }}" class="{{ 'on' if ep == 'main.stats' }}">Stats</a>
+    <a href="{{ url_for('main.settings_view') }}" class="{{ 'on' if ep == 'main.settings_view' }}">Settings</a>
+  </nav>
+</header>
+<main>
+  {% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}
+  {% block body %}{% endblock %}
+</main>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

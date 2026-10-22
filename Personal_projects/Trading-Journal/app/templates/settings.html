@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="head"><h1>Settings</h1></div>
+<form method="post" class="card"><h2>Account and defaults</h2>
+  <div class="grid">
+    <div class="field"><label>Account balance $</label><input name="account_balance" value="{{ s.account_balance }}"></div>
+    <div class="field"><label>Options risk %</label><input name="options_risk_pct" value="{{ s.options_risk_pct }}"></div>
+    <div class="field"><label>Swing risk %</label><input name="swing_risk_pct" value="{{ s.swing_risk_pct }}"></div>
+    <div class="field"><label>Swing minimum reward : risk</label><input name="swing_min_rr" value="{{ s.swing_min_rr }}"></div>
+    <div class="field"><label>Scalp 1R $</label><input name="scalp_risk_dollars" value="{{ s.scalp_risk_dollars }}"></div>
+    <div class="field"><label>Default scalp shares</label><input name="default_shares" value="{{ s.default_shares }}"></div>
+    <div class="field"><label>Default commission $</label><input name="default_commission" value="{{ s.default_commission }}"></div>
+    <div class="field"><label>Review model</label><input name="review_model" value="{{ s.review_model }}"></div>
+  </div>
+  <p class="muted">Your options sheet used 5% of $1,500 ($75) for the calculator, while its checklist text mentions a $30 budget. Set the percentage that matches what you actually follow.</p>
+  <button class="btn primary">Save</button>
+</form>
+
+<section class="card"><h2>Claude review</h2>
+  <p>API key: <b>{{ 'found' if has_key else 'not found' }}</b>. It is read from the <code>ANTHROPIC_API_KEY</code> environment variable or from
+  <code>{{ env_file }}</code> on this machine (one line: <code>ANTHROPIC_API_KEY=sk-ant-...</code>). It is never stored in the synced folder.
+  Without a key, use “Copy review packet” and paste it into Claude.</p>
+  <p class="muted">Review rules live in the <code>rules/</code> folder (<code>scalp.md</code>, <code>options.md</code>, <code>swing.md</code>). Edit them when your strategy changes.</p>
+</section>
+
+<section class="card"><h2>Import scalp history</h2>
+  <form method="post" action="{{ url_for('main.settings_import') }}">
+    <div class="field wide"><label>Trade_Log.csv path</label><input name="path" value="{{ csv_path }}"></div>
+    <p class="muted">Safe to run again; trades already imported (matched by trade ID) are skipped. {{ '' if csv_exists else 'File not found at the default path.' }}</p>
+    <button class="btn">Import</button></form>
+</section>
+
+<section class="card"><h2>Data</h2>
+  <p>Database: <code>data/journal.db</code> inside this project folder, so it syncs with your GitHub folder. This machine: <b>{{ lockinfo }}</b>.
+  Only one machine should run the journal at a time; it refuses to start if the other one is running.</p>
+  <p class="muted">Daily backups in <code>data/backups/</code>: {{ backups|map(attribute='name')|join(', ') or 'none yet' }}.</p>
+</section>
+{% endblock %}

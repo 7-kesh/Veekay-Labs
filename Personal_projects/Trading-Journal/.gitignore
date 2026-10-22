@@ -1,0 +1,8 @@
+# Live data syncs through the cloud folder, not git
+data/*
+!data/.gitkeep
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/

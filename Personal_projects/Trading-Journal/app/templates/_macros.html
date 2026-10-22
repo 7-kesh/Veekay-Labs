@@ -1,0 +1,59 @@
+{# One input with a small label above it, sized by cls (f-xs f-sm f-md f-lg f-fill). #}
+{% macro fld(name, label, value='', cls='f-sm', type='text', mode='', extra='', hint='') %}
+<div class="fld {{ cls }}"><label for="i_{{ name }}">{{ label }}{% if hint %} <small>{{ hint }}</small>{% endif %}</label>
+  <input id="i_{{ name }}" type="{{ type }}" name="{{ name }}" value="{{ value }}" {% if mode %}inputmode="{{ mode }}"{% endif %} {{ extra|safe }}></div>
+{% endmacro %}
+
+{% macro yn(name, value, label) %}
+<div class="fld"><span class="lab">{{ label }}</span>
+  <div class="seg yn" role="radiogroup" aria-label="{{ label }}">
+    {% for v, t in (('Y','Yes'),('N','No'),('','–')) %}
+    <label><input type="radio" name="{{ name }}" value="{{ v }}" {{ 'checked' if (value or '') == v }}><span>{{ t }}</span></label>
+    {% endfor %}
+  </div></div>
+{% endmacro %}
+
+{% macro chips(name, options, selected, tone='') %}
+<div class="chips {{ tone }}">
+  {% for o in options %}
+  <label><input type="checkbox" name="{{ name }}" value="{{ o }}" {{ 'checked' if o in selected }}><span>{{ o }}</span></label>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro cat(c) %}{% if c %}<span class="cat cat-{{ c }}">{{ c }}</span>{% endif %}{% endmacro %}
+{% macro ynv(v) %}{% if v in ('Y','N') %}<span class="yn-{{ v }}">{{ v }}</span>{% endif %}{% endmacro %}
+
+{% macro shots_panel(kind, rid, shots, revs) %}
+<section class="card" id="review" data-kind="{{ kind }}" data-id="{{ rid }}">
+  <h2>Screenshots and review</h2>
+  <div class="drop" id="drop" tabindex="0">Paste a screenshot (Ctrl/Cmd+V), drop images here, or <label class="link">choose files<input type="file" id="pick" accept="image/*" multiple hidden></label></div>
+  <div class="thumbs" id="thumbs">
+    {% for s in shots %}
+    <figure data-aid="{{ s.id }}"><a href="{{ url_for('main.shot', name=s.filename) }}" target="_blank"><img src="{{ url_for('main.shot', name=s.filename) }}" alt="screenshot"></a>
+      <button type="button" class="x" title="Remove">×</button></figure>
+    {% endfor %}
+  </div>
+  <div class="row">
+    <button type="button" class="btn primary" id="runReview">Review with Claude</button>
+    <button type="button" class="btn" id="copyPacket">Copy review packet</button>
+    <span class="muted" id="reviewStatus"></span>
+  </div>
+  <div id="reviewOut" class="review">
+    {% if revs %}<div class="muted">Latest review, {{ revs[0].created_at.replace('T',' ') }} ({{ revs[0].model }})</div>
+    <div class="md" data-md="{{ revs[0].text }}"></div>{% endif %}
+  </div>
+  {% if revs|length > 1 %}<details><summary>{{ revs|length - 1 }} earlier review(s)</summary>
+    {% for r in revs[1:] %}<div class="muted">{{ r.created_at.replace('T',' ') }} ({{ r.model }})</div><div class="md" data-md="{{ r.text }}"></div>{% endfor %}
+  </details>{% endif %}
+</section>
+{% endmacro %}
+
+{% macro acct(a) %}<span class="acct acct-{{ a or 'paper' }}">{{ 'Live' if a == 'live' else 'Paper' }}</span>{% endmacro %}
+{% macro acct_pick(value) %}
+<div class="fld"><span class="lab">Account</span>
+  <div class="seg acct-seg" role="radiogroup" aria-label="Paper or live trade">
+    <label><input type="radio" name="account" value="paper" {{ 'checked' if (value or 'paper') != 'live' }}><span>Paper</span></label>
+    <label><input type="radio" name="account" value="live" {{ 'checked' if value == 'live' }}><span>Live</span></label>
+  </div></div>
+{% endmacro %}

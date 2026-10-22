@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cat, ynv, acct %}
+{% block body %}
+<div class="head"><h1>Scalp trades</h1>
+  <div><a class="btn" href="{{ url_for('main.export_csv', kind='scalp') }}">Export CSV</a>
+  <a class="btn primary" href="{{ url_for('main.scalp_new') }}">+ New trade</a></div></div>
+<form class="filters" method="get">
+  <select name="period" onchange="this.form.submit()">
+    {% for v, t in (('week','This week'),('month','This month'),('30d','Last 30 days'),('all','All time')) %}
+    <option value="{{ v }}" {{ 'selected' if period == v }}>{{ t }}</option>{% endfor %}
+  </select>
+  <select name="account" onchange="this.form.submit()">{% for v, l in (('all','Paper + live'),('paper','Paper only'),('live','Live only')) %}<option value="{{ v }}" {{ 'selected' if account == v }}>{{ l }}</option>{% endfor %}</select>
+  <input name="q" value="{{ q }}" placeholder="Ticker">
+  <button class="btn sm">Filter</button>
+  <span class="muted">{{ rows|length }} trades · net <b class="{{ net|signclass }}">{{ net|money or '$0.00' }}</b></span>
+</form>
+<div class="scroll"><table class="dense"><thead><tr>
+  <th>#</th><th>Date</th><th>Acct</th><th>Ticker</th><th>In</th><th>Entry</th><th>Shares</th><th>Stop</th><th>Risk</th><th>Net</th><th>R</th>
+  <th>Setup</th><th>Cat</th><th>Entry</th><th>Exit</th><th>Violation / emotion</th><th></th></tr></thead><tbody>
+{% for t in rows %}<tr class="{{ 'win' if (t.net_pnl or 0) > 0 else ('loss' if (t.net_pnl or 0) < 0 else '') }}">
+  <td>{{ t.trade_no }}</td><td>{{ t.date }}</td><td>{{ acct(t.account) }}</td><td><b>{{ t.ticker }}</b></td><td>{{ t.entry_time }}</td><td>{{ t.entry_price|px }}</td>
+  <td>{{ t.shares|num }}</td><td>{{ t.stop|px }}</td><td>{{ t.planned_risk|money }}</td>
+  <td class="{{ t.net_pnl|signclass }}">{{ t.net_pnl|money }}</td><td>{{ t.r_multiple|num }}</td>
+  <td>{{ t.setup }}</td><td>{{ cat(t.category) }}</td><td>{{ ynv(t.entry_valid) }}</td><td>{{ ynv(t.exit_valid) }}</td>
+  <td class="clip">{{ t.violations }}{{ ' · ' if t.violations and t.emotions }}{{ t.emotions }}</td>
+  <td><a href="{{ url_for('main.scalp_edit', rid=t.id) }}">edit</a></td></tr>
+{% else %}<tr><td colspan="17" class="muted">No trades in this period.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

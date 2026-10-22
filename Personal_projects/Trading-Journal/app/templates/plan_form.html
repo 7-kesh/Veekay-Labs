@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% from "_macros.html" import fld, yn, shots_panel, acct_pick %}
+{% set opt = kind == 'options' %}
+{% set items = cfg.OPTIONS_CHECKLIST if opt else cfg.SWING_CHECKLIST %}
+{% block title %}{{ kind_label[kind] }} plan{% endblock %}
+{% block body %}
+<div class="head"><h1>{{ ('%s · %s' % (plan.ticker, kind_label[kind])) if plan else 'New ' ~ kind ~ ' plan' }}
+  {% if plan %}<span class="pill {{ plan.status }}">{{ plan.status }}</span>{% endif %}</h1>
+  <a class="btn" href="{{ url_for('main.plans_list', kind=kind) }}">All {{ kind }} trades</a></div>
+
+<nav class="subtabs" aria-label="Jump to">
+  <a href="#r-plan" class="on">1 Plan</a><a href="#r-forecast">Forecast</a><a href="#r-check">2 Checklist</a>
+  <a href="#r-entry">3 Entry actuals</a><a href="#r-exit">4 Exit actuals</a>{% if result %}<a href="#r-compare">Plan vs actual</a>{% endif %}
+  {% if plan %}<a href="#review">Screenshots &amp; review</a>{% endif %}
+</nav>
+
+<form method="post" id="planForm" data-quick data-kind="{{ kind }}" data-min-rr="{{ settings.swing_min_rr }}" autocomplete="off">
+<div class="sheet">
+  <div class="rowline" id="r-plan"><div class="rl"><i>1</i>Plan<br>before entry</div>
+    <div class="cells">
+      {{ acct_pick(p.account) }}
+      {{ fld('ticker', 'Ticker', p.ticker or '', 'f-sm', extra='class="upper" required' ~ (' autofocus' if not plan else '')) }}
+      <div class="fld"><span class="lab">Direction</span>
+        <div class="seg">{% for d in (('call','put') if opt else ('long','short')) %}
+        <label><input type="radio" name="direction" value="{{ d }}" {{ 'checked' if p.direction == d }}><span>{{ d|capitalize }}</span></label>{% endfor %}</div></div>
+      {{ fld('plan_date', 'Plan date', p.plan_date, 'f-md', 'date') }}
+      {% if opt %}
+      {{ fld('strike', 'Strike', p.strike|px, 'f-sm', mode='decimal') }}
+      {{ fld('expiry', 'Expiry', p.expiry or '', 'f-md', 'date') }}
+      {{ fld('delta', 'Delta', p.delta|num, 'f-xs', mode='decimal') }}
+      {% endif %}
+      {{ fld('thesis', 'Thesis', p.thesis or '', 'f-fill', hint='trend, levels, trigger', extra='') }}
+    </div></div>
+
+  {% if opt %}
+  <div class="rowline"><div class="rl"><i>·</i>Stock</div>
+    <div class="cells">
+      {{ fld('underlying_entry', 'Stock @ entry', p.underlying_entry|px, 'f-sm', mode='decimal') }}
+      {{ fld('underlying_stop', 'Stock stop', p.underlying_stop|px, 'f-sm', mode='decimal') }}
+      {{ fld('underlying_target', 'Stock target', p.underlying_target|px, 'f-sm', mode='decimal') }}
+      <p class="muted tf" style="align-self:center">{{ cfg.TIMEFRAMES[kind] }}</p>
+    </div></div>
+  {% endif %}
+
+  <div class="rowline plan"><div class="rl"><i>·</i>{{ 'Premiums' if opt else 'Prices' }}<br>and size</div>
+    <div class="cells">
+      {{ fld('entry_price', 'Entry premium' if opt else 'Entry $', p.entry_price|px, 'f-sm', mode='decimal') }}
+      {{ fld('stop_price', 'Stop premium' if opt else 'Stop $', p.stop_price|px, 'f-sm', mode='decimal') }}
+      {{ fld('target_price', 'Target premium' if opt else 'Target $', p.target_price|px, 'f-sm', mode='decimal') }}
+      {{ fld('qty', 'Contracts' if opt else 'Shares', p.qty|num, 'f-xs', mode='numeric') }}
+      {{ fld('account_balance', 'Account $', p.account_balance|num, 'f-sm', mode='decimal') }}
+      {{ fld('risk_pct', 'Risk %', p.risk_pct|num, 'f-xs', mode='decimal') }}
+    </div></div>
+
+  <div class="rowline band" id="r-forecast"><div class="rl top0"><i>Σ</i>Forecast</div>
+    <div class="cells" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div class="forecast">
+        <div class="fc"><span>Investment</span><b id="fInvest">–</b></div>
+        <div class="fc"><span>Risk budget</span><b id="fBudget">–</b></div>
+        <div class="fc loss"><span>Planned loss</span><b id="fLoss">–</b></div>
+        <div class="fc gain"><span>Potential profit</span><b id="fProfit">–</b></div>
+        <div class="fc rr"><span>Reward : risk</span><b id="fRR">–</b></div>
+        <div class="fc"><span>{{ 'Max contracts' if opt else 'Max shares' }}</span><b id="fMax">–</b></div>
+      </div>
+      <div class="verdicts" id="fVerdicts"></div>
+    </div></div>
+
+  {% if opt %}
+  <div class="rowline"><div class="rl"><i>·</i>Liquidity</div>
+    <div class="cells">
+      {{ fld('bid_ask_spread', 'Bid/ask $', p.bid_ask_spread|px, 'f-sm', mode='decimal', hint='smaller') }}
+      {{ fld('volume', 'Volume', p.volume|num, 'f-sm', mode='numeric', hint='higher') }}
+      {{ fld('open_interest', 'Open interest', p.open_interest|num, 'f-md', mode='numeric', hint='higher') }}
+    </div></div>
+  {% endif %}
+
+  <div class="rowline" id="r-check"><div class="rl top0"><i>2</i>Entry<br>checklist</div>
+    <div class="cells" style="flex-direction:column;align-items:stretch;gap:2px">
+      {% for key, text in items %}<label class="check"><input type="checkbox" name="chk_{{ key }}" {{ 'checked' if ticks.get(key) }}> {{ text }}</label>{% endfor %}
+    </div></div>
+
+  <div class="rowline" id="r-entry"><div class="rl"><i>3</i>Entry<br>actuals</div>
+    <div class="cells">
+      {{ fld('entry_date', 'Entry date', p.entry_date or '', 'f-md', 'date') }}
+      {{ fld('actual_entry', 'Actual entry', p.actual_entry|px, 'f-sm', mode='decimal') }}
+      {{ yn('entry_followed', p.entry_followed, 'Entry strategy followed') }}
+    </div></div>
+
+  <div class="rowline" id="r-exit"><div class="rl"><i>4</i>Exit<br>actuals</div>
+    <div class="cells">
+      {{ fld('exit_date', 'Exit date', p.exit_date or '', 'f-md', 'date') }}
+      {{ fld('actual_exit', 'Actual exit', p.actual_exit|px, 'f-sm', mode='decimal') }}
+      {{ fld('fees', 'Fees $', p.fees|px, 'f-xs', mode='decimal') }}
+      <div class="fld f-fill"><label for="exit_scenario">What happened at the exit</label>
+        <select name="exit_scenario" id="exit_scenario"><option value="">–</option>
+        {% for k, t, y in cfg.EXIT_SCENARIOS %}<option value="{{ k }}" data-followed="{{ y }}" {{ 'selected' if p.exit_scenario == k }}>{{ t }}</option>{% endfor %}</select></div>
+      {{ yn('exit_followed', p.exit_followed, 'Exit strategy followed') }}
+    </div>
+    <div></div>
+    <div class="cells" style="grid-column:2">
+      {{ fld('exit_reason', 'Exit reason / lessons', p.exit_reason or '', 'f-fill') }}
+      <div class="fld f-fill"><label for="i_notes">Notes</label><textarea id="i_notes" name="notes" rows="1">{{ p.notes or '' }}</textarea></div>
+    </div>
+    <div></div>
+    <details style="grid-column:2" {{ 'open' if p.orders_text }}><summary>Order details (paste from the broker, used by the review)</summary>
+      <textarea name="orders_text" rows="4">{{ p.orders_text or '' }}</textarea></details>
+  </div>
+</div>
+
+{% if result %}
+<section class="card" id="r-compare"><h2>Plan vs actual</h2>
+  <table><thead><tr><th></th><th>Planned</th><th>Actual</th><th></th></tr></thead><tbody>
+  {% for label, planned, actual, note in result %}<tr><td>{{ label }}</td><td>{{ planned|px if planned is not none }}</td><td><b>{{ actual|px if actual is not none }}</b></td><td class="muted">{{ note or '' }}</td></tr>{% endfor %}
+  {% if plan.realized_pl is not none %}<tr class="total"><td>Realized</td><td></td><td><b class="{{ plan.realized_pl|signclass }}">{{ plan.realized_pl|money }}</b></td>
+    <td class="muted">{{ ('ROI ' ~ (plan.roi|num) ~ '%') if plan.roi is not none }}</td></tr>{% endif %}
+  </tbody></table></section>
+{% endif %}
+
+<div class="actions">
+  <button class="btn primary">Save</button>
+  {% if plan and plan.status != 'cancelled' and plan.status != 'closed' %}<button class="btn" name="cancel" value="1">Cancel plan</button>{% endif %}
+  {% if plan and plan.status == 'cancelled' %}<button class="btn" name="reopen" value="1">Reopen</button>{% endif %}
+  <span class="hint">Cmd/Ctrl+Enter saves · Tab moves across the row</span>
+  {% if plan %}<button class="btn danger" formaction="{{ url_for('main.plan_delete', kind=kind, rid=plan.id) }}" formnovalidate
+    onclick="return confirm('Delete this plan and its screenshots?')">Delete</button>{% endif %}
+</div>
+</form>
+
+{% if plan %}<div style="margin-top:16px">{{ shots_panel(kind, plan.id, shots, revs) }}</div>
+{% else %}<section class="card muted" style="margin-top:16px">Save the plan to attach screenshots and run a Claude review.</section>{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='plan.js') }}"></script>{% endblock %}

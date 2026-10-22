@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cat, acct %}
+{% block body %}
+<div class="head"><h1>Today <small>{{ today }}</small></h1>
+  <div><a class="btn b-scalp" href="{{ url_for('main.scalp_new') }}">+ Scalp trade</a>
+  <a class="btn b-options" href="{{ url_for('main.plan_new', kind='options') }}">+ Options plan</a>
+  <a class="btn b-swing" href="{{ url_for('main.plan_new', kind='swing') }}">+ Swing plan</a></div></div>
+
+<div class="tiles">
+  <div class="tile"><span>Scalp trades</span><b>{{ trades|length }}</b></div>
+  <div class="tile k-pos"><span>Wins</span><b>{{ wins }}</b></div>
+  <div class="tile {{ 'k-pos' if net > 0 else ('k-neg' if net < 0 else '') }}"><span>Net P&amp;L</span><b class="{{ net|signclass }}">{{ net|money or '$0.00' }}</b></div>
+  <div class="tile k-warn"><span>Waiting for actuals</span><b>{{ waiting|length }}</b></div>
+</div>
+
+<section class="card"><h2>Open plans and trades</h2>
+{% if waiting %}
+<table><thead><tr><th>Type</th><th>Ticker</th><th>Status</th><th>Plan</th><th>Planned loss</th><th>Planned R:R</th><th></th></tr></thead><tbody>
+{% for p in waiting %}<tr>
+  <td><span class="pill {{ 'open' }}" style="color:var(--c-{{ p.kind }})">{{ kind_label[p.kind] }}</span></td><td><b>{{ p.ticker }}</b> <small>{{ p.direction }}</small> {{ acct(p.account) }}</td>
+  <td><span class="pill {{ p.status }}">{{ p.status }}</span></td>
+  <td>{{ p.entry_price|px }} → stop {{ p.stop_price|px }} / target {{ p.target_price|px }}</td>
+  <td>{{ p.planned_loss|money }}</td><td>{{ p.rr|num }}</td>
+  <td><a class="btn sm" href="{{ url_for('main.plan_edit', kind=p.kind, rid=p.id) }}#actuals">{{ 'Close out' if p.status == 'open' else 'Enter actuals' }}</a></td>
+</tr>{% endfor %}</tbody></table>
+{% else %}<p class="muted">Nothing waiting. Options and swing plans you have not closed will show here.</p>{% endif %}
+</section>
+
+<section class="card"><h2>Today's scalp trades</h2>
+{% if trades %}
+<table><thead><tr><th>#</th><th>Ticker</th><th>In</th><th>Entry</th><th>Shares</th><th>Net</th><th>R</th><th>Cat</th><th></th></tr></thead><tbody>
+{% for t in trades %}<tr>
+  <td>{{ t.trade_no }}</td><td><b>{{ t.ticker }}</b> {{ acct(t.account) }}</td><td>{{ t.entry_time }}</td><td>{{ t.entry_price|px }}</td><td>{{ t.shares|num }}</td>
+  <td class="{{ t.net_pnl|signclass }}">{{ t.net_pnl|money }}</td><td>{{ t.r_multiple|num }}</td><td>{{ cat(t.category) }}</td>
+  <td><a href="{{ url_for('main.scalp_edit', rid=t.id) }}">edit</a></td></tr>{% endfor %}</tbody></table>
+{% else %}<p class="muted">No scalp trades logged today.</p>{% endif %}
+</section>
+{% endblock %}

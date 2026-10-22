@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% from "_macros.html" import fld, yn, chips, shots_panel, acct_pick %}
+{% block title %}{{ 'Edit ' + trade.trade_no if trade else 'New scalp trade' }}{% endblock %}
+{% block body %}
+<div class="head"><h1>{{ ('Edit ' ~ trade.trade_no ~ ' · ' ~ trade.ticker) if trade else 'New scalp trade' }}</h1>
+  <a class="btn" href="{{ url_for('main.scalp_list') }}">All scalp trades</a></div>
+
+<nav class="subtabs" aria-label="Jump to">
+  <a href="#r-trade" class="on">1 Trade</a><a href="#r-exits">2 Exits</a><a href="#r-judge">3 Judgement</a>
+  <a href="#r-tags">4 Tags</a><a href="#r-more">5 Details</a>{% if trade %}<a href="#review">Screenshots &amp; review</a>{% endif %}
+</nav>
+
+<form method="post" id="scalpForm" data-quick data-risk="{{ settings.scalp_risk_dollars }}" autocomplete="off">
+<div class="sheet">
+  <div class="rowline" id="r-trade"><div class="rl"><i>1</i>Trade</div>
+    <div class="cells">
+      {{ acct_pick(t.account) }}
+      {{ fld('ticker', 'Ticker', t.ticker, 'f-sm', extra='class="upper" required' ~ (' autofocus' if not trade else '')) }}
+      {{ fld('date', 'Date', t.date, 'f-md', 'date') }}
+      {{ fld('entry_time', 'In', t.entry_time, 'f-sm', 'time') }}
+      {{ fld('exit_time', 'Out', t.exit_time, 'f-sm', 'time') }}
+      {{ fld('entry_price', 'Entry $', t.entry_price|px, 'f-sm', mode='decimal') }}
+      {{ fld('shares', 'Shares', t.shares|num, 'f-xs', mode='numeric') }}
+      {{ fld('stop', 'Stop $', t.stop|px, 'f-sm', mode='decimal', hint='before entry') }}
+      {{ fld('commission', 'Comm $', t.commission|num, 'f-xs', mode='decimal') }}
+    </div></div>
+
+  <div class="rowline band" id="r-exits"><div class="rl"><i>2</i>Exits</div>
+    <div class="cells">
+      {{ fld('exits_text', 'Exits', t.exits_text or '', 'f-fill', hint='one price sells all, or shares@price; shares@price', extra='placeholder="50@7.11; 75@7.42; 75@7.82"') }}
+      <div class="live" id="calc">
+        <div class="n"><span>Risk</span><b id="cRisk">–</b></div><div class="n"><span>Gross</span><b id="cGross">–</b></div>
+        <div class="n"><span>Net</span><b id="cNet">–</b></div><div class="n"><span>R</span><b id="cR">–</b></div>
+        <span id="cWarn" class="warn neg"></span>
+      </div>
+      <div id="manualNet" hidden>{{ fld('net_manual', 'Net P&L $', trade.net_pnl|px if trade else '', 'f-sm', mode='decimal', hint='only if exits can’t be parsed') }}</div>
+    </div></div>
+
+  <div class="rowline" id="r-judge"><div class="rl"><i>3</i>Judgement</div>
+    <div class="cells">
+      <div class="fld"><span class="lab">Setup</span>
+        <div class="seg">{% for s in cfg.SETUPS %}<label><input type="radio" name="setup" value="{{ s }}" {{ 'checked' if t.setup == s }}><span>{{ s }}</span></label>{% endfor %}
+          <label><input type="radio" name="setup" value="" {{ 'checked' if not t.setup }}><span>–</span></label></div></div>
+      {{ yn('setup_valid', t.setup_valid, 'Setup valid') }}
+      {{ yn('entry_valid', t.entry_valid, 'Entry valid') }}
+      {{ yn('exit_valid', t.exit_valid, 'Exit valid') }}
+      <div class="fld f-lg"><label for="i_category">Category <small id="catHint"></small></label>
+        <select id="i_category" name="category"><option value="">auto</option>
+        {% for k, v in cfg.CATEGORIES.items() %}<option value="{{ k }}" {{ 'selected' if t.category == k }}>{{ v }}</option>{% endfor %}</select></div>
+    </div></div>
+
+  <div class="rowline" id="r-tags"><div class="rl"><i>4</i>Tags</div>
+    <div class="cells" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div class="fld"><span class="lab">Violations</span>{{ chips('violations', cfg.VIOLATIONS, (t.violations or '').split('; '), 'bad') }}</div>
+      <div class="fld"><span class="lab">Emotions</span>{{ chips('emotions', cfg.EMOTIONS, (t.emotions or '').split('; '), 'feel') }}</div>
+    </div></div>
+
+  <div class="rowline" id="r-more"><div class="rl"><i>5</i>Details</div>
+    <div class="cells">
+      <div class="fld f-md"><label for="i_entry_order">Entry order</label><select id="i_entry_order" name="entry_order"><option value=""></option>
+        {% for o in cfg.ORDER_TYPES %}<option {{ 'selected' if t.entry_order == o }}>{{ o }}</option>{% endfor %}</select></div>
+      <div class="fld f-md"><label for="i_exit_order">Exit order</label><select id="i_exit_order" name="exit_order"><option value=""></option>
+        {% for o in cfg.ORDER_TYPES %}<option {{ 'selected' if t.exit_order == o }}>{{ o }}</option>{% endfor %}</select></div>
+      <div class="fld f-fill"><label for="i_notes">Notes / what I learned</label><textarea id="i_notes" name="notes" rows="2">{{ t.notes or '' }}</textarea></div>
+    </div>
+    <div></div>
+    <details style="grid-column:2" {{ 'open' if t.orders_text }}><summary>Order details (paste from the broker, used by the review)</summary>
+      <textarea name="orders_text" rows="4" placeholder="Paste the order history here">{{ t.orders_text or '' }}</textarea></details>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="btn primary" name="then" value="new">{{ 'Save' if trade else 'Save and add another' }}</button>
+  <button class="btn" name="then" value="review">Save and review…</button>
+  <span class="hint">Cmd/Ctrl+Enter saves · Tab moves across the row</span>
+  {% if trade %}<button class="btn danger" formaction="{{ url_for('main.scalp_delete', rid=trade.id) }}" formnovalidate
+    onclick="return confirm('Delete this trade and its screenshots?')">Delete</button>{% endif %}
+</div>
+</form>
+
+{% if recent %}<section class="card" style="margin-top:16px"><h2>Earlier today</h2><table class="dense"><tbody>
+{% for r in recent %}<tr><td>{{ r.trade_no }}</td><td><b>{{ r.ticker }}</b></td><td>{{ r.entry_price|px }}</td><td class="{{ r.net_pnl|signclass }}">{{ r.net_pnl|money }}</td><td>{{ r.category }}</td>
+<td><a href="{{ url_for('main.scalp_edit', rid=r.id) }}">edit</a></td></tr>{% endfor %}</tbody></table></section>{% endif %}
+
+{% if trade %}{{ shots_panel('scalp', trade.id, shots, revs) }}
+{% else %}<section class="card muted" style="margin-top:16px">Screenshots and Claude review are available after you save the trade. Use “Save and review…”.</section>{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='scalp.js') }}"></script>{% endblock %}
