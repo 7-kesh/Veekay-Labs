@@ -2,8 +2,9 @@
 // _save_scalp / _next_trade_no / _suggest_category, plus app/audit.py's log_changes.
 import { supabase } from './supabase-client.js';
 import { DEFAULT_SETTINGS } from './constants.js';
-import { scalpResult } from './calc.js';
+import { scalpResult, optionsPlan, swingPlan, realized, num as calcNum } from './calc.js';
 import * as setupC from './setup-c.js';
+import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS } from './constants.js';
 
 function rethrow(error) { if (error) throw error; }
 
@@ -162,6 +163,94 @@ export async function saveScalpTrade(id, form, settings) {
   }
   if (v.setup === 'C') await setupC.save(tradeId, v.date, form);
   return tradeId;
+}
+
+// ---------- options / swing plans ----------
+
+export async function listPlans(kind, { status = 'all', account = 'all' } = {}) {
+  let query = supabase.from('plans').select('*').eq('kind', kind);
+  if (account !== 'all') query = query.eq('account', account);
+  if (status !== 'all') query = query.eq('status', status);
+  const { data, error } = await query;
+  rethrow(error);
+  const order = { open: 0, planned: 1 };
+  return (data || []).sort((a, b) =>
+    (order[a.status] ?? 2) - (order[b.status] ?? 2) || (b.plan_date || '').localeCompare(a.plan_date || '') || b.id - a.id);
+}
+
+export async function getPlan(id) {
+  const { data, error } = await supabase.from('plans').select('*').eq('id', id).single();
+  rethrow(error);
+  return data;
+}
+
+function planCalc(kind, v, settings) {
+  if (kind === 'options') return optionsPlan(v.entry_price, v.stop_price, v.target_price, v.qty, v.account_balance, v.risk_pct, v.direction, v.strike);
+  return swingPlan(v.entry_price, v.stop_price, v.target_price, v.qty, v.account_balance, v.risk_pct, calcNum(settings.swing_min_rr, 2), v.direction);
+}
+
+// form: raw field values as submitted (strings), plus chk_<key> booleans for the checklist.
+// Mirrors app/routes.py's _save_plan. Returns the saved row's id.
+export async function savePlan(kind, id, form, settings) {
+  const old = id ? await getPlan(id) : null;
+  const v = {};
+  for (const k of ['plan_date', 'thesis', 'expiry', 'entry_date', 'exit_date', 'exit_reason', 'exit_scenario',
+    'entry_followed', 'exit_followed', 'orders_text', 'notes']) v[k] = form[k] || '';
+  v.ticker = (form.ticker || '').toUpperCase();
+  v.direction = form.direction || '';
+  v.account = form.account === 'live' ? 'live' : 'paper';
+  for (const k of ['strike', 'delta', 'bid_ask_spread', 'volume', 'open_interest', 'underlying_entry', 'underlying_stop',
+    'underlying_target', 'entry_price', 'stop_price', 'target_price', 'qty', 'account_balance', 'risk_pct',
+    'actual_entry', 'actual_exit', 'fees']) v[k] = numOrNull(form[k]);
+  if (v.account_balance === null) v.account_balance = calcNum(settings.account_balance);
+  if (v.risk_pct === null) v.risk_pct = calcNum(kind === 'options' ? settings.options_risk_pct : settings.swing_risk_pct);
+
+  const items = kind === 'options' ? OPTIONS_CHECKLIST : SWING_CHECKLIST;
+  const ticks = {};
+  for (const [key] of items) ticks[key] = !!form['chk_' + key];
+  v.checklist = ticks;
+
+  const plan = planCalc(kind, v, settings);
+  v.investment = plan.investment; v.planned_loss = plan.planned_loss;
+  v.potential_profit = plan.potential_profit; v.rr = plan.rr;
+
+  if (v.actual_exit !== null && v.actual_entry === null) v.actual_entry = v.entry_price;
+  const res = realized(kind, v.direction, v.qty, v.actual_entry, v.actual_exit, v.fees, plan.planned_loss);
+  Object.assign(v, res);
+
+  if (!v.entry_followed && v.entry_price !== null && v.actual_entry !== null) {
+    v.entry_followed = Object.values(ticks).every(Boolean) ? 'Y' : 'N';
+  }
+  if (!v.exit_followed && v.exit_scenario) {
+    const match = EXIT_SCENARIOS.find(([k]) => k === v.exit_scenario);
+    v.exit_followed = match ? match[2] : '';
+  }
+
+  const cancelled = form.cancel === '1' || (old && old.status === 'cancelled' && form.reopen !== '1');
+  if (cancelled) v.status = 'cancelled';
+  else if (v.actual_exit !== null) v.status = 'closed';
+  else if (v.actual_entry !== null) v.status = 'open';
+  else v.status = 'planned';
+
+  if (!v.plan_date) v.plan_date = new Date().toISOString().slice(0, 10);
+  if (v.status === 'closed' && !v.exit_date) v.exit_date = new Date().toISOString().slice(0, 10);
+
+  if (old) {
+    const { error } = await supabase.from('plans').update(v).eq('id', id);
+    rethrow(error);
+    return id;
+  }
+  const { data, error } = await supabase.from('plans').insert({ kind, ...v }).select('id').single();
+  rethrow(error);
+  return data.id;
+}
+
+export async function deletePlan(kind, id) {
+  const { data: shots } = await supabase.from('attachments').select('filename').eq('kind', kind).eq('ref_id', id);
+  if (shots && shots.length) rethrow((await supabase.storage.from('screenshots').remove(shots.map(s => s.filename))).error);
+  rethrow((await supabase.from('reviews').delete().eq('kind', kind).eq('ref_id', id)).error);
+  rethrow((await supabase.from('attachments').delete().eq('kind', kind).eq('ref_id', id)).error);
+  rethrow((await supabase.from('plans').delete().eq('id', id)).error);
 }
 
 // ---------- screenshots (Supabase Storage, "screenshots" bucket - see supabase/storage.sql) ----------

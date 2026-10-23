@@ -7,6 +7,9 @@ import * as scalpList from './views/scalp-list.js';
 import * as scalpForm from './views/scalp-form.js';
 import * as strategyView from './views/strategy.js';
 import * as weeklyView from './views/weekly.js';
+import * as settingsView from './views/settings.js';
+import * as planList from './views/plan-list.js';
+import * as planForm from './views/plan-form.js';
 
 const app = document.getElementById('app');
 const loginScreen = document.getElementById('loginScreen');
@@ -18,6 +21,11 @@ register('scalp', scalpList.render);
 register('scalp/:id', scalpForm.render);
 register('strategy', strategyView.render);
 register('weekly', weeklyView.render);
+register('settings', settingsView.render);
+register('options', (p, el) => planList.render('options', p, el));
+register('options/:id', (p, el) => planForm.render('options', p, el));
+register('swing', (p, el) => planList.render('swing', p, el));
+register('swing/:id', (p, el) => planForm.render('swing', p, el));
 
 mount(app);
 

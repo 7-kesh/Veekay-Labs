@@ -6,10 +6,8 @@
   --pos:#15803d;--neg:#dc2626;--warn:#b45309;--pos-bg:#e3f6ea;--neg-bg:#fde8e8;--warn-bg:#fdf1d8;
   --shadow:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.04);
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0c1118;--card:#151c26;--ink:#e8edf4;--muted:#93a1b5;--line:#27313f;--field:#0f151d;
-  --c-scalp:#5b8def;--c-options:#a78bfa;--c-swing:#2dd4bf;--c-futures:#fbbf24;--c-home:#94a3b8;--on-sec:#0b1220;
-  --pos:#4ade80;--neg:#fb7185;--warn:#fbbf24;--pos-bg:#12301f;--neg-bg:#3a1820;--warn-bg:#3a2d10;--shadow:none}}
+/* Dark mode removed on purpose (Veekay's call, 2026-10-23) - always light, regardless of
+   system theme preference. */
 body.sec-scalp{--sec:var(--c-scalp)}body.sec-options{--sec:var(--c-options)}
 body.sec-swing{--sec:var(--c-swing)}body.sec-futures{--sec:var(--c-futures)}
 *{box-sizing:border-box}
