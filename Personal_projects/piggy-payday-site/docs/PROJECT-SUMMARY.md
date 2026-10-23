@@ -14,6 +14,7 @@
   1. Partner's first sign-in (Supabase email rate limit was hit; retry after it resets).
   2. Then turn OFF "Allow new users to sign up" (Authentication → Sign In / Providers). Verify with `curl <supabase-url>/auth/v1/settings -H "apikey: <anon key>"` → `"disable_signup": true`.
 - **Next up (if/when wanted):** parent/kid roles; see Open Items.
+- **Pending, not deployed (2026-10-22):** added a "Property of VeekayLabs" footer line to `public/index.html` (`.sync-note` style, bottom of `.page`). The auto-mode safety classifier blocked the production `wrangler pages deploy` (deploys to shared/live infra need explicit go-ahead) - change is committed to the working tree but not live or pushed. Deploy with `npx wrangler pages deploy public --project-name piggy-payday --branch main --commit-dirty=true` once Veekay confirms.
 
 ## Architecture
 
