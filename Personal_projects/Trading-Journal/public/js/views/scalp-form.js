@@ -377,6 +377,8 @@ export async function render(params, el) {
         const before = window.location.hash;
         if (then === 'new') {
           navigate(`scalp/new?ticker=${encodeURIComponent(formObj.ticker || '')}`);
+        } else if (then === 'complete') {
+          navigate('scalp');
         } else {
           navigate(`scalp/${id}`);
         }
