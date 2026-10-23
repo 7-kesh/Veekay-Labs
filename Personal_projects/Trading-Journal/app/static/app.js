@@ -59,17 +59,20 @@
   var kind = box.dataset.kind, id = box.dataset.id;
   var thumbs = document.getElementById('thumbs'), status = document.getElementById('reviewStatus');
 
-  // Shrink large screenshots in the browser so the synced folder stays small.
+  // Shrink large screenshots in the browser so storage stays small - a 1-minute chart's
+  // candles/indicators stay perfectly readable well under 1800px, for Claude's review and for
+  // re-reading it yourself. Screenshots also auto-expire after 30 days (see db.py's startup
+  // purge) - the review's text output is the durable record, not the raw image.
   function shrink(file) {
     return new Promise(function (resolve) {
       if (file.type === 'image/gif') return resolve(file);
       var img = new Image(), url = URL.createObjectURL(file);
       img.onload = function () {
-        var max = 1800, s = Math.min(1, max / Math.max(img.width, img.height));
+        var max = 1200, s = Math.min(1, max / Math.max(img.width, img.height));
         var c = document.createElement('canvas');
         c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        c.toBlob(function (b) { URL.revokeObjectURL(url); resolve(b ? new File([b], 'shot.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.88);
+        c.toBlob(function (b) { URL.revokeObjectURL(url); resolve(b ? new File([b], 'shot.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.78);
       };
       img.onerror = function () { resolve(file); };
       img.src = url;

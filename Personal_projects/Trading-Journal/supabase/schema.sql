@@ -81,6 +81,11 @@ create index if not exists ix_plans_kind on public.plans(kind, status);
 -- ---------- screenshots ----------
 -- file bytes live in Supabase Storage (bucket "screenshots"), not this table - this just
 -- indexes them the same way app/db.py's "attachments" table does today.
+-- RETENTION: screenshots auto-expire after 30 days (Veekay's call, 2026-10-23 - storage cost
+-- vs. re-review value) - the review's text output is the durable record, not the raw image.
+-- The local app enforces this today via db.purge_old_screenshots(), lazy on server start. The
+-- JS rewrite (Step 2+) needs the same check client-side on load: list storage objects/
+-- attachment rows older than 30 days, remove() them from Storage, delete the rows.
 create table if not exists public.attachments (
   id bigint generated always as identity primary key,
   kind text, ref_id bigint, filename text, created_at timestamptz default now()

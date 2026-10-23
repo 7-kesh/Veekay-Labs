@@ -10,6 +10,7 @@ def create_app():
     db.init()
     with db.connect() as c:
         strategy.seed_if_empty(c)
+    db.purge_old_screenshots()  # 30-day retention - lazy, runs once per server start
     from .routes import bp
     app.register_blueprint(bp)
     app.before_request(auth.require_login)

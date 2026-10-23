@@ -1,6 +1,6 @@
 import shutil
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from . import config
 
@@ -187,4 +187,21 @@ def purge_shots(kind, ref_id, conn):
     conn.execute("DELETE FROM reviews WHERE kind=? AND ref_id=?", (kind, ref_id))
 
 
-__all__ = ["connect", "init", "settings", "backup", "now", "purge_shots", "shutil"]
+def purge_old_screenshots(days=30):
+    """Screenshots auto-expire - a trade's narrative review (text, already generated from the
+    image) is the durable record, not the raw pixels. Reviews themselves are never touched.
+    Lazy, not a cron job: runs once per server start, which is enough given this app is opened
+    daily - no new infra needed, and the same policy carries into the Supabase/JS rewrite as a
+    client-side check on load, same reasoning."""
+    cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+    with connect() as c:
+        old = c.execute("SELECT id, filename FROM attachments WHERE created_at<?", (cutoff,)).fetchall()
+        for r in old:
+            (config.SHOTS / r["filename"]).unlink(missing_ok=True)
+        if old:
+            c.executemany("DELETE FROM attachments WHERE id=?", [(r["id"],) for r in old])
+            c.commit()
+    return len(old)
+
+
+__all__ = ["connect", "init", "settings", "backup", "now", "purge_shots", "purge_old_screenshots", "shutil"]
