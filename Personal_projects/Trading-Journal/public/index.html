@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading Journal</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  #loginScreen { display: flex; align-items: center; justify-content: center; height: 100vh; }
+  #loginScreen .card { width: 320px; }
+  #loginScreen .card h1 { margin-top: 0; font-size: 18px; }
+  #loginScreen input { width: 100%; margin-bottom: 10px; }
+  #loginScreen .neg { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" hidden>
+  <form id="loginForm" class="card">
+    <h1>Trading Journal</h1>
+    <input type="email" name="email" placeholder="Email" required autocomplete="username">
+    <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+    <button class="btn primary" type="submit" style="width:100%">Log in</button>
+    <p id="loginError" class="neg"></p>
+  </form>
+</div>
+
+<div class="shell" id="shell" hidden>
+  <aside class="side" aria-label="Main navigation">
+    <a class="brand" href="#/today">Trading Journal</a>
+    <a class="sn s-home" href="#/today">Today</a>
+
+    <div class="sg">Journal</div>
+    <a class="sn s-scalp" href="#/scalp">Scalp</a>
+    <a class="sn s-options">Options <span class="soon">soon</span></a>
+    <a class="sn s-swing">Swing <span class="soon">soon</span></a>
+    <a class="sn s-futures">Futures <span class="soon">soon</span></a>
+
+    <div class="sg">Stats</div>
+    <a class="sn s-home">Portfolio <span class="soon">soon</span></a>
+
+    <span class="grow"></span>
+    <a class="sn s-home">Weekly review <span class="soon">soon</span></a>
+    <a class="sn s-home" href="#/strategy">Strategy</a>
+
+    <div style="padding:0 16px 12px">
+      <button class="btn sm" id="logoutBtn" style="width:100%">Log out (<span id="userEmail"></span>)</button>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--muted);padding:0 12px 10px">Property of VeekayLabs</p>
+  </aside>
+  <main id="app"></main>
+</div>
+
+<script src="config.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

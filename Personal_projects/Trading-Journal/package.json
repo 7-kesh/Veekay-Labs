@@ -1,0 +1,9 @@
+{
+  "name": "trading-journal",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cloudflare Pages Functions for Trading Journal (Claude review proxy). The static site itself (public/) needs no build step.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.1.0"
+  }
+}
