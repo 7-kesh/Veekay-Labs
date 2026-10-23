@@ -2,7 +2,7 @@
 // the browser. Port of app/review.py's run(), minus the DB write (the client does that itself,
 // under its own authenticated/RLS-scoped Supabase session, right after this returns).
 import Anthropic from '@anthropic-ai/sdk';
-import { verifyUser, unauthorized } from '../_lib/verifyUser.js';
+import { verifyUser, unauthorized } from '../lib/verifyUser.js';
 
 const SYSTEM = `You are reviewing one trade for Veekay, a disciplined retail trader who journals every trade.
 Grade the trade against Veekay's written rules, which are included below, not against generic advice.
@@ -96,11 +96,11 @@ function tradeText(kind, trade) {
   return lines.join('\n');
 }
 
-export async function onRequestPost({ request, env }) {
+export async function handleReview(request, env) {
   const user = await verifyUser(request, env);
   if (!user) return unauthorized();
   if (!env.ANTHROPIC_API_KEY) {
-    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured on this Pages project.' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured on this Worker.' }), { status: 500 });
   }
 
   let body;

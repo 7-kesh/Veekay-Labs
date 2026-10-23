@@ -62,6 +62,21 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 
 ## Session Log
 
+### 2026-10-23 (co-builder, later): Deployed, fixed a real architecture mismatch - Pages Functions don't run under Workers Builds
+
+**What happened:** Veekay created the Cloudflare project; it deployed fine as a static site (`veekay-labs-trade-journal.venkatkrishnanchellappa.workers.dev` loaded correctly, CSS/JS all served), but every `/api/*` call 404'd. Root cause, confirmed by what Veekay saw in his dashboard settings (Build command / Deploy command / Root directory, no "Build output directory" field, and the `*.workers.dev` domain itself): Cloudflare set this project up via **Workers Builds** (their newer unified Git-connected Worker deploy), not classic **Pages**. The `functions/` directory file-based routing I'd built (`functions/api/review.js` etc.) is a Pages-only convention - a plain Worker doesn't scan for it at all, at any root-directory setting. No amount of settings-tweaking would have fixed it; the deployment model itself didn't match the code.
+
+**Fixed:** restructured as a single Worker entry point instead.
+- `wrangler.jsonc` (new, project root): declares `main: "src/worker.js"`, `assets: {directory: "./public", binding: "ASSETS"}` (serves the static site), `compatibility_date`. `name` is set to `veekay-labs-trade-journal`, inferred from the deployed URL - **worth double-checking this exactly matches what the Cloudflare dashboard shows**, since a Worker name mismatch would deploy to (or create) the wrong Worker.
+- `src/worker.js` (new): the one fetch handler - routes `POST /api/review` and `POST /api/classify-change` to their handlers, falls through to `env.ASSETS.fetch(request)` for everything else.
+- `src/lib/verifyUser.js`, `src/routes/review.js`, `src/routes/classifyChange.js`: the same logic that was in `functions/`, just with the handler signature changed from Pages' `onRequestPost({request, env})` to a plain `(request, env)` the Worker's own router calls directly.
+- Deleted `functions/` entirely - dead code under this deployment model, and keeping it around would be misleading.
+- `package.json`: added `wrangler` as a devDependency (`deploy` script: `wrangler deploy`), so `npm install` (the configured build command) + `npx wrangler deploy` (the deploy command) is self-contained.
+
+**Verified before pushing:** `npx wrangler deploy --dry-run` bundles cleanly (24 asset files read, Worker compiles, `@anthropic-ai/sdk` resolves). Ran `wrangler dev` locally and hit every route directly: `/index.html` and `/js/calc.js` serve correctly, and - the actual fix - `POST /api/review` and `POST /api/classify-change` now correctly return `401 Unauthorized` instead of `404 Not Found`. Pushed; Cloudflare's Workers Builds should pick it up automatically same as before.
+
+**Still not verified: a real review call with a real API key against a live screenshot** - needs Veekay to confirm the new deploy succeeded and then run one for real.
+
 ### 2026-10-23 (co-builder): Cloudflare+Supabase migration - screenshots, Claude review, strategy governance, Setup C
 
 **Did**

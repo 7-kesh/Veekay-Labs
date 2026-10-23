@@ -2,8 +2,14 @@
   "name": "trading-journal",
   "private": true,
   "version": "1.0.0",
-  "description": "Cloudflare Pages Functions for Trading Journal (Claude review proxy). The static site itself (public/) needs no build step.",
+  "description": "Cloudflare Worker (Workers Builds, not Pages) for Trading Journal: serves public/ as static assets and /api/* as the Claude review proxy. Deploy with `npx wrangler deploy`.",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.152.0"
   }
 }

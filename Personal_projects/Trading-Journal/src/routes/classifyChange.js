@@ -3,13 +3,13 @@
 // call, so it's the one part of strategy governance that costs tokens; closing/opening the
 // versioned rule row and logging the change stay plain client-side code (public/js/strategy.js).
 import Anthropic from '@anthropic-ai/sdk';
-import { verifyUser, unauthorized } from '../_lib/verifyUser.js';
+import { verifyUser, unauthorized } from '../lib/verifyUser.js';
 
-export async function onRequestPost({ request, env }) {
+export async function handleClassifyChange(request, env) {
   const user = await verifyUser(request, env);
   if (!user) return unauthorized();
   if (!env.ANTHROPIC_API_KEY) {
-    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured on this Pages project.' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured on this Worker.' }), { status: 500 });
   }
 
   let body;

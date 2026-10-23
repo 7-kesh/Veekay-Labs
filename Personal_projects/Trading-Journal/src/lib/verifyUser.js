@@ -1,9 +1,9 @@
-// Shared auth check for every Pages Function. The function never gets Supabase credentials
-// beyond the public anon key - it just asks Supabase's auth server "is this access token
-// valid, and whose is it", then checks the email against the one allow-listed account. The
-// real data access control (RLS + is_veekay()) still lives in Postgres, same as every other
-// write in this app; this is only a cheap gate to stop a stranger from burning the Anthropic
-// API budget if they ever found this endpoint's URL.
+// Shared auth check for every API route. The Worker never gets Supabase credentials beyond
+// the public anon key - it just asks Supabase's auth server "is this access token valid, and
+// whose is it", then checks the email against the one allow-listed account. The real data
+// access control (RLS + is_veekay()) still lives in Postgres, same as every other write in
+// this app; this is only a cheap gate to stop a stranger from burning the Anthropic API
+// budget if they ever found this endpoint's URL.
 // Same values as public/config.js (the anon key is meant to be public - see that file's comment).
 const SUPABASE_URL = 'https://bnnkoambrwgeyzftokwq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubmtvYW1icndnZXl6ZnRva3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3MjUzNjIsImV4cCI6MjEwODMwMTM2Mn0.NQP4jVj1kl6rllGSBdj0XC8MJjCQKR9K0FtQpI785dc';
@@ -24,4 +24,8 @@ export async function verifyUser(request, env) {
 
 export function unauthorized() {
   return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } });
+}
+
+export function json(data, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 }
