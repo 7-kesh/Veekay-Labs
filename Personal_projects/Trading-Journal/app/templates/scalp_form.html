@@ -27,7 +27,12 @@
 
   <div class="rowline band" id="r-exits"><div class="rl"><i>2</i>Exits</div>
     <div class="cells">
-      {{ fld('exits_text', 'Exits', t.exits_text or '', 'f-fill', hint='one price sells all, or shares@price; shares@price', extra='placeholder="50@7.11; 75@7.42; 75@7.82"') }}
+      <div class="fld f-fill">
+        <label for="i_exits_text">Exits <small>add rows below, or type/fix the text directly</small></label>
+        <div class="exitRows" id="exitRows"></div>
+        <button type="button" class="btn sm" id="addExit">+ Add exit</button>
+        <textarea id="i_exits_text" name="exits_text" rows="2" placeholder="50@7.11; 75@7.42">{{ t.exits_text or '' }}</textarea>
+      </div>
       <div class="live" id="calc">
         <div class="n"><span>Risk</span><b id="cRisk">–</b></div><div class="n"><span>Gross</span><b id="cGross">–</b></div>
         <div class="n"><span>Net</span><b id="cNet">–</b></div><div class="n"><span>R</span><b id="cR">–</b></div>

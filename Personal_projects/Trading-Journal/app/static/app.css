@@ -81,6 +81,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--sec);background:var(-
 input.upper{text-transform:uppercase;font-weight:700}textarea{resize:vertical}
 code{background:var(--field);padding:1px 5px;border-radius:5px;font-size:13px;border:1px solid var(--line)}
 
+/* exit-leg row builder */
+.exitRows{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.exitRow{display:flex;gap:6px;align-items:center}
+.exitRow input{padding:6px 8px}
+.exitRow .exShares{width:70px}.exitRow .exPrice{width:80px}.exitRow .exNote{flex:1;min-width:90px}
+.exitRow .exAt{color:var(--muted);font-weight:600}
+.exitRow .exRemove{flex:none;width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--field);
+  color:var(--neg);cursor:pointer;font-size:15px;line-height:1}
+
 /* segmented Y/N and chips */
 .seg{display:flex;gap:4px}.seg label,.chips label{margin:0}
 .seg input,.chips input{position:absolute;opacity:0;width:1px;height:1px}

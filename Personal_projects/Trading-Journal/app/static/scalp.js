@@ -56,6 +56,57 @@
   form.addEventListener('input', update); form.addEventListener('change', update); update();
   var t = $('ticker'); t.addEventListener('input', function () { t.value = t.value.toUpperCase(); });
 
+  // Exit-leg row builder: a friendlier way to add "shares@price (note)" fills than typing the
+  // whole semicolon-separated line by hand. One-way sync, rows -> the real exits_text textarea
+  // (never the reverse) - so typing directly in the textarea to fix something always works,
+  // and nothing from a complex historical entry can be silently lost or mangled.
+  (function () {
+    var exitsField = $('exits_text'), rowsEl = document.getElementById('exitRows'), addBtn = document.getElementById('addExit');
+    if (!exitsField || !rowsEl) return;
+    function escAttr(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+    function parseToken(tok) {
+      tok = tok.trim();
+      if (!tok) return null;
+      var m = tok.match(/^(?:(\d+(?:\.\d+)?)\s*@\s*)?\$?(\d+(?:\.\d+)?)\s*(.*)$/);
+      if (!m) return { shares: '', price: '', note: tok };  // doesn't fit the pattern - keep it, don't drop it
+      var note = m[3].trim();
+      if (note.charAt(0) === '(') note = note.slice(1);
+      if (note.charAt(note.length - 1) === ')') note = note.slice(0, -1);
+      return { shares: m[1] || '', price: m[2], note: note };
+    }
+    function tokenFromRow(r) {
+      var sh = r.shares.trim(), pr = r.price.trim(), note = r.note.trim();
+      if (!pr) return '';
+      return (sh ? sh + '@' : '') + pr + (note ? ' (' + note + ')' : '');
+    }
+    function addRow(shares, price, note) {
+      var row = document.createElement('div');
+      row.className = 'exitRow';
+      row.innerHTML =
+        '<input type="text" class="exShares" placeholder="shares" inputmode="numeric" value="' + escAttr(shares) + '">' +
+        '<span class="exAt">@</span>' +
+        '<input type="text" class="exPrice" placeholder="price" inputmode="decimal" value="' + escAttr(price) + '">' +
+        '<input type="text" class="exNote" placeholder="time / note (optional)" value="' + escAttr(note) + '">' +
+        '<button type="button" class="exRemove" title="Remove this exit">×</button>';
+      row.querySelector('.exRemove').addEventListener('click', function () { row.remove(); syncExits(); });
+      rowsEl.appendChild(row);
+    }
+    function syncExits() {
+      var rows = Array.prototype.map.call(rowsEl.querySelectorAll('.exitRow'), function (row) {
+        return { shares: row.querySelector('.exShares').value, price: row.querySelector('.exPrice').value, note: row.querySelector('.exNote').value };
+      });
+      exitsField.value = rows.map(tokenFromRow).filter(Boolean).join('; ');
+      update();
+    }
+    rowsEl.addEventListener('input', syncExits);
+    addBtn.addEventListener('click', function () { addRow('', '', ''); });
+
+    var seeded = exitsField.value.split(/[;\n]/).map(parseToken).filter(Boolean);
+    if (seeded.length) seeded.forEach(function (r) { addRow(r.shares, r.price, r.note); });
+    else addRow('', '', '');  // a fresh trade starts with one empty row ready to fill in
+  })();
+
   // Rule engine: checks the CURRENT form values, not what's saved - no save happens here.
   var checkBtn = document.getElementById('checkRules');
   if (checkBtn && form.dataset.id) {
