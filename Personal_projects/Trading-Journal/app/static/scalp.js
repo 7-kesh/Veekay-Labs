@@ -53,4 +53,22 @@
   }
   form.addEventListener('input', update); form.addEventListener('change', update); update();
   var t = $('ticker'); t.addEventListener('input', function () { t.value = t.value.toUpperCase(); });
+
+  // Rule engine: checks the CURRENT form values, not what's saved - no save happens here.
+  var checkBtn = document.getElementById('checkRules');
+  if (checkBtn && form.dataset.id) {
+    checkBtn.addEventListener('click', async function () {
+      var out = document.getElementById('rulesOut');
+      out.textContent = 'Checking…'; checkBtn.disabled = true;
+      try {
+        var res = await fetch('/scalp/' + form.dataset.id + '/check', { method: 'POST', body: new FormData(form) });
+        var j = await res.json();
+        out.innerHTML = j.flags.map(function (fl) {
+          var cls = fl.status === 'pass' ? 'ok' : (fl.status === 'insufficient_evidence' ? 'warn' : 'neg');
+          return '<div class="flagrow ' + cls + '"><b>' + fl.check.replace(/_/g, ' ') + '</b> ' + fl.message + '</div>';
+        }).join('');
+      } catch (e) { out.textContent = 'Could not run the checks.'; }
+      checkBtn.disabled = false;
+    });
+  }
 })();

@@ -8,9 +8,9 @@ from datetime import date, datetime, timedelta
 
 from jinja2 import Undefined
 from flask import (Blueprint, Response, abort, flash, g, jsonify, redirect, render_template, request,
-                   send_from_directory, url_for)
+                   send_from_directory, session, url_for)
 
-from . import calc, config, db, importer, improve, lock, perf, review
+from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine
 
 bp = Blueprint("main", __name__)
 KINDS = ("options", "swing")
@@ -161,7 +161,8 @@ def _save_scalp(rid=None):
     old = row_or_404("scalp_trades", rid) if rid else None
     s = S()
     v = {k: f(k) for k in ("date", "entry_time", "exit_time", "exits_text", "category", "setup", "setup_valid",
-                           "entry_valid", "exit_valid", "entry_order", "exit_order", "orders_text", "notes")}
+                           "entry_valid", "exit_valid", "entry_order", "exit_order", "orders_text", "notes",
+                           "tally_2candle")}
     v["ticker"] = f("ticker").upper()
     v["account"] = "live" if f("account") == "live" else "paper"
     v["violations"] = "; ".join(request.form.getlist("violations"))
@@ -556,10 +557,25 @@ def review_run(kind, rid):
     row = _target(kind, rid)
     names = [a["filename"] for a in attachments(kind, rid)]
     try:
-        text = review.run(kind, rid, row, names, S()["review_model"])
+        text, gates, proposed = review.run(kind, rid, row, names, S()["review_model"])
     except Exception as e:  # surface API/key problems in the page instead of a 500
         return jsonify(error=str(e)), 400
-    return jsonify(text=text)
+    return jsonify(text=text, gates=gates, proposed=proposed)
+
+
+@bp.route("/scalp/<int:rid>/check", methods=["POST"])
+def scalp_check(rid):
+    """Run the rule-engine half of the Objective Assessment against the form's CURRENT
+    (possibly just-edited, not yet saved) values - never against what's already stored."""
+    row = row_or_404("scalp_trades", rid)
+    trade = {"entry_price": f("entry_price"), "stop": f("stop"), "shares": f("shares"),
+              "entry_time": f("entry_time"), "category": f("category"),
+              "violations": request.form.getlist("violations")}
+    prior = conn().execute(
+        "SELECT MAX(exit_time) AS t FROM scalp_trades WHERE ticker=? AND date=? AND id!=? AND entry_time<?",
+        (row["ticker"], row["date"], rid, trade["entry_time"] or "99:99")).fetchone()["t"]
+    risk_dollars = float(S().get("scalp_risk_dollars", 20) or 20)
+    return jsonify(flags=rule_engine.run(trade, prior, risk_dollars))
 
 
 @bp.route("/packet/<any(scalp,options,swing):kind>/<int:rid>")
@@ -593,3 +609,36 @@ def settings_import():
     except OSError as e:
         flash("Could not read %s: %s" % (path, e))
     return redirect(url_for("main.settings_view"))
+
+
+# ---------- login ----------
+
+@bp.route("/login", methods=["GET", "POST"])
+def login_view():
+    first_run = not auth.configured()
+    if request.method == "POST":
+        if first_run:
+            email, password, confirm = f("email"), f("password"), f("confirm")
+            if not email or not password:
+                flash("Email and password are required.")
+            elif password != confirm:
+                flash("Passwords don't match.")
+            elif len(password) < 8:
+                flash("Use at least 8 characters.")
+            else:
+                auth.set_credentials(email, password)
+                session["authed"], session["email"] = True, email.strip()
+                return redirect(request.args.get("next") or url_for("main.today_view"))
+        else:
+            email, password = f("email"), f("password")
+            if auth.check(email, password):
+                session["authed"], session["email"] = True, email.strip()
+                return redirect(request.args.get("next") or url_for("main.today_view"))
+            flash("Wrong email or password.")
+    return render_template("login.html", first_run=first_run)
+
+
+@bp.route("/logout", methods=["POST"])
+def logout_view():
+    session.clear()
+    return redirect(url_for("main.login_view"))

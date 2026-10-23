@@ -106,6 +106,27 @@
     fig.remove();
   });
 
+  // The gate keys Claude judges from the chart - kept in the same order as review.GATE_KEYS.
+  var GATE_LABELS = { established_level: 'Established level', trigger: 'Trigger', room: 'Room',
+    mom_ttm: 'MOM / TTM', ema_extension: '8 EMA extension', exit_structure: 'Exit structure' };
+
+  function applyProposed(p) {
+    var form = document.getElementById('scalpForm');
+    if (!form) return;
+    ['setup', 'setup_valid', 'entry_valid', 'exit_valid'].forEach(function (name) {
+      if (!p[name]) return;
+      var r = form.querySelector('input[name="' + name + '"][value="' + p[name] + '"]');
+      if (r) r.checked = true;
+    });
+    if (p.category) { var sel = form.querySelector('select[name="category"]'); if (sel) sel.value = p.category; }
+    ['violations', 'emotions'].forEach(function (name) {
+      var vals = p[name] || [];
+      form.querySelectorAll('input[name="' + name + '"]').forEach(function (cb) { cb.checked = vals.indexOf(cb.value) !== -1; });
+    });
+    form.dispatchEvent(new Event('change'));
+    status.textContent = 'Filled in — review the form and hit Save to keep it.';
+  }
+
   document.getElementById('runReview').addEventListener('click', async function () {
     var out = document.getElementById('reviewOut');
     status.textContent = 'Reviewing… this takes up to a minute.';
@@ -114,7 +135,25 @@
       var res = await fetch('/review/' + kind + '/' + id, { method: 'POST' });
       var j = await res.json();
       if (j.error) { out.innerHTML = '<p class="neg">' + esc(j.error) + '</p>'; }
-      else { out.innerHTML = '<div class="md" data-md=""></div>'; var m = out.firstChild; m.setAttribute('data-md', j.text); renderAll(out); }
+      else {
+        out.innerHTML = '<div class="md" data-md=""></div>'; var m = out.firstChild; m.setAttribute('data-md', j.text); renderAll(out);
+        if (j.gates) {
+          var g = document.createElement('div'); g.className = 'gaterow';
+          g.innerHTML = Object.keys(GATE_LABELS).map(function (k) {
+            var r = j.gates[k]; if (!r) return '';
+            var cls = r.result === 'pass' ? 'ok' : (r.result === 'insufficient_evidence' ? 'warn' : 'neg');
+            return '<span class="gatechip ' + cls + '" title="' + esc(r.evidence) + '">' + GATE_LABELS[k] + '</span>';
+          }).join('');
+          out.appendChild(g);
+        }
+        if (j.proposed) {
+          var btn = document.createElement('button');
+          btn.type = 'button'; btn.className = 'btn'; btn.style.marginTop = '8px';
+          btn.textContent = 'Fill in Claude’s suggestion';
+          btn.addEventListener('click', function () { applyProposed(j.proposed); });
+          out.appendChild(btn);
+        }
+      }
     } catch (err) { out.innerHTML = '<p class="neg">' + esc(String(err)) + '</p>'; }
     status.textContent = ''; this.disabled = false;
   });

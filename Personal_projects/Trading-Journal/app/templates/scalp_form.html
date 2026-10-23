@@ -10,7 +10,7 @@
   <a href="#r-tags">4 Tags</a><a href="#r-more">5 Details</a>{% if trade %}<a href="#review">Screenshots &amp; review</a>{% endif %}
 </nav>
 
-<form method="post" id="scalpForm" data-quick data-risk="{{ settings.scalp_risk_dollars }}" autocomplete="off">
+<form method="post" id="scalpForm" data-quick data-risk="{{ settings.scalp_risk_dollars }}" {% if trade %}data-id="{{ trade.id }}"{% endif %} autocomplete="off">
 <div class="sheet">
   <div class="rowline" id="r-trade"><div class="rl"><i>1</i>Trade</div>
     <div class="cells">
@@ -47,6 +47,18 @@
       <div class="fld f-lg"><label for="i_category">Category <small id="catHint"></small></label>
         <select id="i_category" name="category"><option value="">auto</option>
         {% for k, v in cfg.CATEGORIES.items() %}<option value="{{ k }}" {{ 'selected' if t.category == k }}>{{ v }}</option>{% endfor %}</select></div>
+      {% if trade %}
+      <div class="fld"><span class="lab">2-candle tally <small>Setup A/B only</small></span>
+        <div class="seg" role="radiogroup" aria-label="2-candle tally">
+          {% for v, lbl in (('success','Success'),('fail','Fail'),('contaminated','Contaminated'),('','–')) %}
+          <label><input type="radio" name="tally_2candle" value="{{ v }}" {{ 'checked' if (t.tally_2candle or '') == v }}><span>{{ lbl }}</span></label>
+          {% endfor %}
+        </div></div>
+      <div class="fld f-fill">
+        <button type="button" class="btn" id="checkRules">Check against rules</button>
+        <div id="rulesOut" class="rules-out"></div>
+      </div>
+      {% endif %}
     </div></div>
 
   <div class="rowline" id="r-tags"><div class="rl"><i>4</i>Tags</div>

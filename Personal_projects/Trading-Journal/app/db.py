@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS scalp_trades (
   violations TEXT, emotions TEXT,
   entry_order TEXT, exit_order TEXT,
   orders_text TEXT, notes TEXT,
+  tally_2candle TEXT,                -- success | fail | contaminated | '' (not scored) - Setup A/B only
   legacy_json TEXT,
   created_at TEXT, updated_at TEXT
 );
@@ -54,7 +55,7 @@ CREATE INDEX IF NOT EXISTS ix_att ON attachments(kind, ref_id);
 
 CREATE TABLE IF NOT EXISTS reviews (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  kind TEXT, ref_id INTEGER, model TEXT, text TEXT, created_at TEXT
+  kind TEXT, ref_id INTEGER, model TEXT, text TEXT, proposed_json TEXT, created_at TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_rev ON reviews(kind, ref_id);
 """
@@ -86,6 +87,10 @@ def init():
         for table in ("scalp_trades", "plans"):  # databases created before the paper/live field
             if "account" not in [r["name"] for r in c.execute("PRAGMA table_info(%s)" % table)]:
                 c.execute("ALTER TABLE %s ADD COLUMN account TEXT DEFAULT 'paper'" % table)
+        if "proposed_json" not in [r["name"] for r in c.execute("PRAGMA table_info(reviews)")]:
+            c.execute("ALTER TABLE reviews ADD COLUMN proposed_json TEXT")
+        if "tally_2candle" not in [r["name"] for r in c.execute("PRAGMA table_info(scalp_trades)")]:
+            c.execute("ALTER TABLE scalp_trades ADD COLUMN tally_2candle TEXT")
         for k, v in config.DEFAULT_SETTINGS.items():
             c.execute("INSERT OR IGNORE INTO settings(key, value) VALUES (?, ?)", (k, v))
 

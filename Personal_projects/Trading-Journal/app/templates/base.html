@@ -33,6 +33,12 @@
 
   <span class="grow"></span>
   <a class="sn s-home {{ 'on' if ep == 'main.settings_view' }}" href="{{ url_for('main.settings_view') }}">Settings</a>
+  {% if session.get('authed') %}
+  <form method="post" action="{{ url_for('main.logout_view') }}" style="padding:0 16px 12px">
+    <button class="btn sm" style="width:100%">Log out{{ ' (' + session.get('email','') + ')' if session.get('email') }}</button>
+  </form>
+  {% endif %}
+  <p style="text-align:center;font-size:11px;color:var(--muted);padding:0 12px 10px">Property of VeekayLabs</p>
 </aside>
 <main>
   {% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}

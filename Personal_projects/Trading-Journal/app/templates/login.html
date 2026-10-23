@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ 'Set up login' if first_run else 'Log in' }} - Trading Journal</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body class="sec-home">
+<main style="max-width:420px;margin:72px auto">
+  {% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}
+  {% if first_run %}
+  <form method="post" class="card">
+    <h2>Set up your login</h2>
+    <p class="muted">One-time setup on this machine. The password is stored hashed, outside the synced folder.</p>
+    <div class="field"><label>Email</label><input type="email" name="email" required autofocus></div>
+    <div class="field"><label>Password</label><input type="password" name="password" required minlength="8"></div>
+    <div class="field"><label>Confirm password</label><input type="password" name="confirm" required minlength="8"></div>
+    <button class="btn primary">Create login</button>
+  </form>
+  {% else %}
+  <form method="post" class="card">
+    <h2>Log in</h2>
+    <div class="field"><label>Email</label><input type="email" name="email" required autofocus></div>
+    <div class="field"><label>Password</label><input type="password" name="password" required></div>
+    <button class="btn primary">Log in</button>
+  </form>
+  {% endif %}
+  <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:16px">Property of VeekayLabs</p>
+</main>
+</body>
+</html>

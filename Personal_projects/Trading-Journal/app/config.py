@@ -10,8 +10,39 @@ LOCK_PATH = DATA / ".lock"
 RULES = ROOT / "rules"
 PORT = int(os.environ.get("TJ_PORT", 5057))
 
-# The API key is per machine and stays out of the synced folder.
+# The API key and login credentials are per machine and stay out of the synced folder.
 ENV_FILE = Path.home() / ".trading-journal.env"
+
+
+def env_get(key):
+    val = os.environ.get(key)
+    if val:
+        return val
+    try:
+        for line in ENV_FILE.read_text().splitlines():
+            if line.startswith(key + "="):
+                return line.split("=", 1)[1].strip().strip("'\"")
+    except OSError:
+        pass
+    return None
+
+
+def env_set(key, value):
+    lines, found = [], False
+    if ENV_FILE.exists():
+        for line in ENV_FILE.read_text().splitlines():
+            if line.startswith(key + "="):
+                lines.append("%s=%s" % (key, value))
+                found = True
+            elif line.strip():
+                lines.append(line)
+    if not found:
+        lines.append("%s=%s" % (key, value))
+    ENV_FILE.write_text("\n".join(lines) + "\n")
+    try:
+        os.chmod(ENV_FILE, 0o600)
+    except OSError:
+        pass
 
 DEFAULT_SETTINGS = {
     "account_balance": "1500",
