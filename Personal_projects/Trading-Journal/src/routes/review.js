@@ -97,8 +97,8 @@ function tradeText(kind, trade) {
 }
 
 export async function handleReview(request, env) {
-  const user = await verifyUser(request, env);
-  if (!user) return unauthorized();
+  const { user, reason } = await verifyUser(request, env);
+  if (!user) return unauthorized(reason);
   if (!env.ANTHROPIC_API_KEY) {
     return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured on this Worker.' }), { status: 500 });
   }

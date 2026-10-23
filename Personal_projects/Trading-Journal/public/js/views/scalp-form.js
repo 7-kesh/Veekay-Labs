@@ -149,8 +149,9 @@ export async function render(params, el) {
     </div>
 
     <div class="actions">
-      <button class="btn primary" type="submit">${trade ? 'Save' : 'Save and add another'}</button>
-      <span class="hint">Cmd/Ctrl+Enter saves</span>
+      <button class="btn primary" type="submit" name="then" value="new">${trade ? 'Save' : 'Save and add another'}</button>
+      ${trade ? '' : `<button class="btn" type="submit" name="then" value="review">Save and review…</button>`}
+      <span class="hint">Cmd/Ctrl+Enter saves · Tab moves across the row</span>
       ${trade ? `<button class="btn danger" type="button" id="deleteBtn">Delete</button>` : ''}
     </div>
     </form>
@@ -318,6 +319,7 @@ function wireForm(el, t, settings, trade) {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const then = (e.submitter && e.submitter.value) || 'new'; // which button was clicked: "new" or "review"
     const fd = new FormData(form);
     const formObj = {};
     for (const [k, v] of fd.entries()) {
@@ -325,18 +327,24 @@ function wireForm(el, t, settings, trade) {
       formObj[k] = v;
     }
     formObj.violations ||= []; formObj.emotions ||= [];
-    const submitBtn = form.querySelector('button[type=submit]');
-    submitBtn.disabled = true;
+    const submitBtns = form.querySelectorAll('button[type=submit]');
+    submitBtns.forEach(b => { b.disabled = true; });
     try {
       const id = await saveScalpTrade(trade ? trade.id : null, formObj, settings);
       const before = window.location.hash;
-      if (trade) navigate(`scalp/${id}`); else navigate(`scalp/new?ticker=${encodeURIComponent(formObj.ticker || '')}`);
+      if (trade) {
+        navigate(`scalp/${id}`);
+      } else if (then === 'review') {
+        navigate(`scalp/${id}`); // go straight to the saved trade, where screenshots/review live
+      } else {
+        navigate(`scalp/new?ticker=${encodeURIComponent(formObj.ticker || '')}`);
+      }
       if (window.location.hash === before) await dispatch();
     } catch (err) {
       alert('Could not save: ' + (err.message || err));
       console.error(err);
     }
-    submitBtn.disabled = false;
+    submitBtns.forEach(b => { b.disabled = false; });
   });
 
   document.addEventListener('keydown', function saveShortcut(e) {

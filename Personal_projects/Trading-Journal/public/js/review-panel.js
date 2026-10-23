@@ -126,7 +126,7 @@ export async function mountReviewPanel(container, opts) {
         body: JSON.stringify({ kind: opts.kind, trade: opts.tradeData, rulesText: opts.rulesText, images, model: opts.model }),
       });
       const j = await res.json();
-      if (!res.ok || j.error) throw new Error(j.error || 'Review failed.');
+      if (!res.ok || j.error) throw new Error([j.error, j.reason].filter(Boolean).join(': ') || 'Review failed.');
       await saveReview(opts.kind, opts.refId, opts.model, j.text, j.gates, j.proposed);
       renderReviewOut(out, { created_at: new Date().toISOString(), model: opts.model, text_body: j.text, proposed_json: { gates: j.gates, proposed: j.proposed } });
     } catch (err) {

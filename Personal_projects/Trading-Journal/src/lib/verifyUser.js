@@ -8,22 +8,28 @@
 const SUPABASE_URL = 'https://bnnkoambrwgeyzftokwq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubmtvYW1icndnZXl6ZnRva3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3MjUzNjIsImV4cCI6MjEwODMwMTM2Mn0.NQP4jVj1kl6rllGSBdj0XC8MJjCQKR9K0FtQpI785dc';
 
+// Returns { user } on success, or { reason } on failure - reason is for debugging only
+// (surfaced in the 401 body since this app has exactly one legitimate user; it doesn't help
+// an attacker beyond knowing "wrong token" vs "wrong email", which "Unauthorized" already implies).
 export async function verifyUser(request, env) {
   const auth = request.headers.get('authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return null;
+  if (!token) return { reason: 'No bearer token on the request.' };
   const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { Authorization: `Bearer ${token}`, apikey: SUPABASE_ANON_KEY },
   });
-  if (!res.ok) return null;
+  if (!res.ok) return { reason: `Supabase rejected the access token (status ${res.status}).` };
   const user = await res.json();
-  const allowed = (env.ALLOWED_EMAIL || '').toLowerCase();
-  if (!allowed || (user.email || '').toLowerCase() !== allowed) return null;
-  return user;
+  const allowed = (env.ALLOWED_EMAIL || '').trim().toLowerCase();
+  if (!allowed) return { reason: 'ALLOWED_EMAIL is not configured on this Worker.' };
+  if ((user.email || '').trim().toLowerCase() !== allowed) {
+    return { reason: `Signed in as ${user.email}, which does not match the configured ALLOWED_EMAIL.` };
+  }
+  return { user };
 }
 
-export function unauthorized() {
-  return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } });
+export function unauthorized(reason) {
+  return new Response(JSON.stringify({ error: 'Unauthorized', reason }), { status: 401, headers: { 'content-type': 'application/json' } });
 }
 
 export function json(data, status = 200) {

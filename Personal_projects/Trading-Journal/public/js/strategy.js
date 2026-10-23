@@ -141,6 +141,6 @@ export async function classifyChange(ruleKey, originalText, newText, model) {
     body: JSON.stringify({ ruleKey, originalText, newText, model }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Could not classify the change.');
+  if (!res.ok) throw new Error([data.error, data.reason].filter(Boolean).join(': ') || 'Could not classify the change.');
   return data;
 }

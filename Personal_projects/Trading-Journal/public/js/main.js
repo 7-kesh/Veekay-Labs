@@ -1,4 +1,4 @@
-import { getSession, signIn, signOut, onAuthChange } from './auth.js';
+import { signIn, signOut, onAuthChange } from './auth.js';
 import { ensureSettings, purgeOldScreenshots } from './db.js';
 import { seedIfEmpty as seedStrategyIfEmpty } from './strategy.js';
 import { register, mount, dispatch, navigate } from './router.js';
@@ -37,6 +37,8 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   await signOut();
 });
 
+let authedUserId = null; // tracks whether we've already set up the app for this signed-in user
+
 async function showAuthed(session) {
   loginScreen.hidden = true;
   shell.hidden = false;
@@ -49,10 +51,20 @@ async function showAuthed(session) {
 }
 
 function showLogin() {
+  authedUserId = null;
   shell.hidden = true;
   loginScreen.hidden = false;
 }
 
-onAuthChange((session) => { session ? showAuthed(session) : showLogin(); });
-const initial = await getSession();
-if (initial) await showAuthed(initial); else showLogin();
+// Supabase fires onAuthStateChange for background events too (TOKEN_REFRESHED, USER_UPDATED,
+// a repeated INITIAL_SESSION) - re-rendering the app on every one of those would wipe whatever
+// the user is in the middle of typing. showAuthed() (which re-fetches data and re-dispatches
+// the router) only runs for an actual new sign-in; showLogin() is cheap/idempotent so it's
+// always safe to call whenever there's no session, including on first load.
+onAuthChange((session) => {
+  if (session) {
+    if (session.user.id !== authedUserId) { authedUserId = session.user.id; showAuthed(session); }
+  } else {
+    showLogin();
+  }
+});
