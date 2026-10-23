@@ -61,13 +61,19 @@ export async function getScalpTrade(id) {
 }
 
 async function nextTradeNo() {
-  // trade_no is always assigned as max+1 at insert time, so it stays monotonic with id -
-  // the newest row by id always holds the highest trade_no, deletions notwithstanding.
-  const { data, error } = await supabase.from('scalp_trades').select('trade_no')
-    .order('id', { ascending: false }).limit(1);
+  // Must be the actual highest trade_no NUMBER, not "whatever row has the highest id" - a
+  // bulk import can backfill an old trade_no (e.g. T001) well after T002..T103 already exist,
+  // giving it a fresh high id while holding a low number. Relying on id order broke exactly
+  // that way after this app's own migration backfills. Matches routes.py's
+  // "ORDER BY CAST(SUBSTR(trade_no,2) AS INTEGER) DESC LIMIT 1" by computing the max client-side.
+  const { data, error } = await supabase.from('scalp_trades').select('trade_no');
   rethrow(error);
-  const last = data && data[0] ? parseInt(String(data[0].trade_no || '').slice(1), 10) : 0;
-  return 'T' + String((Number.isNaN(last) ? 0 : last) + 1).padStart(3, '0');
+  let max = 0;
+  for (const r of data || []) {
+    const n = parseInt(String(r.trade_no || '').slice(1), 10);
+    if (!Number.isNaN(n) && n > max) max = n;
+  }
+  return 'T' + String(max + 1).padStart(3, '0');
 }
 
 function suggestCategory(setup, entryValid, exitValid, violations) {
