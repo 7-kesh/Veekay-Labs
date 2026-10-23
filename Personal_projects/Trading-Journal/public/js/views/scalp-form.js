@@ -70,10 +70,12 @@ export async function render(params, el) {
       <div class="rowline band" id="r-exits"><div class="rl"><i>2</i>Exits</div>
         <div class="cells">
           <div class="fld f-fill">
-            <label for="i_exits_text">Exits <small>add rows below, or type/fix the text directly</small></label>
+            <label for="i_exits_text">Exits</label>
             <div class="exitRows" id="exitRows"></div>
             <button type="button" class="btn sm" id="addExit">+ Add exit</button>
-            <textarea id="i_exits_text" name="exits_text" rows="2" placeholder="50@7.11; 75@7.42">${esc(t.exits_text || '')}</textarea>
+            <details><summary>Show raw text (fix directly, or paste a messy historical entry)</summary>
+              <textarea id="i_exits_text" name="exits_text" rows="2" placeholder="50@7.11; 75@7.42">${esc(t.exits_text || '')}</textarea>
+            </details>
           </div>
           <div class="live" id="calc">
             <div class="n"><span>Risk</span><b id="cRisk">–</b></div><div class="n"><span>Gross</span><b id="cGross">–</b></div>
