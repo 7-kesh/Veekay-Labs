@@ -12,7 +12,7 @@
 - **Not done:** API key setup; run on the second machine; Futures; automated tests for login.
 - **Waiting on Veekay:** set his real login email/password (test credentials were used to verify the flow, then wiped); options risk budget ($75 vs $30); confirmation that Options/Swing default to Paper; rules-file review.
 - **Planned (scoped, not started):** migrate to Cloudflare Pages + Supabase - full rewrite (Python calc/perf/improve/review logic -> JS, static+Supabase like `piggy-payday-site`), Supabase Auth email+password (not magic-link - Veekay's call, overriding the initially recommended magic-link), one-time data migration of existing scalp trades, then retire the local Flask app.
-- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phases 1-3 (10-gate Objective Assessment + rule engine; versioned strategy rules + PDF playbook; Setup C's versioned gate + per-trade log) are built, verified live, committed and pushed. Remaining: 2-candle tally aggregation, weekly wrap-up ritual, audit trail. See the Session Log for the full design.
+- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phases 1-4 (10-gate Objective Assessment + rule engine; versioned strategy rules + PDF playbook; Setup C's versioned gate + per-trade log; weekly wrap-up ritual) are built, verified live, committed and pushed. Remaining: audit trail (Phase 5, the last one). See the Session Log for the full design.
 
 ## What exists
 
@@ -56,6 +56,19 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 - Costs in "Key areas to improve" overlap; never present them as additive.
 
 ## Session Log
+
+### 2026-10-22 (co-builder, yet another continuation): Phase 4 - weekly wrap-up ritual
+
+**Did**
+- `app/weekly.py` (new): almost entirely reuses existing, already-tested code rather than rebuilding stats logic - `week_bounds()` (Monday-Friday for any date), then the same `perf.analyse()` + `improve.scalp_areas()`/`improve.focus()` the stats pages already call, just scoped to one week's `scalp_trades` rows instead of a period filter. By-day breakdown, category (A-X) counts, 2-candle tally (Setup A/B only, matching the standing rule that Setup C never folds into it), and `setup_c.tally()` (built in Phase 3, unused until now) are new, small, pure functions.
+- `weekly_notes` table: only the free-text side of the ritual (action items committed to, Weekend Prep notes, discussion notes) - the computed side is never stored, just recomputed from `scalp_trades`/`setup_c_log`/`strategy_change_log` on every view, so it's always current.
+- New `/weekly` page: KPI tiles, by-day table, 2-candle and Setup C tallies, strategy changes stated that week (pulled from Phase 2's `strategy_change_log`, styled as a red flag), ranked suggested action items, and an editable form for what Veekay actually commits to. Prior/next week navigation via `?week=YYYY-MM-DD`.
+
+**Verified live, real historical data:** the week of 2026-10-12 (13 real trades) rendered correctly - accurate by-day breakdown, win rate, entry/exit validity, and a genuinely useful, specific, dollar-ranked suggestion ("Don't enter without 1R of room to resistance - 3 trades, $9.10 lost") computed from real data through already-validated logic. Setup C tally correctly showed "not recorded: 2" for two trades marked Setup C before Phase 3 existed, rather than guessing. Save round-tripped through a real POST + redirect + reload (confirmed with a throwaway test note, deleted immediately after - nothing left in the real weekly_notes table).
+
+**Deliberately not built:** no attempt at full parity with TradeVenture's entire Mode B (cumulative evidence tables, recurring-pattern writeups, "Items for Discussion" as its own section) - the data-driven core is here; the rest is Veekay's own discussion to have, now with real numbers in front of him instead of manual tallying.
+
+**Next session should:** Phase 5 (audit trail) is the last of the six - a `trade_history`-style table logging every field change (old value -> new value, timestamp, source: manual vs. Claude-suggested), not literal git (this project already rules that out for `data/`). After that, the six-feature plan from earlier in this session is complete and TradeVenture can actually be considered for retirement, per Veekay's original ask.
 
 ### 2026-10-22 (co-builder, continued once more): Phase 3 - Setup C's versioned gate + per-trade log
 

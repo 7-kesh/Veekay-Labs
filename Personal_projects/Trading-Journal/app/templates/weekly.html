@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Weekly Review{% endblock %}
+{% block body %}
+<div class="head"><h1>Weekly Review <small>{{ data.monday }} &ndash; {{ data.friday }}</small></h1>
+  <div><a class="btn sm" href="{{ url_for('main.weekly_view', week=prev_week) }}">&larr; Prior week</a>
+  <a class="btn sm" href="{{ url_for('main.weekly_view', week=next_week) }}">Next week &rarr;</a></div></div>
+
+<div class="tiles">
+  <div class="tile"><span>Scalp trades</span><b>{{ data.n }}</b></div>
+  <div class="tile {{ 'k-pos' if data.win_pct and data.win_pct >= 43 else 'k-warn' }}"><span>Win %</span><b>{{ data.win_pct|num if data.win_pct is not none else '–' }}{{ '%' if data.win_pct is not none }}</b></div>
+  <div class="tile {{ 'k-pos' if data.net > 0 else ('k-neg' if data.net < 0 else '') }}"><span>Net P&amp;L</span><b class="{{ data.net|signclass }}">{{ data.net|money }}</b></div>
+  <div class="tile"><span>Entry valid</span><b>{{ data.entry_ok|num if data.entry_ok is not none else '–' }}{{ '%' if data.entry_ok is not none }}</b></div>
+  <div class="tile"><span>Exit valid</span><b>{{ data.exit_ok|num if data.exit_ok is not none else '–' }}{{ '%' if data.exit_ok is not none }}</b></div>
+</div>
+
+<section class="card"><h2>By day</h2>
+{% if data.n %}
+<table class="dense"><thead><tr><th>Date</th><th>Trades</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>X</th><th>Net</th></tr></thead><tbody>
+{% for d in data.days %}<tr><td>{{ d.date }}</td><td>{{ d.trades }}</td>
+  <td>{{ d.cats.get('A', 0) }}</td><td>{{ d.cats.get('B', 0) }}</td><td>{{ d.cats.get('C', 0) }}</td>
+  <td>{{ d.cats.get('D', 0) }}</td><td>{{ d.cats.get('E', 0) }}</td><td>{{ d.cats.get('X', 0) }}</td>
+  <td class="{{ d.net|signclass }}">{{ d.net|money }}</td></tr>{% endfor %}
+</tbody></table>
+{% else %}<p class="muted">No scalp trades this week.</p>{% endif %}
+</section>
+
+<div class="cols">
+<section class="card"><h2>2-candle tally <small>Setup A/B only</small></h2>
+  <p>Success <b>{{ data.tally_2candle.success }}</b> &middot; Fail <b>{{ data.tally_2candle.fail }}</b>
+  &middot; Contaminated <b>{{ data.tally_2candle.contaminated }}</b>
+  {% if data.tally_2candle.rate is not none %}&middot; Rate <b>{{ data.tally_2candle.rate }}%</b>{% endif %}</p>
+</section>
+<section class="card"><h2>Setup C tally <small>experimental, never folded into A/B</small></h2>
+  {% if data.setup_c_tally %}
+  <p>{% for result, n in data.setup_c_tally.items() %}{{ result }}: <b>{{ n }}</b>{{ ', ' if not loop.last }}{% endfor %}</p>
+  {% else %}<p class="muted">No Setup C trades this week.</p>{% endif %}
+</section>
+</div>
+
+{% if data.changes %}
+<section class="card" style="border-top-color:var(--neg)"><h2>Strategy changes stated this week</h2>
+{% for c in data.changes %}<p class="neg"><b>{{ c.date }} &middot; {{ c.rule_key }} ({{ c.effect }})</b><br>{{ c.new_text }}</p>{% endfor %}
+</section>
+{% endif %}
+
+<section class="card"><h2>Suggested action items <small>ranked by dollar cost, from this week's trades</small></h2>
+{% if data.action_items %}
+<ol>{% for it in data.action_items %}<li><b>{{ it.directive }}</b> - {{ it.n }} trade(s), {{ it.cost|money }} lost. {{ it.action }}</li>{% endfor %}</ol>
+{% else %}<p class="muted">Nothing stands out yet this week.</p>{% endif %}
+</section>
+
+<form method="post" class="card">
+  <h2>Action items for next week</h2>
+  <div class="fld f-fill"><textarea name="action_items" rows="3" placeholder="What you're committing to, in your own words">{{ saved.action_items if saved else '' }}</textarea></div>
+  <h2>Weekend prep <small>Freeze &rarr; Decide &rarr; Reveal, targeting this week's weakest gate</small></h2>
+  <div class="fld f-fill"><textarea name="weekend_prep" rows="3" placeholder="Notes from the 20-decision practice">{{ saved.weekend_prep if saved else '' }}</textarea></div>
+  <h2>Discussion notes</h2>
+  <div class="fld f-fill"><textarea name="notes" rows="3" placeholder="Anything else from this week's review">{{ saved.notes if saved else '' }}</textarea></div>
+  <button class="btn primary">Save</button>
+</form>
+{% endblock %}

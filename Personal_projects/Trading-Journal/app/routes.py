@@ -10,7 +10,7 @@ from jinja2 import Undefined
 from flask import (Blueprint, Response, abort, flash, g, jsonify, redirect, render_template, request,
                    send_from_directory, session, url_for)
 
-from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine, setup_c, strategy
+from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine, setup_c, strategy, weekly
 
 bp = Blueprint("main", __name__)
 KINDS = ("options", "swing")
@@ -637,6 +637,28 @@ def strategy_playbook():
     pdf_bytes = strategy.build_playbook_pdf(_ordered_rules(), strategy.change_log(conn()))
     return Response(pdf_bytes, mimetype="application/pdf",
                      headers={"Content-Disposition": "inline; filename=Strategy_Playbook.pdf"})
+
+
+# ---------- weekly wrap-up ----------
+
+@bp.route("/weekly", methods=["GET", "POST"])
+def weekly_view():
+    week = request.args.get("week")
+    monday, _ = weekly.week_bounds(week)
+    if request.method == "POST":
+        conn().execute(
+            "INSERT INTO weekly_notes(week_start, action_items, weekend_prep, notes, updated_at) VALUES (?,?,?,?,?) "
+            "ON CONFLICT(week_start) DO UPDATE SET action_items=excluded.action_items, "
+            "weekend_prep=excluded.weekend_prep, notes=excluded.notes, updated_at=excluded.updated_at",
+            (monday, f("action_items"), f("weekend_prep"), f("notes"), db.now()))
+        conn().commit()
+        flash("Weekly notes saved.")
+        return redirect(url_for("main.weekly_view", week=monday))
+    data = weekly.weekly_review(conn(), S(), week)
+    saved = conn().execute("SELECT * FROM weekly_notes WHERE week_start=?", (monday,)).fetchone()
+    prev_week = (date.fromisoformat(monday) - timedelta(days=7)).isoformat()
+    next_week = (date.fromisoformat(monday) + timedelta(days=7)).isoformat()
+    return render_template("weekly.html", data=data, saved=saved, prev_week=prev_week, next_week=next_week)
 
 
 # ---------- settings ----------

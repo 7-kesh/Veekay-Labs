@@ -90,6 +90,15 @@ CREATE INDEX IF NOT EXISTS ix_change_log_date ON strategy_change_log(date);
 -- One row per trade declared as experimental Setup C at entry - never a relabel of a failed
 -- A/B. Separate from strategy_rules (which versions Setup C's own gate definition): this is
 -- per-trade evidence against whichever version was in force on the trade's date.
+-- Free-text side of the weekly ritual - what Veekay commits to and writes, not computed.
+-- The computed side (by-day, validity, tallies, suggested action items) is never stored,
+-- just recomputed from scalp_trades/setup_c_log/strategy_change_log on each view.
+CREATE TABLE IF NOT EXISTS weekly_notes (
+  week_start TEXT PRIMARY KEY,
+  action_items TEXT, weekend_prep TEXT, notes TEXT,
+  updated_at TEXT
+);
+
 CREATE TABLE IF NOT EXISTS setup_c_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   trade_id INTEGER NOT NULL UNIQUE,
