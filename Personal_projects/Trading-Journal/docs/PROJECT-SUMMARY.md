@@ -62,6 +62,23 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 
 ## Session Log
 
+### 2026-10-23 (co-builder, live-testing round): First real "Review with Claude" confirmed working - three real bugs fixed, one credential needs rotating
+
+**Three real bugs Veekay hit testing the deployed app, all fixed and pushed:**
+1. **Screen kept refreshing.** `onAuthStateChange` was re-rendering the whole app on *every* Supabase auth event, including silent background `TOKEN_REFRESHED` events - not just real sign-in/sign-out. Fixed in `auth.js`/`main.js`: only reacts to an actual new sign-in (tracked by user id) or a real sign-out; background events are now ignored.
+2. **Screenshots only appeared after leaving and re-editing a trade.** The port had dropped the Python app's second submit button ("Save and review…") - every new trade saved and redirected to a blank new-trade form (the "Save and add another" rapid-entry path), never to the trade's own page where the screenshot/review panel lives. Restored both buttons in `scalp-form.js`, routed by which one was clicked (`e.submitter`).
+3. **"Review with Claude" said Unauthorized with no explanation**, which led to a real debugging chain:
+   - First fix: `verifyUser.js` wasn't trimming `ALLOWED_EMAIL`/the signed-in email before comparing, and returned a bare "Unauthorized" with no detail. Added `.trim()` and a `reason` string surfaced in the 401 body.
+   - Redeployed - same error, now readable: `ALLOWED_EMAIL is not configured on this Worker.` Veekay couldn't find it in the Cloudflare dashboard at all: **"Variables cannot be added to a Worker that only has static assets"** - a real Cloudflare dashboard limitation: this project was originally created as a static-assets-only Worker, and the dashboard locks the Variables/Secrets UI permanently based on how the project started, even after real server-side code (this session's `src/worker.js`) was deployed to it.
+   - Worked around it with the `wrangler` CLI instead (`npx wrangler login`, then `wrangler secret put ALLOWED_EMAIL` / `ANTHROPIC_API_KEY`) - this talks to Cloudflare's API directly and bypasses the dashboard restriction entirely.
+   - Still failed, same error, even after a direct `wrangler deploy` to the confirmed-matching Worker name and `wrangler secret list` showing both secrets present. Added a temporary diagnostic (env key *names* only, never values) to the 401 reason to see what the Worker actually had access to at request time.
+   - That revealed the real cause: `ALLOWED_EMAIL` **was** in `env`, but its value was empty. The interactive masked prompt (`Enter a secret value:`) wasn't actually capturing the pasted value in this terminal environment - `wrangler secret put` doesn't validate non-empty input, so it silently accepted and uploaded an empty string. Fixed by piping the value directly instead of using the interactive prompt: `printf '%s' 'value' | npx wrangler secret put NAME`. Also caught Veekay running the command with the literal placeholder text `your-email@example.com` still in it before correcting to his real email.
+   - With both secrets set correctly this way, **the first real "Review with Claude" call succeeded** - confirmed by Veekay directly, not just a parity test or a local dry-run. Removed the temporary diagnostic afterward.
+
+**Real credential exposure, needs Veekay's action:** he pasted his actual `ANTHROPIC_API_KEY` value into this chat while running the `printf | wrangler secret put` command (asked to "paste the real key" - he pasted it inline in his terminal command, which is visible in this session transcript). Flagged immediately. **Treat that key as compromised - rotate it in the Anthropic Console (revoke, create a new one) and update it in both `~/.trading-journal.env` and via `wrangler secret put ANTHROPIC_API_KEY` again.** Not yet done as of this entry.
+
+**Lesson for next time piping secrets via `wrangler secret put` or similar:** don't ask the user to paste the literal secret value into a shell command in a chat session - it ends up in the transcript. Better: have them run the interactive `wrangler secret put NAME` form themselves and type/paste directly into their own terminal's prompt (even though that's what failed silently this time) - if that's unreliable in this environment, the safer non-interactive alternative is piping from a file Veekay fills in locally and deletes after (`printf "$(cat ~/.tmp-secret)" | wrangler secret put NAME && rm ~/.tmp-secret`), never typed inline where it is sent to me.
+
 ### 2026-10-23 (co-builder, later still): Weekly wrap-up ported (perf.py, improve.py's scalp half, weekly.py)
 
 **Did**
