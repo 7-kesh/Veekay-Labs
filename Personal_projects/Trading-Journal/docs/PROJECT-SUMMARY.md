@@ -12,7 +12,8 @@
 - **Not done:** API key setup; run on the second machine; Futures; automated tests for login.
 - **Waiting on Veekay:** set his real login email/password (test credentials were used to verify the flow, then wiped); options risk budget ($75 vs $30); confirmation that Options/Swing default to Paper; rules-file review.
 - **Planned (scoped, not started):** migrate to Cloudflare Pages + Supabase - full rewrite (Python calc/perf/improve/review logic -> JS, static+Supabase like `piggy-payday-site`), Supabase Auth email+password (not magic-link - Veekay's call, overriding the initially recommended magic-link), one-time data migration of existing scalp trades, then retire the local Flask app.
-- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phases 1-4 (10-gate Objective Assessment + rule engine; versioned strategy rules + PDF playbook; Setup C's versioned gate + per-trade log; weekly wrap-up ritual) are built, verified live, committed and pushed. Remaining: audit trail (Phase 5, the last one). See the Session Log for the full design.
+- **Consolidation from TradeVenture - all six phases complete (2026-10-22):** 10-gate Objective Assessment + rule engine; versioned strategy rules + PDF playbook; Setup C's versioned gate + per-trade log; weekly wrap-up ritual; field-level audit trail. All built, verified live, committed and pushed. See the Session Log for the full design of each.
+- **Real bug found via Phase 5, fixed on T103, NOT yet fixed at the root (2026-10-22):** editing and saving a trade whose violation tag text doesn't exactly match `config.VIOLATIONS` (e.g. an imported tag like `"Planned risk over $20 (tag to confirm)"`) silently drops that tag - the checkbox never renders checked, so saving writes the trade back without it. Scanned the database: **15 of 91 trades with recorded violations** have at least one tag that will silently drop on next save (T018, T029, T030, T044, T046, T069, T076, T085, T086, T092, T095, T100, T101, T102 [two tags], T103 - T103 already hit and restored this session). Not fixed yet - needs Veekay's call on the approach (see Session Log).
 
 ## What exists
 
@@ -56,6 +57,22 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 - Costs in "Key areas to improve" overlap; never present them as additive.
 
 ## Session Log
+
+### 2026-10-22 (co-builder, final phase of this run): Phase 5 - field-level audit trail, and a real bug it caught
+
+**Did**
+- `app/audit.py` (new): `trade_history` table, one row per changed field per save - old value, new value, timestamp, and `source` ("manual" vs. "claude-suggested"). Not literal git - a binary SQLite file has no meaningful diff trail, and this project already rules out committing `data/`.
+- Source attribution is a real heuristic, not a guess: `_matches_proposed()` compares the saved value against the most recent review's `proposed` object for that field (violations/emotions compared as the joined string Claude proposed vs. what got saved). If they match, it's logged "claude-suggested"; otherwise "manual" - covers the case where Veekay clicks "Fill in Claude's suggestion" then edits before saving, which should correctly read as manual.
+- Wired into `_save_scalp()`: a brand-new trade logs one `(created)` row; an edit diffs every column between the old row and the new values and logs only what actually changed.
+- New "History" section on the scalp edit page, read-only, newest first.
+
+**Verified - and this is the real story of the session:** tested end to end via Flask's test client first (throwaway trade, a field edit that matched a fake review's proposal classified "claude-suggested" correctly, a manual field change classified "manual" correctly, cleaned up after). Then tested live in the browser on a real trade (T103) to confirm the UI renders - toggled `exit_order` to "Limit" and saved, a low-risk, easily-reversible field chosen deliberately.
+
+**The audit trail immediately caught a real, pre-existing bug, unrelated to this session's work:** the History table showed `violations` changed from `"Anticipated trigger; Planned risk over $20 (tag to confirm)"` to just `"Anticipated trigger"` - a tag silently dropped by my test save, which I hadn't touched or intended to change. Root cause: the violations checkboxes render checked via an exact string match against `config.VIOLATIONS`; T103's tag carries a `"(tag to confirm)"` suffix from the original TradeVenture import that doesn't match the canonical `"Planned risk over $20"` entry, so the checkbox never renders checked, and any save silently writes the trade back without it. **Scanned the whole database for the same exposure: 15 of 91 trades with recorded violations have at least one tag that will silently drop the next time that trade is saved** - full list in the Snapshot above. Restored T103's `violations` and `exit_order` to their exact original values via a direct, audited correction (logged through `audit.log_changes()` itself, not a raw bypass) - confirmed via the History table that the full honest sequence (original -> silently dropped -> restored) is visible, not papered over.
+
+**Not fixed yet, deliberately - this needs Veekay's call, not a unilateral redesign mid-session:** options include (a) extend `config.VIOLATIONS` to cover the annotated variants actually in the data, (b) normalize/strip parenthetical suffixes before the checkbox match (loses the "(tag to confirm)" provenance note), (c) show an unmatched tag as an extra, separately-preserved read-only badge next to the checkboxes so it survives a save untouched, or (d) a warning banner when opening a trade with a tag that won't survive a save. Flagged clearly rather than guessed at.
+
+**This closes the six-feature consolidation plan from earlier in the session** (frozen-strategy governance, the 10-gate Objective Assessment, Setup C's gates, the 2-candle tally, the weekly wrap-up, the audit trail) - all five phases built, each verified against real data or a real test, not just inline reasoning. TradeVenture is now a real retirement candidate per Veekay's original ask, pending: the violation-tag bug above, and anything else he wants to shake out before treating this app as the sole source of truth.
 
 ### 2026-10-22 (co-builder, yet another continuation): Phase 4 - weekly wrap-up ritual
 

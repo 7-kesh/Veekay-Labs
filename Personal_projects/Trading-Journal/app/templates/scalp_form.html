@@ -119,5 +119,14 @@
 
 {% if trade %}{{ shots_panel('scalp', trade.id, shots, revs) }}
 {% else %}<section class="card muted" style="margin-top:16px">Screenshots and Claude review are available after you save the trade. Use “Save and review…”.</section>{% endif %}
+
+{% if trade and history %}
+<section class="card" style="margin-top:16px"><h2>History</h2>
+<table class="dense"><thead><tr><th>When</th><th>Field</th><th>Old</th><th>New</th><th>Source</th></tr></thead><tbody>
+{% for h in history %}<tr><td>{{ h.created_at.replace('T',' ') }}</td><td>{{ h.field }}</td>
+  <td>{{ h.old_value or '(empty)' }}</td><td>{{ h.new_value or '(empty)' }}</td>
+  <td>{{ 'Claude suggested' if h.source == 'claude-suggested' else 'Manual' }}</td></tr>{% endfor %}
+</tbody></table></section>
+{% endif %}
 {% endblock %}
 {% block scripts %}<script src="{{ url_for('static', filename='scalp.js') }}"></script>{% endblock %}

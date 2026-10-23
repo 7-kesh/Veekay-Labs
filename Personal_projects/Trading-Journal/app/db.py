@@ -90,6 +90,17 @@ CREATE INDEX IF NOT EXISTS ix_change_log_date ON strategy_change_log(date);
 -- One row per trade declared as experimental Setup C at entry - never a relabel of a failed
 -- A/B. Separate from strategy_rules (which versions Setup C's own gate definition): this is
 -- per-trade evidence against whichever version was in force on the trade's date.
+-- Audit trail: one row per changed field per save. Not literal git - see app/audit.py.
+CREATE TABLE IF NOT EXISTS trade_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kind TEXT NOT NULL DEFAULT 'scalp',
+  trade_id INTEGER NOT NULL,
+  field TEXT NOT NULL,
+  old_value TEXT, new_value TEXT, source TEXT,
+  created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_trade_history ON trade_history(kind, trade_id);
+
 -- Free-text side of the weekly ritual - what Veekay commits to and writes, not computed.
 -- The computed side (by-day, validity, tallies, suggested action items) is never stored,
 -- just recomputed from scalp_trades/setup_c_log/strategy_change_log on each view.
