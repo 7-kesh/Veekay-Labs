@@ -1,10 +1,11 @@
 // Port of app/templates/settings.html, trimmed to what applies in the hosted app - the
-// per-machine bits (API key file path, CSV import, local backups) don't exist anymore; the
-// API key is a Cloudflare secret and there's no local filesystem to import from or back up.
+// per-machine bits (API key file path, local backups) don't exist anymore; the API key is a
+// Cloudflare secret, and CSV import is replaced by the one-time local-data import below.
 import { getSettings } from '../db.js';
 import { supabase } from '../supabase-client.js';
 import { DEFAULT_SETTINGS } from '../constants.js';
 import { esc } from '../format.js';
+import { importLocalData } from '../migrate.js';
 
 const LABELS = {
   account_balance: 'Account balance ($)',
@@ -38,6 +39,15 @@ export async function render(_params, el) {
       Worker (<code>ANTHROPIC_API_KEY</code>, <code>ALLOWED_EMAIL</code>) - not editable here.
       Update them with <code>wrangler secret put</code>.
     </section>
+    <section class="card" style="margin-top:16px">
+      <h2>Import local data</h2>
+      <p class="muted">One-time import of the JSON exported from the local Flask app's
+        <code>data/journal.db</code> (scalp trades, history, reviews). Safe to run more than
+        once - any trade already present (matched by trade number) is skipped.</p>
+      <input type="file" id="importFile" accept=".json">
+      <button class="btn primary" id="importBtn" type="button" style="margin-left:8px">Import</button>
+      <pre id="importLog" class="muted" style="white-space:pre-wrap;margin-top:8px"></pre>
+    </section>
   `;
 
   el.querySelector('#settingsForm').addEventListener('submit', async (e) => {
@@ -49,5 +59,20 @@ export async function render(_params, el) {
     if (error) { msg.textContent = 'Could not save: ' + error.message; msg.hidden = false; return; }
     msg.textContent = 'Saved.'; msg.hidden = false;
     setTimeout(() => { msg.hidden = true; }, 2000);
+  });
+
+  el.querySelector('#importBtn').addEventListener('click', async () => {
+    const fileInput = el.querySelector('#importFile');
+    const out = el.querySelector('#importLog');
+    const file = fileInput.files[0];
+    if (!file) { out.textContent = 'Choose a file first.'; return; }
+    out.textContent = 'Importing…\n';
+    try {
+      const result = await importLocalData(file, (msg) => { out.textContent += msg + '\n'; });
+      out.textContent += `Done: ${result.trades} trades, ${result.history} history rows, ${result.reviews} reviews imported.`;
+    } catch (err) {
+      out.textContent += 'Error: ' + (err.message || err);
+      console.error(err);
+    }
   });
 }
