@@ -182,9 +182,12 @@ export async function saveScalpTrade(id, form, settings) {
 // Aggregated history for the review prompt - evidence about Veekay's PATTERNS over time, never
 // evidence about the trade being reviewed right now. review.js walls this off from gate grading
 // (see HISTORY_ADDENDUM there); this function only computes the numbers.
-export async function getPatternDigest({ ticker, setup, excludeId, limit = 80 } = {}) {
+// Deliberately ticker-agnostic: the strategy's setups (A/B/C) are defined by chart structure and
+// location, not by which stock it is, and most tickers only get traded once or twice anyway, so
+// grouping by symbol would just be noise (or superstition) dressed up as a pattern.
+export async function getPatternDigest({ setup, excludeId, limit = 80 } = {}) {
   const { data, error } = await supabase.from('scalp_trades')
-    .select('id,ticker,setup,category,violations,net_pnl,date')
+    .select('id,setup,category,violations,date')
     .order('date', { ascending: false }).limit(limit);
   rethrow(error);
   const rows = (data || []).filter(r => r.id !== excludeId);
@@ -192,13 +195,11 @@ export async function getPatternDigest({ ticker, setup, excludeId, limit = 80 } 
 
   function tally(list) {
     const cat = {}, viol = {};
-    let net = 0, netCount = 0;
     for (const r of list) {
       if (r.category) cat[r.category] = (cat[r.category] || 0) + 1;
       for (const v of (r.violations || '').split('; ').filter(Boolean)) viol[v] = (viol[v] || 0) + 1;
-      if (r.net_pnl !== null && r.net_pnl !== undefined) { net += r.net_pnl; netCount++; }
     }
-    return { count: list.length, cat, viol, avgNet: netCount ? net / netCount : null };
+    return { count: list.length, cat, viol };
   }
   function fmtCat(cat, total) {
     return Object.entries(cat).sort((a, b) => b[1] - a[1])
@@ -214,14 +215,6 @@ export async function getPatternDigest({ ticker, setup, excludeId, limit = 80 } 
   lines.push(`Last ${overall.count} trades: ${fmtCat(overall.cat, overall.count) || 'no categories recorded yet'}.`);
   if (Object.keys(overall.viol).length) lines.push(`Most frequent violations: ${fmtViol(overall.viol)}.`);
 
-  if (ticker) {
-    const sameTicker = rows.filter(r => r.ticker === ticker);
-    if (sameTicker.length) {
-      const t = tally(sameTicker);
-      lines.push(`This ticker (${ticker}), ${t.count} prior trade(s): ${fmtCat(t.cat, t.count)}` +
-        `${t.avgNet !== null ? `, avg net $${t.avgNet.toFixed(2)}` : ''}.`);
-    }
-  }
   if (setup) {
     const sameSetup = rows.filter(r => r.setup === setup);
     if (sameSetup.length) {

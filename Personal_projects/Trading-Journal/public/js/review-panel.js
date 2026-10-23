@@ -137,7 +137,7 @@ export async function mountReviewPanel(container, opts) {
       for (const s of currentShots.slice(0, 8)) images.push(await attachmentToBase64(s.filename));
       // Scalp only, for now - options/swing don't have the gate/violation taxonomy this draws on.
       const historyDigest = (opts.kind === 'scalp' && tradeData)
-        ? await getPatternDigest({ ticker: tradeData.ticker, setup: tradeData.setup, excludeId: id })
+        ? await getPatternDigest({ setup: tradeData.setup, excludeId: id })
         : '';
       const res = await fetch('/api/review', {
         method: 'POST',
