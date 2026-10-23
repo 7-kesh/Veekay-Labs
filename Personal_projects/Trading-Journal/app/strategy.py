@@ -26,6 +26,12 @@ SEED_SCALP = [
     ("trigger", "Trigger",
      "Buy intrabar when C2 crosses above C1 high. A missed C2 is a missed trade. Only "
      "support/resistance known at entry may be used."),
+    ("setup_c", "Setup C (experimental v0.4) - category X, never counted in A/B results",
+     "Price between established support and resistance with meaningful room; the last two "
+     "candles hold the 8 EMA and trend up; MOM and TTM positive (yellow TTM = weaker "
+     "confirmation); current candle crosses above the previous candle high; stop a few cents "
+     "below the previous candle low; sized by risk. Declared before entry, never a relabel of "
+     "a failed A/B."),
     ("gate_mom_ttm", "Gate - MOM/TTM",
      "MOM and TTM improving towards positive (both). Negative and still falling does not "
      "confirm. Positive but falling is a risk signal to record, not a fail."),
@@ -65,10 +71,14 @@ SEED_SCALP = [
 
 
 def seed_if_empty(conn):
-    if conn.execute("SELECT COUNT(*) FROM strategy_rules WHERE kind='scalp'").fetchone()[0]:
-        return
+    """Backfills any SEED_SCALP rule_key that has no row yet - not all-or-nothing, so adding a
+    new seed entry later (e.g. Setup C, added after Phase 2 had already seeded the first 13)
+    still reaches existing databases without a manual migration step."""
+    existing = {r["rule_key"] for r in conn.execute("SELECT DISTINCT rule_key FROM strategy_rules WHERE kind='scalp'")}
     now = db.now()
     for rule_key, _label, text in SEED_SCALP:
+        if rule_key in existing:
+            continue
         conn.execute(
             "INSERT INTO strategy_rules(kind, rule_key, text, effective_from, source, created_at) "
             "VALUES ('scalp', ?, ?, ?, 'initial seed from rules/scalp.md', ?)",
@@ -98,6 +108,17 @@ def rules_text_for(conn, kind, as_of=None):
     for rule_key, text in rules.items():
         lines.append("**%s**: %s" % (labels.get(rule_key, rule_key), text))
     return "\n\n".join(lines)
+
+
+def rule_effective_from(conn, kind, rule_key, as_of=None):
+    """The effective_from of whichever row for rule_key was in force on `as_of` - e.g. for
+    Setup C, this doubles as "which version applied to this trade"."""
+    as_of = as_of or _date.today().isoformat()
+    row = conn.execute(
+        "SELECT effective_from FROM strategy_rules WHERE kind=? AND rule_key=? "
+        "AND effective_from<=? AND (effective_to IS NULL OR effective_to>?) "
+        "ORDER BY effective_from DESC LIMIT 1", (kind, rule_key, as_of, as_of)).fetchone()
+    return row["effective_from"] if row else None
 
 
 def change_log(conn, kind="scalp"):
@@ -184,8 +205,10 @@ def build_playbook_pdf(ordered_rules, log_rows):
              Paragraph("Generated %s - live from the app, not a dated snapshot." % _date.today().isoformat(), styles["Normal"]),
              Spacer(1, 16)]
 
+    with db.connect() as conn:
+        effective = {rule_key: rule_effective_from(conn, "scalp", rule_key) for rule_key, _, _ in ordered_rules}
     for rule_key, label, text in ordered_rules:
-        changed = _effective_from(rule_key)
+        changed = effective.get(rule_key)
         if changed and changed != SEED_DATE:
             story.append(Paragraph("%s &nbsp; <font color='red'><b>[CHANGED %s]</b></font>" % (label, changed), label_style))
         else:
@@ -211,14 +234,3 @@ def build_playbook_pdf(ordered_rules, log_rows):
 
     doc.build(story)
     return buf.getvalue()
-
-
-def _effective_from(rule_key):
-    """The current row's own effective_from for one rule_key (today's in-force version)."""
-    with db.connect() as conn:
-        row = conn.execute(
-            "SELECT effective_from FROM strategy_rules WHERE kind='scalp' AND rule_key=? "
-            "AND effective_from<=? AND (effective_to IS NULL OR effective_to>?) "
-            "ORDER BY effective_from DESC LIMIT 1",
-            (rule_key, _date.today().isoformat(), _date.today().isoformat())).fetchone()
-        return row["effective_from"] if row else None

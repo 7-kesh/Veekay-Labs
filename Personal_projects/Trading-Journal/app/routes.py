@@ -10,7 +10,7 @@ from jinja2 import Undefined
 from flask import (Blueprint, Response, abort, flash, g, jsonify, redirect, render_template, request,
                    send_from_directory, session, url_for)
 
-from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine, strategy
+from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine, setup_c, strategy
 
 bp = Blueprint("main", __name__)
 KINDS = ("options", "swing")
@@ -196,15 +196,18 @@ def _save_scalp(rid=None):
     if old:
         conn().execute("UPDATE scalp_trades SET %s, updated_at=? WHERE id=?" % ", ".join(c + "=?" for c in cols),
                        [v[c] for c in cols] + [db.now(), rid])
-        conn().commit()
-        return rid
-    seq = conn().execute("SELECT COUNT(*) FROM scalp_trades WHERE date=?", (v["date"],)).fetchone()[0] + 1
-    cur = conn().execute(
-        "INSERT INTO scalp_trades(trade_no, day_seq, created_at, updated_at, %s) VALUES (?,?,?,?,%s)" % (
-            ", ".join(cols), ",".join("?" * len(cols))),
-        [_next_trade_no(), seq, db.now(), db.now()] + [v[c] for c in cols])
+        new_id = rid
+    else:
+        seq = conn().execute("SELECT COUNT(*) FROM scalp_trades WHERE date=?", (v["date"],)).fetchone()[0] + 1
+        cur = conn().execute(
+            "INSERT INTO scalp_trades(trade_no, day_seq, created_at, updated_at, %s) VALUES (?,?,?,?,%s)" % (
+                ", ".join(cols), ",".join("?" * len(cols))),
+            [_next_trade_no(), seq, db.now(), db.now()] + [v[c] for c in cols])
+        new_id = cur.lastrowid
+    if v["setup"] == "C":
+        setup_c.save(conn(), new_id, v["date"], f)
     conn().commit()
-    return cur.lastrowid
+    return new_id
 
 
 @bp.route("/scalp/new", methods=["GET", "POST"])
@@ -218,7 +221,7 @@ def scalp_new():
     blank = {"date": date.today().isoformat(), "account": "paper", "ticker": request.args.get("ticker", ""), "shares": s["default_shares"],
              "commission": s["default_commission"]}
     last = conn().execute("SELECT * FROM scalp_trades WHERE date=? ORDER BY id DESC LIMIT 3", (blank["date"],)).fetchall()
-    return render_template("scalp_form.html", t=blank, trade=None, recent=last, shots=[], revs=[], settings=s)
+    return render_template("scalp_form.html", t=blank, trade=None, recent=last, shots=[], revs=[], settings=s, setup_c_row=None)
 
 
 @bp.route("/scalp/<int:rid>", methods=["GET", "POST"])
@@ -230,7 +233,7 @@ def scalp_edit(rid):
                         else url_for("main.scalp_list"))
     t = row_or_404("scalp_trades", rid)
     return render_template("scalp_form.html", t=t, trade=t, recent=[], shots=attachments("scalp", rid),
-                           revs=reviews("scalp", rid), settings=S())
+                           revs=reviews("scalp", rid), settings=S(), setup_c_row=setup_c.get(conn(), rid))
 
 
 @bp.route("/scalp/<int:rid>/delete", methods=["POST"])

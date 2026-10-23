@@ -12,7 +12,7 @@
 - **Not done:** API key setup; run on the second machine; Futures; automated tests for login.
 - **Waiting on Veekay:** set his real login email/password (test credentials were used to verify the flow, then wiped); options risk budget ($75 vs $30); confirmation that Options/Swing default to Paper; rules-file review.
 - **Planned (scoped, not started):** migrate to Cloudflare Pages + Supabase - full rewrite (Python calc/perf/improve/review logic -> JS, static+Supabase like `piggy-payday-site`), Supabase Auth email+password (not magic-link - Veekay's call, overriding the initially recommended magic-link), one-time data migration of existing scalp trades, then retire the local Flask app.
-- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phase 1 (10-gate Objective Assessment + rule engine) and Phase 2 (versioned strategy rules, change classification, PDF playbook) are both built and verified live in the browser, committed and pushed. Remaining: Setup C gates, 2-candle tally aggregation, weekly wrap-up ritual, audit trail. See the Session Log for the full design.
+- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phases 1-3 (10-gate Objective Assessment + rule engine; versioned strategy rules + PDF playbook; Setup C's versioned gate + per-trade log) are built, verified live, committed and pushed. Remaining: 2-candle tally aggregation, weekly wrap-up ritual, audit trail. See the Session Log for the full design.
 
 ## What exists
 
@@ -56,6 +56,21 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 - Costs in "Key areas to improve" overlap; never present them as additive.
 
 ## Session Log
+
+### 2026-10-22 (co-builder, continued once more): Phase 3 - Setup C's versioned gate + per-trade log
+
+**Did**
+- Setup C's gate definition needed no new mechanism - it's just one more row in `strategy_rules` (`rule_key='setup_c'`, text from the existing v0.4 definition in `rules/scalp.md`'s Setups section). Gets the same date-aware resolution, change classification, red-flag treatment and PDF-playbook inclusion as every other rule, for free.
+- Fixed a real gap this surfaced: `strategy.seed_if_empty()` was all-or-nothing (skip entirely if the table had any rows), so adding `setup_c` to `SEED_SCALP` after Phase 2 had already seeded the first 13 would never have reached a running database. Changed it to backfill per missing `rule_key` instead - caught by testing, not by inspection, since the row count stayed at 13 after a restart until the fix.
+- `app/setup_c.py` (new): `setup_c_log` table, one row per trade declared Setup C at entry (never a relabel of a failed A/B). `save()` stamps each row with `version` = whichever `setup_c` rule was in force on the trade's own date, via `strategy.rule_effective_from()` (generalized from a private helper Phase 2's PDF builder already had). `tally()` counts by result (X/C/E) for whenever the weekly wrap-up (Phase 4) needs it - not wired to any UI yet.
+- Setup C section added to the scalp edit form (support/resistance, room vs risk, declared-before-entry, 2-candle EMA hold, crossed-prev-candle-high, MOM/TTM, danger structure, confluence, invalidation price, result, notes) - hidden unless Setup = C is selected (`scalp.js`), saved through the same form/Save button as the rest of the trade, no separate save action.
+- One real naming collision caught before it shipped: the trade's own `notes` textarea and Setup C's notes field can't both be `name="notes"` in the same HTML form. Setup C's field is submitted as `setup_c_notes`; `setup_c.save()` maps it back to the `notes` column explicitly.
+
+**Verified:** a throwaway trade created through Flask's test client (ticker `ZZZTEST`, Setup C, every field filled) round-tripped correctly - `setup_c_log` row created with all values intact and `version` correctly stamped `2026-10-19`. Deleted immediately after (both `scalp_trades` and `setup_c_log` rows) - nothing left behind. Also confirmed in the browser that selecting Setup C reveals the section and selecting A/B hides it again; did not save that browser test onto a real trade (T103).
+
+**Not yet done:** no stats/tally display wired to the UI yet (the `tally()` function exists, unused) - natural fit for Phase 4's weekly wrap-up rather than its own page.
+
+**Next session should:** Phase 4 - the weekly wrap-up ritual (by-day table, Problem-Area-vs-baseline, action items, Weekend Prep). This is where `setup_c.tally()` and the 2-candle tally field (from Phase 1, also not yet aggregated anywhere) both get their first real UI.
 
 ### 2026-10-22 (co-builder, continued further): Phase 2 - versioned strategy rules, change classification, PDF playbook
 

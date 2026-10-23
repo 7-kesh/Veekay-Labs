@@ -86,6 +86,20 @@ CREATE TABLE IF NOT EXISTS strategy_change_log (
   created_at TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_change_log_date ON strategy_change_log(date);
+
+-- One row per trade declared as experimental Setup C at entry - never a relabel of a failed
+-- A/B. Separate from strategy_rules (which versions Setup C's own gate definition): this is
+-- per-trade evidence against whichever version was in force on the trade's date.
+CREATE TABLE IF NOT EXISTS setup_c_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  trade_id INTEGER NOT NULL UNIQUE,
+  version TEXT,
+  support_below TEXT, resistance_above TEXT, room_vs_risk TEXT,
+  declared_before_entry TEXT, ema_hold_2candle TEXT, crossed_prev_candle_high TEXT,
+  mom_ttm TEXT, danger_structure TEXT, confluence_strength TEXT, invalidation_price REAL,
+  result TEXT, notes TEXT,
+  created_at TEXT, updated_at TEXT
+);
 """
 
 

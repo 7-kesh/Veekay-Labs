@@ -61,6 +61,29 @@
       {% endif %}
     </div></div>
 
+  <div class="rowline band" id="r-setupc" hidden><div class="rl"><i>C</i>Setup C log <small>experimental, never counted in A/B</small></div>
+    <div class="cells">
+      {{ fld('support_below', 'Support below', setup_c_row.support_below if setup_c_row else '', 'f-sm') }}
+      {{ fld('resistance_above', 'Resistance above', setup_c_row.resistance_above if setup_c_row else '', 'f-sm') }}
+      <div class="fld f-md"><label for="i_room_vs_risk">Room vs risk</label>
+        <select id="i_room_vs_risk" name="room_vs_risk"><option value=""></option>
+        {% for o in ('ample', 'tight', 'insufficient') %}<option {{ 'selected' if setup_c_row and setup_c_row.room_vs_risk == o }}>{{ o }}</option>{% endfor %}</select></div>
+      {{ yn('declared_before_entry', setup_c_row.declared_before_entry if setup_c_row else '', 'Declared before entry') }}
+      {{ yn('ema_hold_2candle', setup_c_row.ema_hold_2candle if setup_c_row else '', '2 candles held 8 EMA') }}
+      {{ yn('crossed_prev_candle_high', setup_c_row.crossed_prev_candle_high if setup_c_row else '', 'Crossed prev candle high') }}
+      {{ fld('mom_ttm', 'MOM / TTM', setup_c_row.mom_ttm if setup_c_row else '', 'f-md', hint='e.g. "MOM rising, TTM yellow"') }}
+      {{ fld('danger_structure', 'Danger structure', setup_c_row.danger_structure if setup_c_row else '', 'f-md', hint='"none" if clear') }}
+      <div class="fld f-md"><label for="i_confluence_strength">Confluence</label>
+        <select id="i_confluence_strength" name="confluence_strength"><option value=""></option>
+        {% for o in ('weak', 'moderate', 'strong') %}<option {{ 'selected' if setup_c_row and setup_c_row.confluence_strength == o }}>{{ o }}</option>{% endfor %}</select></div>
+      {{ fld('invalidation_price', 'Invalidation $', setup_c_row.invalidation_price|px if setup_c_row else '', 'f-sm', mode='decimal') }}
+      <div class="fld f-md"><label for="i_result">Result</label>
+        <select id="i_result" name="result"><option value="">not recorded</option>
+        {% for k, lbl in {'X': 'X - valid sample', 'C': 'C - failed a gate', 'E': 'E - under review'}.items() %}
+        <option value="{{ k }}" {{ 'selected' if setup_c_row and setup_c_row.result == k }}>{{ lbl }}</option>{% endfor %}</select></div>
+      {{ fld('setup_c_notes', 'Notes', setup_c_row.notes if setup_c_row else '', 'f-fill') }}
+    </div></div>
+
   <div class="rowline" id="r-tags"><div class="rl"><i>4</i>Tags</div>
     <div class="cells" style="flex-direction:column;align-items:stretch;gap:8px">
       <div class="fld"><span class="lab">Violations</span>{{ chips('violations', cfg.VIOLATIONS, (t.violations or '').split('; '), 'bad') }}</div>

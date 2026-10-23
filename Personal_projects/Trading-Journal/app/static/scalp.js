@@ -50,6 +50,8 @@
     var cat = suggest(val('setup'), val('entry_valid'), val('exit_valid'),
       form.querySelectorAll('[name=violations]:checked').length);
     document.getElementById('catHint').textContent = (!$('category').value && cat) ? '(auto: ' + cat + ')' : '';
+    var setupC = document.getElementById('r-setupc');
+    if (setupC) setupC.hidden = val('setup') !== 'C';
   }
   form.addEventListener('input', update); form.addEventListener('change', update); update();
   var t = $('ticker'); t.addEventListener('input', function () { t.value = t.value.toUpperCase(); });
