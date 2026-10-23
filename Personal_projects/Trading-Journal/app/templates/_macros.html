@@ -41,7 +41,21 @@
   </div>
   <div id="reviewOut" class="review">
     {% if revs %}<div class="muted">Latest review, {{ revs[0].created_at.replace('T',' ') }} ({{ revs[0].model }})</div>
-    <div class="md" data-md="{{ revs[0].text }}"></div>{% endif %}
+    <div class="md" data-md="{{ revs[0].text }}"></div>
+    {% set stored = revs[0].proposed_json | fromjson %}
+    {% if stored and stored.gates %}
+    {% set gate_labels = [('established_level','Established level'), ('trigger','Trigger'), ('room','Room'),
+                           ('mom_ttm','MOM / TTM'), ('ema_extension','8 EMA extension'), ('exit_structure','Exit structure')] %}
+    <div class="gaterow">
+      {% for k, label in gate_labels %}{% set g = stored.gates.get(k) %}{% if g %}
+      <span class="gatechip {{ 'ok' if g.result == 'pass' else ('warn' if g.result == 'insufficient_evidence' else 'neg') }}" title="{{ g.evidence }}">{{ label }}</span>
+      {% endif %}{% endfor %}
+    </div>
+    {% endif %}
+    {% if stored and stored.proposed %}
+    <button type="button" class="btn applyProposedBtn" style="margin-top:8px" data-proposed='{{ stored.proposed | tojson }}'>Fill in Claude&rsquo;s suggestion</button>
+    {% endif %}
+    {% endif %}
   </div>
   {% if revs|length > 1 %}<details><summary>{{ revs|length - 1 }} earlier review(s)</summary>
     {% for r in revs[1:] %}<div class="muted">{{ r.created_at.replace('T',' ') }} ({{ r.model }})</div><div class="md" data-md="{{ r.text }}"></div>{% endfor %}

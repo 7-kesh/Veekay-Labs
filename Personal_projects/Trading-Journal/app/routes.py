@@ -36,6 +36,14 @@ def _ctx():
     return {"cfg": config, "today": date.today().isoformat(), "kind_label": {"scalp": "Scalp", "options": "Options", "swing": "Swing"}}
 
 
+@bp.app_template_filter("fromjson")
+def _fromjson(s):
+    try:
+        return json.loads(s) if s else None
+    except ValueError:
+        return None
+
+
 def S():
     return db.settings(conn())
 

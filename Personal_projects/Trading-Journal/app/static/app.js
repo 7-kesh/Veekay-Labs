@@ -127,6 +127,13 @@
     status.textContent = 'Filled in — review the form and hit Save to keep it.';
   }
 
+  // Delegated so it covers both a server-rendered button (reopening a trade with a past
+  // review) and one freshly created right after a "Review with Claude" click - one handler.
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.applyProposedBtn');
+    if (btn) applyProposed(JSON.parse(btn.dataset.proposed));
+  });
+
   document.getElementById('runReview').addEventListener('click', async function () {
     var out = document.getElementById('reviewOut');
     status.textContent = 'Reviewing… this takes up to a minute.';
@@ -148,9 +155,9 @@
         }
         if (j.proposed) {
           var btn = document.createElement('button');
-          btn.type = 'button'; btn.className = 'btn'; btn.style.marginTop = '8px';
+          btn.type = 'button'; btn.className = 'btn applyProposedBtn'; btn.style.marginTop = '8px';
           btn.textContent = 'Fill in Claude’s suggestion';
-          btn.addEventListener('click', function () { applyProposed(j.proposed); });
+          btn.dataset.proposed = JSON.stringify(j.proposed);
           out.appendChild(btn);
         }
       }
