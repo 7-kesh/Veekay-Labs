@@ -94,8 +94,18 @@ export async function render(params, el) {
           ${yn('declared_before_entry', setupCRow ? setupCRow.declared_before_entry : '', 'Declared before entry')}
           ${yn('ema_hold_2candle', setupCRow ? setupCRow.ema_hold_2candle : '', '2 candles held 8 EMA')}
           ${yn('crossed_prev_candle_high', setupCRow ? setupCRow.crossed_prev_candle_high : '', 'Crossed prev candle high')}
-          ${fld('mom', 'MOM', setupCRow ? setupCRow.mom : '', 'f-md', { hint: 'e.g. "rising, still negative"' })}
-          ${fld('ttm', 'TTM', setupCRow ? setupCRow.ttm : '', 'f-md', { hint: 'e.g. "yellow"' })}
+          <div class="fld f-md"><label for="i_mom_sign">MOM sign</label>
+            <select id="i_mom_sign" name="mom_sign"><option value=""></option>
+            ${setupC.MOM_SIGNS.map(o => `<option ${setupCRow && setupCRow.mom_sign === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+          <div class="fld f-md"><label for="i_mom_direction">MOM direction</label>
+            <select id="i_mom_direction" name="mom_direction"><option value=""></option>
+            ${setupC.DIRECTIONS.map(o => `<option ${setupCRow && setupCRow.mom_direction === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+          <div class="fld f-md"><label for="i_ttm_color">TTM color</label>
+            <select id="i_ttm_color" name="ttm_color"><option value=""></option>
+            ${setupC.TTM_COLORS.map(o => `<option ${setupCRow && setupCRow.ttm_color === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+          <div class="fld f-md"><label for="i_ttm_direction">TTM direction</label>
+            <select id="i_ttm_direction" name="ttm_direction"><option value=""></option>
+            ${setupC.DIRECTIONS.map(o => `<option ${setupCRow && setupCRow.ttm_direction === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
           ${fld('danger_structure', 'Danger structure', setupCRow ? setupCRow.danger_structure : '', 'f-md', { hint: 'overhead resistance - double top, repeated rejection; "none" if clear' })}
           <div class="fld f-md"><label for="i_confluence_strength">Confluence</label>
             <select id="i_confluence_strength" name="confluence_strength"><option value=""></option>
