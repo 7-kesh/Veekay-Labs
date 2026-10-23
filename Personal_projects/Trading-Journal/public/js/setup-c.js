@@ -3,7 +3,7 @@ import { supabase } from './supabase-client.js';
 import { ruleEffectiveFrom } from './strategy.js';
 
 export const FIELDS = ['support_below', 'resistance_above', 'room_vs_risk', 'declared_before_entry',
-  'ema_hold_2candle', 'crossed_prev_candle_high', 'mom_ttm', 'danger_structure',
+  'ema_hold_2candle', 'crossed_prev_candle_high', 'mom', 'ttm', 'danger_structure',
   'confluence_strength', 'invalidation_price', 'result', 'notes'];
 
 export const RESULTS = { X: 'X - valid sample', C: 'C - failed a gate', E: 'E - under review' };

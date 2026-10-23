@@ -94,12 +94,13 @@ export async function render(params, el) {
           ${yn('declared_before_entry', setupCRow ? setupCRow.declared_before_entry : '', 'Declared before entry')}
           ${yn('ema_hold_2candle', setupCRow ? setupCRow.ema_hold_2candle : '', '2 candles held 8 EMA')}
           ${yn('crossed_prev_candle_high', setupCRow ? setupCRow.crossed_prev_candle_high : '', 'Crossed prev candle high')}
-          ${fld('mom_ttm', 'MOM / TTM', setupCRow ? setupCRow.mom_ttm : '', 'f-md', { hint: 'e.g. "MOM rising, TTM yellow"' })}
-          ${fld('danger_structure', 'Danger structure', setupCRow ? setupCRow.danger_structure : '', 'f-md', { hint: '"none" if clear' })}
+          ${fld('mom', 'MOM', setupCRow ? setupCRow.mom : '', 'f-md', { hint: 'e.g. "rising, still negative"' })}
+          ${fld('ttm', 'TTM', setupCRow ? setupCRow.ttm : '', 'f-md', { hint: 'e.g. "yellow"' })}
+          ${fld('danger_structure', 'Danger structure', setupCRow ? setupCRow.danger_structure : '', 'f-md', { hint: 'overhead resistance - double top, repeated rejection; "none" if clear' })}
           <div class="fld f-md"><label for="i_confluence_strength">Confluence</label>
             <select id="i_confluence_strength" name="confluence_strength"><option value=""></option>
             ${['weak', 'moderate', 'strong'].map(o => `<option ${setupCRow && setupCRow.confluence_strength === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
-          ${fld('invalidation_price', 'Invalidation $', setupCRow ? px(setupCRow.invalidation_price) : '', 'f-sm', { mode: 'decimal' })}
+          ${fld('invalidation_price', 'Invalidation $', setupCRow ? px(setupCRow.invalidation_price) : '', 'f-sm', { mode: 'decimal', hint: 'price where the thesis is proven wrong, not your stop' })}
           <div class="fld f-md"><label for="i_result">Result</label>
             <select id="i_result" name="result"><option value="">not recorded</option>
             ${Object.entries(setupC.RESULTS).map(([k, lbl]) => `<option value="${k}" ${setupCRow && setupCRow.result === k ? 'selected' : ''}>${lbl}</option>`).join('')}</select></div>
