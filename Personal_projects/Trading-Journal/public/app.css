@@ -1,10 +1,12 @@
-/* Section colors: Scalp blue, Options violet, Swing teal, Futures amber. --sec follows the page's section. */
+/* Section colors: Scalp blue, Options violet, Swing teal, Futures amber. --sec follows the
+   page's section. Palette refreshed 2026-10-23 (Veekay's call) - richer and warmer than the
+   original flat greys, still light and easy on the eyes, not neon. */
 :root{
-  --bg:#f3f5f9;--card:#fff;--ink:#16202c;--muted:#64748b;--line:#dfe5ee;--field:#f7f9fc;
-  --c-scalp:#2563eb;--c-options:#7c3aed;--c-swing:#0d9488;--c-futures:#d97706;--c-home:#475569;
+  --bg:#eef1fa;--card:#fff;--ink:#1c2534;--muted:#5f6b8a;--line:#dde3f3;--field:#f5f7fd;
+  --c-scalp:#2f6fed;--c-options:#8b5cf6;--c-swing:#0ea5a4;--c-futures:#f59e0b;--c-home:#5b6b93;
   --sec:var(--c-home);--on-sec:#fff;
-  --pos:#15803d;--neg:#dc2626;--warn:#b45309;--pos-bg:#e3f6ea;--neg-bg:#fde8e8;--warn-bg:#fdf1d8;
-  --shadow:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.04);
+  --pos:#15a357;--neg:#e0315c;--warn:#d97706;--pos-bg:#e1f7ec;--neg-bg:#fde6ec;--warn-bg:#fdf1d8;
+  --shadow:0 1px 2px rgba(30,41,82,.07),0 4px 16px rgba(30,41,82,.06);
 }
 /* Dark mode removed on purpose (Veekay's call, 2026-10-23) - always light, regardless of
    system theme preference. */
@@ -19,7 +21,7 @@ a{color:var(--sec);text-decoration:none}a:hover{text-decoration:underline}
 /* sidebar navigation: every section and stats page is one click away */
 .shell{display:grid;grid-template-columns:224px minmax(0,1fr);min-height:100vh}
 .side{position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:14px 12px;
-  background:var(--card);border-right:3px solid var(--sec)}
+  background:color-mix(in srgb,var(--sec) 4%,var(--card));border-right:3px solid var(--sec)}
 .brand{font-weight:800;color:var(--ink);padding:6px 10px 14px;letter-spacing:-.01em;font-size:16px}
 .sg{margin:14px 10px 4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
 .sn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-weight:600;color:var(--ink);border:1px solid transparent}

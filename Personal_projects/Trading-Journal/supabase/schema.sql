@@ -52,6 +52,10 @@ create table if not exists public.scalp_trades (
   entry_order text, exit_order text,
   orders_text text, notes text,
   tally_2candle text,                       -- success | fail | contaminated | '' - Setup A/B only
+  -- Section 2/3 of the entry form, every setup (added 2026-10-23 - see migrate-section3-assessments.sql):
+  support_below numeric, resistance_above numeric, confluence_strength text,
+  structure_valid text, trigger_valid text, extended text, ema_alignment text,
+  mom_sign text, mom_direction text, ttm_color text, ttm_direction text,
   legacy_json jsonb,
   created_at timestamptz default now(), updated_at timestamptz default now()
 );
