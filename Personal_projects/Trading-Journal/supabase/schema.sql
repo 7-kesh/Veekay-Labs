@@ -56,6 +56,7 @@ create table if not exists public.scalp_trades (
   support_below numeric, resistance_above numeric, confluence_strength text,
   structure_valid text, trigger_valid text, extended text, ema_alignment text,
   mom_sign text, mom_direction text, ttm_color text, ttm_direction text,
+  review_status text default 'draft',       -- draft | complete
   legacy_json jsonb,
   created_at timestamptz default now(), updated_at timestamptz default now()
 );

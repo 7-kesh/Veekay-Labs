@@ -125,6 +125,7 @@ export async function saveScalpTrade(id, form, settings) {
     date: form.date || '', entry_time: form.entry_time || '', exit_time: form.exit_time || '',
     exits_text: form.exits_text || '', category: form.category || '', setup: form.setup || '',
     setup_valid: form.setup_valid || '', entry_valid: form.entry_valid || '', exit_valid: form.exit_valid || '',
+    review_status: form.review_status || 'draft',
     entry_order: form.entry_order || '', exit_order: form.exit_order || '', orders_text: form.orders_text || '',
     notes: form.notes || '', tally_2candle: form.tally_2candle || '',
     ticker: (form.ticker || '').toUpperCase(),
@@ -132,6 +133,13 @@ export async function saveScalpTrade(id, form, settings) {
     violations: (form.violations || []).join('; '),
     emotions: (form.emotions || []).join('; '),
     entry_price: numOrNull(form.entry_price), shares: numOrNull(form.shares), stop: numOrNull(form.stop),
+    // Section 2/3 - known S/R/confluence and the objective-assessment fields, every setup.
+    support_below: numOrNull(form.support_below), resistance_above: numOrNull(form.resistance_above),
+    confluence_strength: form.confluence_strength || '',
+    structure_valid: form.structure_valid || '', trigger_valid: form.trigger_valid || '',
+    extended: form.extended || '', ema_alignment: form.ema_alignment || '',
+    mom_sign: form.mom_sign || '', mom_direction: form.mom_direction || '',
+    ttm_color: form.ttm_color || '', ttm_direction: form.ttm_direction || '',
   };
   v.commission = form.commission !== '' && form.commission != null
     ? numOrNull(form.commission) : numOrNull(settings.default_commission, 0);

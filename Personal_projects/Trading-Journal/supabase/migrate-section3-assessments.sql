@@ -16,6 +16,8 @@ alter table public.scalp_trades add column if not exists mom_sign text;
 alter table public.scalp_trades add column if not exists mom_direction text;
 alter table public.scalp_trades add column if not exists ttm_color text;
 alter table public.scalp_trades add column if not exists ttm_direction text;
+-- 'draft' = needs review/updating later (plain Save), 'complete' = final check done (Complete review).
+alter table public.scalp_trades add column if not exists review_status text default 'draft';
 
 alter table public.setup_c_log drop column if exists support_below;
 alter table public.setup_c_log drop column if exists resistance_above;

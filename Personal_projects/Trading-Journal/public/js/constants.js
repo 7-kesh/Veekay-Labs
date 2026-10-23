@@ -74,6 +74,11 @@ Not followed: panic sell without a planned reason; holding beyond the stop hopin
 Same three valid exits as options: target reached, stop reached as planned, or invalidation by a predefined rule. Panic sells, holding beyond the stop and exiting early out of comfort are not followed.`,
 };
 
+// Section 3 "Assessments" - every scalp trade, every setup.
+export const MOM_SIGNS = ['Negative', 'Positive'];
+export const TTM_COLORS = ['Red', 'Yellow', 'Green', 'Blue'];
+export const DIRECTIONS = ['Increasing', 'Decreasing'];
+
 export const TIMEFRAMES = {
   options: 'Analysis: Daily / 4H / 1H. Entry confirmation: 15M / 5M. Hold: intraday to 2 days.',
   swing: 'Analysis: Weekly / Daily. Entry confirmation: 4H / 1H. Hold: several days to weeks.',

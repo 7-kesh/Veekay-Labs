@@ -49,10 +49,23 @@ function renderReviewOut(out, rev) {
   }
 }
 
-// opts: { kind, refId, tradeData, rulesText, model, onApplyProposed(proposed) }
+// opts: { kind, refId (null if not saved yet), ensureRefId: async () => {id, tradeData},
+//         tradeData, rulesText, model, onApplyProposed(proposed) }
+// ensureRefId is called lazily on the first upload/review action when refId starts out null -
+// it should save a draft trade from the current form and return its id, so screenshots and
+// review are usable before the user ever clicks Save (Veekay's "always enable" request).
 export async function mountReviewPanel(container, opts) {
-  const shots = await listAttachments(opts.kind, opts.refId);
-  const revs = await listReviews(opts.kind, opts.refId);
+  let refId = opts.refId || null;
+  let tradeData = opts.tradeData;
+  async function ensureRefId() {
+    if (refId) return refId;
+    const r = await opts.ensureRefId();
+    refId = r.id; tradeData = r.tradeData;
+    return refId;
+  }
+
+  const shots = refId ? await listAttachments(opts.kind, refId) : [];
+  const revs = refId ? await listReviews(opts.kind, refId) : [];
 
   container.innerHTML = `
     <section class="card" id="review">
@@ -79,9 +92,10 @@ export async function mountReviewPanel(container, opts) {
     files = Array.from(files).filter(f => f.type.indexOf('image/') === 0);
     if (!files.length) return;
     status.textContent = 'Uploading…';
+    const id = await ensureRefId();
     for (const f of files) {
       const shrunk = await shrink(f);
-      const res = await uploadAttachment(opts.kind, opts.refId, shrunk);
+      const res = await uploadAttachment(opts.kind, id, shrunk);
       if (res) {
         const fig = document.createElement('figure'); fig.dataset.aid = res.id;
         fig.innerHTML = `<a href="${esc(res.url)}" target="_blank"><img src="${esc(res.url)}" alt="screenshot"></a><button type="button" class="x" title="Remove">×</button>`;
@@ -117,17 +131,18 @@ export async function mountReviewPanel(container, opts) {
     try {
       const session = await getSession();
       if (!session) throw new Error('Not signed in.');
-      const currentShots = await listAttachments(opts.kind, opts.refId);
+      const id = await ensureRefId();
+      const currentShots = await listAttachments(opts.kind, id);
       const images = [];
       for (const s of currentShots.slice(0, 8)) images.push(await attachmentToBase64(s.filename));
       const res = await fetch('/api/review', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ kind: opts.kind, trade: opts.tradeData, rulesText: opts.rulesText, images, model: opts.model }),
+        body: JSON.stringify({ kind: opts.kind, trade: tradeData, rulesText: opts.rulesText, images, model: opts.model }),
       });
       const j = await res.json();
       if (!res.ok || j.error) throw new Error([j.error, j.reason].filter(Boolean).join(': ') || 'Review failed.');
-      await saveReview(opts.kind, opts.refId, opts.model, j.text, j.gates, j.proposed);
+      await saveReview(opts.kind, id, opts.model, j.text, j.gates, j.proposed);
       renderReviewOut(out, { created_at: new Date().toISOString(), model: opts.model, text_body: j.text, proposed_json: { gates: j.gates, proposed: j.proposed } });
     } catch (err) {
       out.innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`;

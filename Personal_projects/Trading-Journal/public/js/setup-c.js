@@ -2,13 +2,11 @@
 import { supabase } from './supabase-client.js';
 import { ruleEffectiveFrom } from './strategy.js';
 
-export const FIELDS = ['support_below', 'resistance_above', 'room_vs_risk', 'declared_before_entry',
-  'ema_hold_2candle', 'crossed_prev_candle_high', 'mom_sign', 'mom_direction', 'ttm_color', 'ttm_direction',
-  'danger_structure', 'confluence_strength', 'invalidation_price', 'result', 'notes'];
-
-export const MOM_SIGNS = ['Negative', 'Positive'];
-export const TTM_COLORS = ['Red', 'Yellow', 'Green', 'Blue'];
-export const DIRECTIONS = ['Increasing', 'Decreasing'];
+// Setup-C-specific only - known Support/Resistance/Confluence and MOM/TTM moved onto every
+// scalp trade (scalp_trades columns, see constants.js), since Section 3's assessment applies
+// to every setup, not just the experimental one. See supabase/migrate-section3-assessments.sql.
+export const FIELDS = ['room_vs_risk', 'declared_before_entry', 'ema_hold_2candle', 'crossed_prev_candle_high',
+  'danger_structure', 'invalidation_price', 'result', 'notes'];
 
 export const RESULTS = { X: 'X - valid sample', C: 'C - failed a gate', E: 'E - under review' };
 

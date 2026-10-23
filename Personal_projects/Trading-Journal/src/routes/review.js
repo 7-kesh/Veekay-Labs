@@ -46,7 +46,17 @@ and "evidence" is one or two sentences of what was visible at entry (or at the r
 Then fill in the \`proposed\` object so it matches your gates and narrative verdict exactly - these values
 pre-fill Veekay's edit form for him to review and save himself, they are never applied automatically.
 Leave a field empty ("" or []) when the evidence is insufficient to recommend a value; never guess
-just to fill every field.`;
+just to fill every field. The form's own Section 3 "Assessments" asks for these as separate fields -
+derive them from the same chart reading as the gates above, not a second independent judgment:
+- structure_valid: Y/N version of the established_level gate.
+- trigger_valid: Y/N version of the trigger gate.
+- extended: Y/N - Y means the fill IS extended from the 8 EMA (the inverse of the ema_extension gate,
+  which passes when NOT extended).
+- ema_alignment: Y/N - is the 8 EMA above the 21 EMA.
+- mom_sign / mom_direction: "Negative" or "Positive", and "Increasing" or "Decreasing".
+- ttm_color / ttm_direction: the TTM Squeeze histogram color ("Red", "Yellow", "Green" or "Blue") you
+  can actually see, and "Increasing" or "Decreasing".
+Leave any of these empty ("") rather than guess when the chart doesn't show it clearly.`;
 
 const SETUPS = ['A', 'B', 'C', ''];
 const CATEGORIES = ['A', 'B', 'C', 'X', 'D', 'E', ''];
@@ -55,6 +65,10 @@ const VIOLATIONS = ["No established support", "Inadequate room to resistance", "
   "Planned risk over $20", "No stop set before entry", "Moved or removed stop",
   "Early exit", "Held past stop"];
 const EMOTIONS = ["FOMO", "Fear exit", "Panic", "Revenge", "Overconfident", "Hesitated", "Calm / planned"];
+const YN = ['Y', 'N', ''];
+const MOM_SIGNS = ['Negative', 'Positive', ''];
+const TTM_COLORS = ['Red', 'Yellow', 'Green', 'Blue', ''];
+const DIRECTIONS = ['Increasing', 'Decreasing', ''];
 
 function scalpSchema() {
   const gate = {
@@ -72,13 +86,18 @@ function scalpSchema() {
       proposed: {
         type: 'object',
         properties: {
-          setup: { type: 'string', enum: SETUPS }, setup_valid: { type: 'string', enum: ['Y', 'N', ''] },
-          entry_valid: { type: 'string', enum: ['Y', 'N', ''] }, exit_valid: { type: 'string', enum: ['Y', 'N', ''] },
+          setup: { type: 'string', enum: SETUPS }, setup_valid: { type: 'string', enum: YN },
+          entry_valid: { type: 'string', enum: YN }, exit_valid: { type: 'string', enum: YN },
           category: { type: 'string', enum: CATEGORIES },
           violations: { type: 'array', items: { type: 'string', enum: VIOLATIONS } },
           emotions: { type: 'array', items: { type: 'string', enum: EMOTIONS } },
+          structure_valid: { type: 'string', enum: YN }, trigger_valid: { type: 'string', enum: YN },
+          extended: { type: 'string', enum: YN }, ema_alignment: { type: 'string', enum: YN },
+          mom_sign: { type: 'string', enum: MOM_SIGNS }, mom_direction: { type: 'string', enum: DIRECTIONS },
+          ttm_color: { type: 'string', enum: TTM_COLORS }, ttm_direction: { type: 'string', enum: DIRECTIONS },
         },
-        required: ['setup', 'setup_valid', 'entry_valid', 'exit_valid', 'category', 'violations', 'emotions'],
+        required: ['setup', 'setup_valid', 'entry_valid', 'exit_valid', 'category', 'violations', 'emotions',
+          'structure_valid', 'trigger_valid', 'extended', 'ema_alignment', 'mom_sign', 'mom_direction', 'ttm_color', 'ttm_direction'],
         additionalProperties: false,
       },
     },
