@@ -1,6 +1,7 @@
-import { listScalpTrades } from '../db.js';
+import { listScalpTrades, deleteScalpTrade } from '../db.js';
 import { money, signclass, px, esc } from '../format.js';
 import { downloadCsv } from '../csv.js';
+import { dispatch } from '../router.js';
 
 function periodBounds(period) {
   const t = new Date(); const iso = d => d.toISOString().slice(0, 10);
@@ -26,11 +27,11 @@ export async function render(params, el) {
       <input type="text" name="q" placeholder="Ticker" value="${esc(q)}" style="width:100px">
       <span class="muted">${rows.length} trades · Net <b class="${signclass(net)}">${money(net)}</b></span>
     </form>
-    <table class="dense"><thead><tr><th>Trade</th><th>Date</th><th>Ticker</th><th>Entry</th><th>Net</th><th>R</th><th>Cat</th><th></th></tr></thead>
+    <table class="dense"><thead><tr><th>Trade</th><th>Date</th><th>Ticker</th><th>Entry</th><th>Net</th><th>R</th><th>Cat</th><th></th><th></th></tr></thead>
     <tbody>${rows.map(r => `<tr>
       <td>${esc(r.trade_no)}</td><td>${esc(r.date)}</td><td><b>${esc(r.ticker)}</b></td><td>${px(r.entry_price)}</td>
       <td class="${signclass(r.net_pnl)}">${money(r.net_pnl)}</td><td>${r.r_multiple ?? ''}</td><td>${esc(r.category || '')}</td>
-      <td><a href="#/scalp/${r.id}">edit</a></td></tr>`).join('') || '<tr><td colspan="8" class="muted">No trades in this range.</td></tr>'}
+      <td><a href="#/scalp/${r.id}">edit</a></td><td><a href="#" class="deleteRow neg" data-id="${r.id}" data-label="${esc(r.trade_no)}">delete</a></td></tr>`).join('') || '<tr><td colspan="9" class="muted">No trades in this range.</td></tr>'}
     </tbody></table>
   `;
   const form = el.querySelector('#filters');
@@ -41,5 +42,13 @@ export async function render(params, el) {
   form.q.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); form.dispatchEvent(new Event('change')); } });
   el.querySelector('#exportCsv').addEventListener('click', () => {
     downloadCsv(`scalp_${new Date().toISOString().slice(0, 10)}.csv`, rows);
+  });
+  el.querySelectorAll('.deleteRow').forEach(a => {
+    a.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!confirm(`Delete trade ${a.dataset.label} and its screenshots? This can't be undone.`)) return;
+      await deleteScalpTrade(a.dataset.id);
+      await dispatch();
+    });
   });
 }

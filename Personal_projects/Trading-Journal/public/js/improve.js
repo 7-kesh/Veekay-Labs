@@ -2,7 +2,7 @@
 // scalp_areas()/focus() only for now (plan_areas() needs options/swing plan rows, ported
 // alongside that CRUD). Pure functions over trade rows, matches the Python rounding/ordering.
 import { num as calcNum } from './calc.js';
-import { VIOLATION_ACTIONS, VIOLATION_DIRECTIVES } from './constants.js';
+import { VIOLATION_ACTIONS, VIOLATION_DIRECTIVES, OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS } from './constants.js';
 
 function usd(v) { return v < 0 ? `-$${(-v).toFixed(2)}` : `$${v.toFixed(2)}`; }
 
@@ -158,6 +158,108 @@ export function scalpAreas(rows, settings, m) {
   if (nostop.length >= 5) {
     items.push(item('Stops not recorded', `${nostop.length} of ${rows.length} trades have no stop on file, so risk and R can't be measured for them.`,
       'Fill in the stop on every trade. It is the number the whole risk rule depends on.', { n: nostop.length, kind: 'data' }));
+  }
+
+  return finish(items, totalLoss);
+}
+
+export function planAreas(kind, plans, settings, m) {
+  const closed = plans.filter(p => p.status === 'closed' && p.realized_pl !== null && p.realized_pl !== undefined);
+  const items = [];
+  const totalLoss = m.gross_loss || 0;
+
+  function split(col) {
+    return [closed.filter(p => p[col] === 'N'), closed.filter(p => p[col] === 'Y')];
+  }
+  for (const [col, title, action, directive] of [
+    ['exit_followed', 'Exits that break the plan',
+      'Decide the exit before entering and set the stop and target orders at entry. If the setup is invalid, exit by the rule, not by feel.',
+      'Exit only at target, stop or a written invalidation'],
+    ['entry_followed', 'Entries that skip the checklist',
+      'Do not enter until every checklist item is ticked, including the entry trigger.',
+      'Tick the whole checklist before you enter'],
+  ]) {
+    const [no, yes] = split(col);
+    if (no.length) {
+      const net = no.reduce((s, p) => s + p.realized_pl, 0);
+      let ev = `${no.length} of ${no.length + yes.length} closed trades did not follow the plan; they netted ${usd(net)}`;
+      ev += yes.length ? `, against ${usd(yes.reduce((s, p) => s + p.realized_pl, 0))} over ${yes.length} that did.` : '.';
+      items.push(item(title, ev, action, { cost: net < 0 ? -net : null, n: no.length, directive }));
+    }
+  }
+
+  const badExit = new Map();
+  for (const p of closed) {
+    if (['panic', 'held', 'early'].includes(p.exit_scenario)) {
+      if (!badExit.has(p.exit_scenario)) badExit.set(p.exit_scenario, []);
+      badExit.get(p.exit_scenario).push(p.realized_pl);
+    }
+  }
+  const labels = Object.fromEntries(EXIT_SCENARIOS.map(([k, t]) => [k, t]));
+  const styleLabel = { panic: 'panic', held: 'holding past the stop', early: 'taking profit early out of comfort' };
+  for (const [k, vals] of badExit) {
+    const sum = vals.reduce((s, v) => s + v, 0);
+    items.push(item(`Exit style: ${(labels[k] || k).toLowerCase()}`, `${vals.length} trade(s), net ${usd(sum)}.`,
+      'Use predefined exits only: planned target, planned stop, or a written invalidation rule.',
+      { cost: sum < 0 ? -sum : null, n: vals.length, kind: 'behaviour', directive: `No exits by ${styleLabel[k]}` }));
+  }
+
+  const over = closed.filter(p => p.planned_loss && p.realized_pl < 0 && -p.realized_pl > p.planned_loss);
+  if (over.length) {
+    const extra = over.reduce((s, p) => s + (-p.realized_pl - p.planned_loss), 0);
+    items.push(item('Losses bigger than planned', `${over.length} trade(s) lost more than the planned loss, by ${usd(extra)} in total.`,
+      'Honor the stop. If a stop is not going to be honored, size the trade smaller so the real risk matches the plan.',
+      { cost: extra, n: over.length, directive: 'Honor the stop on every trade' }));
+  }
+
+  const overbudget = plans.filter(p => p.planned_loss && p.account_balance && p.risk_pct !== null && p.risk_pct !== undefined
+    && p.planned_loss > p.account_balance * p.risk_pct / 100 + 1e-9);
+  if (overbudget.length) {
+    items.push(item('Plans over the risk budget',
+      `${overbudget.length} of ${plans.length} plans risk more than the ${overbudget[0].risk_pct}% budget (largest planned loss ${usd(Math.max(...overbudget.map(p => p.planned_loss)))}).`,
+      `Use the Max ${kind === 'options' ? 'contracts' : 'shares'} figure in the forecast row, or move the stop, before you enter.`,
+      { n: overbudget.length, kind: 'data', directive: 'Size every plan within the risk budget' }));
+  }
+
+  if (m.avg_win_r !== null && m.avg_win_r !== undefined && closed.length) {
+    const planRR = closed.filter(p => p.rr).map(p => p.rr);
+    const realR = closed.filter(p => p.realized_r !== null && p.realized_r !== undefined).map(p => p.realized_r);
+    if (planRR.length && realR.length) {
+      const avgReal = realR.reduce((s, v) => s + v, 0) / realR.length, avgPlan = planRR.reduce((s, v) => s + v, 0) / planRR.length;
+      if (avgReal < 0.5 * avgPlan) {
+        items.push(item('Realized R is far below planned R', `You plan about ${avgPlan.toFixed(2)}R and realize about ${avgReal.toFixed(2)}R on average.`,
+          'Targets may be too far or exits too early. Compare the planned target with where price actually turned, and adjust the plan or hold to it.',
+          { n: closed.length, kind: 'outcome' }));
+      }
+    }
+  }
+
+  const skipped = new Map();
+  const names = Object.fromEntries(kind === 'options' ? OPTIONS_CHECKLIST : SWING_CHECKLIST);
+  for (const p of plans) {
+    if (p.actual_entry !== null && p.actual_entry !== undefined && p.checklist) {
+      for (const [k, v] of Object.entries(p.checklist)) if (!v) skipped.set(k, (skipped.get(k) || 0) + 1);
+    }
+  }
+  if (skipped.size) {
+    const [k, c] = [...skipped.entries()].sort((a, b) => b[1] - a[1])[0];
+    items.push(item('Checklist step skipped most often', `"${names[k] || k}" was not ticked on ${c} entered trade(s).`,
+      'Make this the step you do first, before the chart looks exciting.',
+      { n: c, kind: 'behaviour', directive: `Never skip: ${(names[k] || k).split(':')[0].toLowerCase()}` }));
+  }
+
+  if (m.breakeven_win_pct && m.win_pct < m.breakeven_win_pct) {
+    items.push(item('Win rate is below break-even',
+      `You win ${m.win_pct.toFixed(0)}% but need ${m.breakeven_win_pct.toFixed(0)}% at the current average win (${usd(m.avg_win)}) and loss (${usd(m.avg_loss)}).`,
+      'Either raise the win rate with stricter entries, or widen the reward-to-risk of each plan.', { n: m.n, kind: 'outcome' }));
+  }
+
+  const today = new Date();
+  const stale = plans.filter(p => (p.status === 'planned' || p.status === 'open') && p.plan_date);
+  const old = stale.filter(p => (today - new Date(p.plan_date + 'T00:00:00')) / 86400000 >= 7);
+  if (old.length) {
+    items.push(item('Plans waiting for actuals', `${old.length} plan(s) have sat open for a week or more without actuals.`,
+      'Close them out or cancel them. The plan-vs-actual comparison only works with actuals.', { n: old.length, kind: 'data' }));
   }
 
   return finish(items, totalLoss);

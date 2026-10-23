@@ -1,7 +1,8 @@
 // Port of app/templates/plans_list.html.
-import { listPlans } from '../db.js';
+import { listPlans, deletePlan } from '../db.js';
 import { money, signclass, px, num as fmtNum, esc } from '../format.js';
 import { downloadCsv } from '../csv.js';
+import { dispatch } from '../router.js';
 
 const KIND_LABEL = { options: 'Options', swing: 'Swing' };
 
@@ -28,7 +29,7 @@ export async function render(kind, params, el) {
     </form>
     <div class="scroll"><table class="dense"><thead><tr>
       <th>Date</th><th>Acct</th><th>Ticker</th><th>Status</th><th>Plan entry</th><th>Stop</th><th>Target</th><th>Qty</th><th>Planned loss</th><th>R:R</th>
-      <th>Actual in</th><th>Actual out</th><th>P/L</th><th>ROI</th><th>R</th><th>Entry</th><th>Exit</th><th></th></tr></thead><tbody>
+      <th>Actual in</th><th>Actual out</th><th>P/L</th><th>ROI</th><th>R</th><th>Entry</th><th>Exit</th><th></th><th></th></tr></thead><tbody>
       ${rows.map(p => `<tr class="${(p.realized_pl || 0) > 0 ? 'win' : (p.realized_pl || 0) < 0 ? 'loss' : ''}">
         <td>${esc(p.plan_date)}</td><td>${acct(p.account)}</td>
         <td><b>${esc(p.ticker)}</b> <small>${esc(p.direction || '')}${p.strike ? ' ' + px(p.strike) : ''}</small></td>
@@ -38,7 +39,7 @@ export async function render(kind, params, el) {
         <td>${px(p.actual_entry)}</td><td>${px(p.actual_exit)}</td>
         <td class="${signclass(p.realized_pl)}">${money(p.realized_pl)}</td><td>${p.roi !== null && p.roi !== undefined ? fmtNum(p.roi) + '%' : ''}</td><td>${fmtNum(p.realized_r)}</td>
         <td>${ynv(p.entry_followed)}</td><td>${ynv(p.exit_followed)}</td>
-        <td><a href="#/${kind}/${p.id}">open</a></td></tr>`).join('') || '<tr><td colspan="18" class="muted">Nothing here yet.</td></tr>'}
+        <td><a href="#/${kind}/${p.id}">open</a></td><td><a href="#" class="deleteRow neg" data-id="${p.id}" data-label="${esc(p.ticker)}">delete</a></td></tr>`).join('') || '<tr><td colspan="19" class="muted">Nothing here yet.</td></tr>'}
     </tbody></table></div>
   `;
   const form = el.querySelector('#filters');
@@ -48,5 +49,13 @@ export async function render(kind, params, el) {
   });
   el.querySelector('#exportCsv').addEventListener('click', () => {
     downloadCsv(`${kind}_${new Date().toISOString().slice(0, 10)}.csv`, rows.map(({ checklist, ...rest }) => rest));
+  });
+  el.querySelectorAll('.deleteRow').forEach(a => {
+    a.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!confirm(`Delete this ${a.dataset.label} plan and its screenshots? This can't be undone.`)) return;
+      await deletePlan(kind, a.dataset.id);
+      await dispatch();
+    });
   });
 }
