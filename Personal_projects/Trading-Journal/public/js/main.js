@@ -6,6 +6,7 @@ import * as today from './views/today.js';
 import * as scalpList from './views/scalp-list.js';
 import * as scalpForm from './views/scalp-form.js';
 import * as strategyView from './views/strategy.js';
+import * as weeklyView from './views/weekly.js';
 
 const app = document.getElementById('app');
 const loginScreen = document.getElementById('loginScreen');
@@ -16,6 +17,7 @@ register('today', today.render);
 register('scalp', scalpList.render);
 register('scalp/:id', scalpForm.render);
 register('strategy', strategyView.render);
+register('weekly', weeklyView.render);
 
 mount(app);
 

@@ -27,6 +27,36 @@ export const EMOTIONS = ["FOMO", "Fear exit", "Panic", "Revenge", "Overconfident
 
 export const ORDER_TYPES = ["Market", "Limit", "Stop", "Stop-limit", "Bracket"];
 
+// What to do about each violation tag, taken from rules/scalp.md. Unknown tags get a generic action.
+export const VIOLATION_ACTIONS = {
+  "No established support": "Wait until the level has held for several candles before taking Setup A. A low formed one or two candles ago is not support.",
+  "Inadequate room to resistance": "Measure the room to the next known resistance or HOD before entry and require at least 1R.",
+  "Extended / chase": "Skip fills more than about $0.20 above the 8 EMA. Wait for the next valid setup instead of chasing.",
+  "Anticipated trigger": "Wait for C2 to actually cross C1's high intrabar. Do not buy before the trigger.",
+  "MOM/TTM not confirming": "Check that both MOM and TTM are improving toward positive before you click buy.",
+  "Late entry / setup expired": "If C2 was missed it is a missed trade. Wait for a new valid setup.",
+  "Planned risk over $20": "Size from the stop: shares = floor($20 / (entry - stop)).",
+  "No stop set before entry": "Write the structural stop down before you enter.",
+  "Moved or removed stop": "Leave the stop where the plan put it. Re-place it only after a planned partial.",
+  "Early exit": "Exit only on objective deterioration or the planned 25% scale-outs.",
+  "Held past stop": "Exit at the stop. A stop that moves is not a stop.",
+};
+
+// One-line "do/don't" for each violation tag, shown in the Focus now block.
+export const VIOLATION_DIRECTIVES = {
+  "No established support": "Don't enter without established support",
+  "Inadequate room to resistance": "Don't enter without 1R of room to resistance",
+  "Extended / chase": "Avoid extended entries (no chasing above the 8 EMA)",
+  "Anticipated trigger": "Wait for C2 to cross C1's high before buying",
+  "MOM/TTM not confirming": "Don't enter when MOM and TTM aren't improving",
+  "Late entry / setup expired": "Don't take a setup after C2 is gone",
+  "Planned risk over $20": "Size every trade to $20 of risk or less",
+  "No stop set before entry": "Set the stop before you enter",
+  "Moved or removed stop": "Don't move or remove the stop",
+  "Early exit": "Don't exit early without a chart reason",
+  "Held past stop": "Exit at the stop, every time",
+};
+
 export const OPTIONS_CHECKLIST = [
   ["trend", "Trend: bullish or bearish setup identified on TradingView"],
   ["levels", "Support/resistance: valid entry area and price target identified"],

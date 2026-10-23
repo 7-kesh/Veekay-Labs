@@ -62,6 +62,21 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 
 ## Session Log
 
+### 2026-10-23 (co-builder, later still): Weekly wrap-up ported (perf.py, improve.py's scalp half, weekly.py)
+
+**Did**
+- `public/js/perf.js`: full port of `perf.py` (`analyse()`, `histogram()`, `insights()`). Parity-tested against `test_calc.py::test_perf_margins` and `test_empty_series_has_none_metrics` - exact assertions, all pass.
+- `public/js/improve.js`: port of `improve.py`'s `scalpAreas()` and `focus()` (the narrow "Focus now" ranking - umbrella/broad/duplicate filtering). `plan_areas()` (options/swing) deferred until that CRUD exists, since it needs plan rows that don't exist yet. Parity-tested against `test_focus_is_narrow`'s exact assertion.
+- `public/js/weekly.js`: port of `weekly.py` - `weekBounds()`, `byDay()`, `tally2candle()`, `weeklyReview()` (reuses the two ports above, exactly like the Python version reuses `perf`/`improve`), plus `getWeeklyNotes()`/`saveWeeklyNotes()` for the free-text side.
+- `public/js/views/weekly.js`: the `/weekly` page - KPI tiles, by-day table, 2-candle/Setup C tallies, strategy changes stated that week, ranked action items, and the editable notes form. Prior/next week navigation via `?week=YYYY-MM-DD`, same as the Python version.
+- Wired into `main.js`'s router and the sidebar nav link.
+
+**Verified:** all three new parity test files (`perf.test.mjs`, `improve.test.mjs`) pass against the exact Python assertions. `npx wrangler deploy --dry-run` still bundles cleanly (30 asset files now, up from 24). Reloaded the app in a fresh browser tab under local `serve` - clean render, zero console errors, confirming the new import graph (`weekly.js` -> `perf.js`/`improve.js`/`setup-c.js`/`strategy.js`) has no circular-import or missing-export issues. **Did not click into `/weekly` itself** - it's behind login and I don't have Veekay's password; logic is verified via the parity tests and a clean module load, not a live screenshot of the rendered page.
+
+**Caught mid-session, handled correctly:** Veekay's own browser tab (showing the live `*.workers.dev` app at `#/today`, logged in) was sitting in the same Chrome session I was about to test in. Opened a separate new tab for local testing instead of touching his - his live session was never interacted with.
+
+**Not yet ported:** options/swing CRUD and `plan_areas()`, stats/charts pages (portfolio + per-kind, inline SVG), settings page, CSV export, the strategy PDF playbook. Still pending: Veekay's own live login + real-review test on the deployed app, and the 103-trade data migration.
+
 ### 2026-10-23 (co-builder, later): Deployed, fixed a real architecture mismatch - Pages Functions don't run under Workers Builds
 
 **What happened:** Veekay created the Cloudflare project; it deployed fine as a static site (`veekay-labs-trade-journal.venkatkrishnanchellappa.workers.dev` loaded correctly, CSS/JS all served), but every `/api/*` call 404'd. Root cause, confirmed by what Veekay saw in his dashboard settings (Build command / Deploy command / Root directory, no "Build output directory" field, and the `*.workers.dev` domain itself): Cloudflare set this project up via **Workers Builds** (their newer unified Git-connected Worker deploy), not classic **Pages**. The `functions/` directory file-based routing I'd built (`functions/api/review.js` etc.) is a Pages-only convention - a plain Worker doesn't scan for it at all, at any root-directory setting. No amount of settings-tweaking would have fixed it; the deployment model itself didn't match the code.
