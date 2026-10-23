@@ -2,7 +2,7 @@
 // Shared by every trade-detail view (scalp now; options/swing can reuse this once their forms
 // exist). Screenshots live in Supabase Storage; the review itself goes through the
 // /api/review Pages Function so the Anthropic key never reaches the browser.
-import { listAttachments, uploadAttachment, deleteAttachment, listReviews, saveReview, attachmentToBase64 } from './db.js';
+import { listAttachments, uploadAttachment, deleteAttachment, listReviews, saveReview, attachmentToBase64, getPatternDigest } from './db.js';
 import { getSession } from './auth.js';
 import { GATE_LABELS } from './constants.js';
 import { esc, localDatetime } from './format.js';
@@ -135,10 +135,14 @@ export async function mountReviewPanel(container, opts) {
       const currentShots = await listAttachments(opts.kind, id);
       const images = [];
       for (const s of currentShots.slice(0, 8)) images.push(await attachmentToBase64(s.filename));
+      // Scalp only, for now - options/swing don't have the gate/violation taxonomy this draws on.
+      const historyDigest = (opts.kind === 'scalp' && tradeData)
+        ? await getPatternDigest({ ticker: tradeData.ticker, setup: tradeData.setup, excludeId: id })
+        : '';
       const res = await fetch('/api/review', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ kind: opts.kind, trade: tradeData, rulesText: opts.rulesText, images, model: opts.model }),
+        body: JSON.stringify({ kind: opts.kind, trade: tradeData, rulesText: opts.rulesText, images, model: opts.model, historyDigest }),
       });
       const j = await res.json();
       if (!res.ok || j.error) throw new Error([j.error, j.reason].filter(Boolean).join(': ') || 'Review failed.');

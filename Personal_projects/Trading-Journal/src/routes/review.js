@@ -19,7 +19,22 @@ Answer in this structure:
 **Rule check** - a short table: rule | pass / fail / insufficient evidence | evidence.
 **Execution** - order types, fills against the plan, stop handling, partials.
 **Plan vs actual** - only for options and swing trades.
+**Recurring pattern** - only if a "Pattern history" section is given below: one line on whether
+  this trade repeats something recurring in it. Say "No clear repeat" if it doesn't. Omit this
+  section entirely if no pattern history was given.
 **The one thing to fix** - a single concrete action for the next trade.
+`;
+
+const HISTORY_PREAMBLE = `
+## Pattern history (reference only - read carefully)
+This is aggregated statistics from Veekay's own past trades - evidence about his recurring
+patterns over time, NOT evidence about the trade you are reviewing right now. Hard rule: every
+gate, and every value in \`proposed\` (setup_valid, entry_valid, exit_valid, category, structure_valid,
+etc.), is decided ONLY from this trade's own chart screenshots and order evidence, exactly as the
+rules above require - never from the history below, even if it would make the pattern "fit."
+Use this section for exactly two things: the "Recurring pattern" line in your narrative, and
+sharpening "The one thing to fix" if this trade's own evidence actually shows the same issue.
+If it doesn't apply here, say so and move on.
 `;
 
 const GATE_KEYS = ['established_level', 'trigger', 'room', 'mom_ttm', 'ema_extension', 'exit_structure'];
@@ -124,7 +139,7 @@ export async function handleReview(request, env) {
 
   let body;
   try { body = await request.json(); } catch { return new Response(JSON.stringify({ error: 'Invalid JSON body.' }), { status: 400 }); }
-  const { kind, trade, rulesText, images, model } = body;
+  const { kind, trade, rulesText, images, model, historyDigest } = body;
   if (!kind || !trade) return new Response(JSON.stringify({ error: 'Missing kind or trade.' }), { status: 400 });
 
   const content = [];
@@ -136,7 +151,8 @@ export async function handleReview(request, env) {
   content.push({ type: 'text', text: `## Trade\n${tradeText(kind, trade)}\n\nReview this trade.` });
 
   const structured = kind === 'scalp';
-  const system = SYSTEM + `\n\n## Veekay's rules (${kind})\n${rulesText || ''}` + (structured ? GATE_ADDENDUM : '');
+  const system = SYSTEM + `\n\n## Veekay's rules (${kind})\n${rulesText || ''}` + (structured ? GATE_ADDENDUM : '') +
+    (historyDigest ? HISTORY_PREAMBLE + '\n' + historyDigest : '');
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
   const kwargs = {

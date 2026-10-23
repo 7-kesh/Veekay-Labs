@@ -179,6 +179,61 @@ export async function saveScalpTrade(id, form, settings) {
   return tradeId;
 }
 
+// Aggregated history for the review prompt - evidence about Veekay's PATTERNS over time, never
+// evidence about the trade being reviewed right now. review.js walls this off from gate grading
+// (see HISTORY_ADDENDUM there); this function only computes the numbers.
+export async function getPatternDigest({ ticker, setup, excludeId, limit = 80 } = {}) {
+  const { data, error } = await supabase.from('scalp_trades')
+    .select('id,ticker,setup,category,violations,net_pnl,date')
+    .order('date', { ascending: false }).limit(limit);
+  rethrow(error);
+  const rows = (data || []).filter(r => r.id !== excludeId);
+  if (!rows.length) return '';
+
+  function tally(list) {
+    const cat = {}, viol = {};
+    let net = 0, netCount = 0;
+    for (const r of list) {
+      if (r.category) cat[r.category] = (cat[r.category] || 0) + 1;
+      for (const v of (r.violations || '').split('; ').filter(Boolean)) viol[v] = (viol[v] || 0) + 1;
+      if (r.net_pnl !== null && r.net_pnl !== undefined) { net += r.net_pnl; netCount++; }
+    }
+    return { count: list.length, cat, viol, avgNet: netCount ? net / netCount : null };
+  }
+  function fmtCat(cat, total) {
+    return Object.entries(cat).sort((a, b) => b[1] - a[1])
+      .map(([k, n]) => `${k} ${n} (${Math.round(100 * n / total)}%)`).join(', ');
+  }
+  function fmtViol(viol, top = 3) {
+    return Object.entries(viol).sort((a, b) => b[1] - a[1]).slice(0, top)
+      .map(([k, n]) => `${k} (${n})`).join(', ');
+  }
+
+  const lines = [];
+  const overall = tally(rows);
+  lines.push(`Last ${overall.count} trades: ${fmtCat(overall.cat, overall.count) || 'no categories recorded yet'}.`);
+  if (Object.keys(overall.viol).length) lines.push(`Most frequent violations: ${fmtViol(overall.viol)}.`);
+
+  if (ticker) {
+    const sameTicker = rows.filter(r => r.ticker === ticker);
+    if (sameTicker.length) {
+      const t = tally(sameTicker);
+      lines.push(`This ticker (${ticker}), ${t.count} prior trade(s): ${fmtCat(t.cat, t.count)}` +
+        `${t.avgNet !== null ? `, avg net $${t.avgNet.toFixed(2)}` : ''}.`);
+    }
+  }
+  if (setup) {
+    const sameSetup = rows.filter(r => r.setup === setup);
+    if (sameSetup.length) {
+      const s = tally(sameSetup);
+      const cleanPct = s.count ? Math.round(100 * (s.cat.A || 0) / s.count) : 0;
+      lines.push(`Setup ${setup} trades, ${s.count} prior: clean ${s.cat.A || 0} (${cleanPct}%)` +
+        `${Object.keys(s.viol).length ? `, repeat issue(s): ${fmtViol(s.viol, 2)}` : ''}.`);
+    }
+  }
+  return lines.join('\n');
+}
+
 // ---------- options / swing plans ----------
 
 export async function listPlans(kind, { status = 'all', account = 'all' } = {}) {
