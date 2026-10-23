@@ -21,7 +21,11 @@ export async function verifyUser(request, env) {
   if (!res.ok) return { reason: `Supabase rejected the access token (status ${res.status}).` };
   const user = await res.json();
   const allowed = (env.ALLOWED_EMAIL || '').trim().toLowerCase();
-  if (!allowed) return { reason: 'ALLOWED_EMAIL is not configured on this Worker.' };
+  if (!allowed) {
+    // Temporary diagnostic - env key NAMES only, never values, to find out what this Worker
+    // actually sees at request time. Remove once ALLOWED_EMAIL shows up here.
+    return { reason: `ALLOWED_EMAIL is not configured on this Worker. env keys visible: [${Object.keys(env).join(', ')}]` };
+  }
   if ((user.email || '').trim().toLowerCase() !== allowed) {
     return { reason: `Signed in as ${user.email}, which does not match the configured ALLOWED_EMAIL.` };
   }
