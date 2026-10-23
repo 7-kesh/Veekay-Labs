@@ -58,6 +58,34 @@ CREATE TABLE IF NOT EXISTS reviews (
   kind TEXT, ref_id INTEGER, model TEXT, text TEXT, proposed_json TEXT, created_at TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_rev ON reviews(kind, ref_id);
+
+-- Strategy rules are never edited in place: a change closes the old row (effective_to) and
+-- opens a new one (effective_from), so a trade is always assessed against what was in force
+-- on its own date, not today's rules. See app/strategy.py.
+CREATE TABLE IF NOT EXISTS strategy_rules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kind TEXT NOT NULL DEFAULT 'scalp',
+  rule_key TEXT NOT NULL,
+  text TEXT NOT NULL,
+  effective_from TEXT NOT NULL,
+  effective_to TEXT,
+  source TEXT,
+  created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_rules_lookup ON strategy_rules(kind, rule_key, effective_from);
+
+CREATE TABLE IF NOT EXISTS strategy_change_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'scalp',
+  rule_key TEXT NOT NULL,
+  original TEXT,
+  new_text TEXT NOT NULL,
+  effect TEXT,
+  applies_same_day INTEGER DEFAULT 0,
+  created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_change_log_date ON strategy_change_log(date);
 """
 
 

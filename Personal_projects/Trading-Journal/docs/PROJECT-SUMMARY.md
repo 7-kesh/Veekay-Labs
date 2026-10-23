@@ -12,7 +12,7 @@
 - **Not done:** API key setup; run on the second machine; Futures; automated tests for login.
 - **Waiting on Veekay:** set his real login email/password (test credentials were used to verify the flow, then wiped); options risk budget ($75 vs $30); confirmation that Options/Swing default to Paper; rules-file review.
 - **Planned (scoped, not started):** migrate to Cloudflare Pages + Supabase - full rewrite (Python calc/perf/improve/review logic -> JS, static+Supabase like `piggy-payday-site`), Supabase Auth email+password (not magic-link - Veekay's call, overriding the initially recommended magic-link), one-time data migration of existing scalp trades, then retire the local Flask app.
-- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phase 1 (the 10-gate Objective Assessment, split between Claude's vision gates and a new `rule_engine.py` for arithmetic/consistency gates) is built and verified against a real trade via Python/Flask test-client, not yet exercised through the browser. See the Session Log entry below for the full design and the five remaining phases (strategy governance + PDF playbook, Setup C gates, 2-candle tally, weekly wrap-up ritual, audit trail).
+- **In progress (2026-10-22, later):** consolidating everything TradeVenture's skill-driven journal does into this app, then retiring TradeVenture. Phase 1 (10-gate Objective Assessment + rule engine) and Phase 2 (versioned strategy rules, change classification, PDF playbook) are both built and verified live in the browser, committed and pushed. Remaining: Setup C gates, 2-candle tally aggregation, weekly wrap-up ritual, audit trail. See the Session Log for the full design.
 
 ## What exists
 
@@ -56,6 +56,28 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 - Costs in "Key areas to improve" overlap; never present them as additive.
 
 ## Session Log
+
+### 2026-10-22 (co-builder, continued further): Phase 2 - versioned strategy rules, change classification, PDF playbook
+
+**Did**
+- `app/strategy.py` (new): `strategy_rules` and `strategy_change_log` tables. A rule is never edited in place - `apply_change()` closes the old row (`effective_to`) and opens a new one (`effective_from`), so `current_rules(conn, kind, as_of)` always resolves what was in force on a given date via a date-range lookup, not "whatever the file says today."
+- Seeded 13 scalp rules (`SEED_SCALP`) from the existing `rules/scalp.md`, split at the same granularity as the gate checklist (setup_a, setup_b, trigger, gate_mom_ttm, gate_ema_alignment, gate_ema_extension, gate_stop_before_entry, gate_room, gate_danger_structure, sizing, exit_plan, categories, violation_tags), `effective_from` backdated to 2026-10-19 (the date the file itself says it was seeded from). Seeding runs once from `create_app()`, not `db.init()` - avoids a circular import between `db` and `strategy`.
+- `review.rules_text(kind, as_of)` now takes the trade's own date and reads `strategy_rules` for scalp instead of the static file - both `packet()` and `run()` pass `row["date"]`. Options/swing are unchanged (still flat `rules/*.md`, Phase 2 is scalp-only for now).
+- `strategy.classify_change()`: a real API call that reads old vs. proposed wording and classifies the effect (looser/tighter/reversal/addition/definition) - genuinely needs judgment, not a diff, so it's the one place in this feature that costs tokens. Everything else (closing/opening rows, logging) is plain code.
+- New `/strategy` page: each rule with a "Propose a change" disclosure (textarea -> "Check with Claude" -> red-flag banner + classification -> effective-date picker + "also apply to today's trades" checkbox -> "Confirm and apply"). Matches the same never-auto-write discipline as the trade review: the classification is shown, nothing is saved until Veekay explicitly confirms.
+- `/strategy/playbook.pdf`: live-rendered (reportlab), not a dated file to regenerate by hand - same `[CHANGED date]` red-tag convention as TradeVenture's old `Strategy_Playbook_YYYYMMDD.pdf`, computed by comparing each rule's current `effective_from` against the seed date.
+- Added `reportlab==4.2.5` to `requirements.txt` - pinned, since this project's Python 3.9 venv can't run reportlab>=4.3 (dropped 3.9 support; discovered by trying to install, not by reading changelogs).
+
+**Verified live, real API calls, no stray writes:**
+- `/strategy` page loads all 13 rules correctly.
+- Proposed a real (deliberately throwaway) tightening of the MOM/TTM gate - Claude correctly classified it "tighter" with a specific, accurate explanation of what would now fail that used to pass. Did **not** click "Confirm and apply" (that would have actually changed the live rule, which wasn't the point of the test) - confirmed in the database afterward: still exactly 13 rule rows, 0 change-log rows, no side effects from the check-only call.
+- `/strategy/playbook.pdf` renders correctly: title, generation-date note, all 13 rules, no `[CHANGED]` tags (correct, since nothing's actually been changed yet).
+
+**Also fixed in this session, before Phase 2:** gate chips and the "Fill in Claude's suggestion" button from Phase 1 only appeared right after a fresh "Review with Claude" click - reopening a trade later showed the saved narrative but lost the structured data, even though `reviews.proposed_json` already had it. Fixed: `shots_panel` macro now parses it on render (via a new `fromjson` Jinja filter - `cfg.GATE_LABELS` doesn't resolve inside an imported macro without `with context`, so the gate-label list is inlined in the macro directly instead), and the "Fill in" click handler is delegated on `document` so one handler covers both the server-rendered button and the one created live after a review.
+
+**Not yet done:** Setup C's own versioned gate list (Phase 3), 2-candle tally aggregation/rate (data field exists from Phase 1, no rollup yet), weekly wrap-up ritual (Phase 4), audit trail (Phase 5). Options/swing never got their own versioned rules - still flat files, same as before Phase 2.
+
+**Next session should:** Phase 3 (Setup C) is the natural next step since it reuses the same gate-checklist and rule-versioning machinery just built. Also worth a pass: extending `classify_change()`'s red-flag detection to the per-trade review flow itself (today it only fires from the `/strategy` page's explicit edit form, not from anything stated in a trade's notes).
 
 ### 2026-10-22 (co-builder, continued): Phase 1 of the 6-feature architecture - 10-gate Objective Assessment, rule engine
 

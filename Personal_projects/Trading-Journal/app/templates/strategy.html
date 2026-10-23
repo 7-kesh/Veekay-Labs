@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Strategy{% endblock %}
+{% block body %}
+<div class="head"><h1>Strategy</h1>
+  <a class="btn" href="{{ url_for('main.strategy_playbook') }}" target="_blank">Download playbook PDF</a></div>
+
+<p class="muted">Any change to the strategy is a red flag by your own standing rule. Every edit here gets Claude's
+read on what actually changed before it's applied, and a rule is never edited in place - changing it closes the
+old wording on the date you choose and opens the new one, so a trade already in the journal keeps being judged
+against what was in force on its own date unless you explicitly say otherwise.</p>
+
+{% for rule_key, label, text in rules %}
+<section class="card" id="rule-{{ rule_key }}">
+  <div class="head"><h2>{{ label }}</h2>
+    <button type="button" class="btn sm toggleEdit" data-key="{{ rule_key }}">Propose a change</button></div>
+  <p>{{ text }}</p>
+  <div class="editArea" id="edit-{{ rule_key }}" hidden>
+    <textarea class="newText" rows="4" placeholder="New wording for this rule">{{ text }}</textarea>
+    <div class="row" style="margin-top:8px;display:flex;gap:10px;align-items:center">
+      <button type="button" class="btn checkBtn" data-key="{{ rule_key }}">Check with Claude</button>
+      <span class="muted checkStatus"></span>
+    </div>
+    <div class="classifyOut"></div>
+    <form method="post" action="{{ url_for('main.strategy_apply') }}" class="applyForm" hidden>
+      <input type="hidden" name="rule_key" value="{{ rule_key }}">
+      <input type="hidden" name="new_text" class="hiddenNewText">
+      <input type="hidden" name="effect" class="hiddenEffect">
+      <div class="fld f-md"><label>Effective from</label><input type="date" name="effective_from" value="{{ today }}"></div>
+      <div class="fld"><label><input type="checkbox" name="applies_same_day" value="1"> Also apply to today's already-taken trades</label></div>
+      <button class="btn primary" type="submit">Confirm and apply</button>
+    </form>
+  </div>
+</section>
+{% endfor %}
+
+<section class="card">
+  <h2>Strategy Change Log</h2>
+  {% if log %}
+  <table class="dense"><thead><tr><th>Date</th><th>Rule</th><th>Effect</th><th>New wording</th></tr></thead><tbody>
+  {% for r in log %}<tr><td>{{ r.date }}</td><td>{{ r.rule_key }}</td><td>{{ r.effect }}</td><td>{{ r.new_text }}</td></tr>{% endfor %}
+  </tbody></table>
+  {% else %}<p class="muted">No changes logged yet.</p>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='strategy.js') }}"></script>{% endblock %}

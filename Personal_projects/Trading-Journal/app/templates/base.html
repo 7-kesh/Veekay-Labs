@@ -32,6 +32,7 @@
   <a class="sn sub s-swing {{ 'on' if on_stats and which == 'swing' }}" href="{{ url_for('main.stats_view', which='swing', **keep) }}">Swing stats</a>
 
   <span class="grow"></span>
+  <a class="sn s-home {{ 'on' if ep == 'main.strategy_view' }}" href="{{ url_for('main.strategy_view') }}">Strategy</a>
   <a class="sn s-home {{ 'on' if ep == 'main.settings_view' }}" href="{{ url_for('main.settings_view') }}">Settings</a>
   {% if session.get('authed') %}
   <form method="post" action="{{ url_for('main.logout_view') }}" style="padding:0 16px 12px">

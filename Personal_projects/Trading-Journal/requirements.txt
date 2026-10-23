@@ -1,2 +1,3 @@
 flask>=3.0
 anthropic>=0.40
+reportlab==4.2.5  # pinned: this project's Python 3.9 venv can't use reportlab>=4.3 (requires 3.10+)

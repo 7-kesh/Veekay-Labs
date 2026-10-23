@@ -10,7 +10,7 @@ from jinja2 import Undefined
 from flask import (Blueprint, Response, abort, flash, g, jsonify, redirect, render_template, request,
                    send_from_directory, session, url_for)
 
-from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine
+from . import auth, calc, config, db, importer, improve, lock, perf, review, rule_engine, strategy
 
 bp = Blueprint("main", __name__)
 KINDS = ("options", "swing")
@@ -590,6 +590,50 @@ def scalp_check(rid):
 def review_packet(kind, rid):
     row = _target(kind, rid)
     return Response(review.packet(kind, row, attachments(kind, rid)), mimetype="text/plain")
+
+
+# ---------- strategy governance ----------
+
+STRATEGY_LABELS = {k: label for k, label, _ in strategy.SEED_SCALP}
+STRATEGY_ORDER = [k for k, _, _ in strategy.SEED_SCALP]
+
+
+def _ordered_rules():
+    rules = strategy.current_rules(conn(), "scalp")
+    return [(k, STRATEGY_LABELS[k], rules.get(k, "")) for k in STRATEGY_ORDER]
+
+
+@bp.route("/strategy")
+def strategy_view():
+    return render_template("strategy.html", rules=_ordered_rules(), log=strategy.change_log(conn()))
+
+
+@bp.route("/strategy/propose", methods=["POST"])
+def strategy_propose():
+    rule_key, new_text = f("rule_key"), f("new_text")
+    rules = strategy.current_rules(conn(), "scalp")
+    try:
+        result = strategy.classify_change(rule_key, rules.get(rule_key), new_text, S()["review_model"])
+    except Exception as e:  # surface API/key problems in the page instead of a 500
+        return jsonify(error=str(e)), 400
+    return jsonify(result)
+
+
+@bp.route("/strategy/apply", methods=["POST"])
+def strategy_apply():
+    rule_key, new_text, effect = f("rule_key"), f("new_text"), f("effect")
+    effective_from = f("effective_from") or date.today().isoformat()
+    strategy.apply_change(conn(), "scalp", rule_key, new_text, effective_from, effect,
+                           f("applies_same_day") == "1", "stated by Veekay")
+    flash("Strategy rule updated.")
+    return redirect(url_for("main.strategy_view"))
+
+
+@bp.route("/strategy/playbook.pdf")
+def strategy_playbook():
+    pdf_bytes = strategy.build_playbook_pdf(_ordered_rules(), strategy.change_log(conn()))
+    return Response(pdf_bytes, mimetype="application/pdf",
+                     headers={"Content-Disposition": "inline; filename=Strategy_Playbook.pdf"})
 
 
 # ---------- settings ----------

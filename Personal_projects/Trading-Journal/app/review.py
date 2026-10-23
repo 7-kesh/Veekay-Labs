@@ -108,14 +108,16 @@ def api_key():
     return None
 
 
-def rules_text(kind):
-    name = "scalp" if kind == "scalp" else kind
-    out = []
-    for n in (name,):
-        p = config.RULES / ("%s.md" % n)
-        if p.exists():
-            out.append(p.read_text())
-    return "\n\n".join(out)
+def rules_text(kind, as_of=None):
+    """For scalp, the rules in force on `as_of` (the trade's own date, not today) - from the
+    versioned strategy_rules table, never the static file. Options/swing aren't on Phase 2's
+    versioned system yet, so they still read their flat rules/*.md file."""
+    if kind == "scalp":
+        from . import strategy
+        with db.connect() as conn:
+            return strategy.rules_text_for(conn, "scalp", as_of)
+    p = config.RULES / ("%s.md" % kind)
+    return p.read_text() if p.exists() else ""
 
 
 def trade_text(kind, row):
@@ -136,7 +138,7 @@ def packet(kind, row, shots):
     """Everything the review needs as text, for pasting into any Claude chat."""
     return "\n\n".join([
         SYSTEM,
-        "## Veekay's rules (%s)\n%s" % (kind, rules_text(kind)),
+        "## Veekay's rules (%s)\n%s" % (kind, rules_text(kind, row["date"])),
         "## Trade\n%s" % trade_text(kind, row),
         "## Screenshots\n%d attached in the journal; attach them to this message." % len(shots),
     ])
@@ -160,7 +162,7 @@ def run(kind, ref_id, row, shot_names, model):
             content += [{"type": "text", "text": "Screenshot %d:" % i}, _image_block(p)]
     content.append({"type": "text", "text": "## Trade\n%s\n\nReview this trade." % trade_text(kind, row)})
     client = anthropic.Anthropic(api_key=key)
-    system = SYSTEM + "\n\n## Veekay's rules (%s)\n%s" % (kind, rules_text(kind))
+    system = SYSTEM + "\n\n## Veekay's rules (%s)\n%s" % (kind, rules_text(kind, row["date"]))
     structured = kind == "scalp"  # only the scalp form has a stable, well-known field set so far
     # Grading against an explicit written rubric is closer to classification than open-ended
     # reasoning - low effort keeps thinking from eating the whole max_tokens budget (it did, at
