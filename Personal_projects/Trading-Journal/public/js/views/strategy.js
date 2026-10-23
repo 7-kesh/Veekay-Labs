@@ -1,10 +1,11 @@
 // Port of app/templates/strategy.html + app/static/strategy.js. Propose a change -> Claude
 // classifies the effect (via the /api/classify-change Pages Function) -> red-flag banner ->
 // pick an effective date -> confirm and apply. Nothing is written until "Confirm and apply".
-import { STRATEGY_ORDER, STRATEGY_LABELS, currentRules, changeLog, applyChange, classifyChange } from '../strategy.js';
+import { STRATEGY_ORDER, STRATEGY_LABELS, SEED_DATE, currentRules, changeLog, applyChange, classifyChange, ruleEffectiveFrom } from '../strategy.js';
 import { getSettings } from '../db.js';
 import { esc } from '../format.js';
 import { dispatch } from '../router.js';
+import { buildPlaybookPdf, downloadPdf } from '../playbook-pdf.js';
 
 export async function render(_params, el) {
   const rules = await currentRules('scalp');
@@ -13,7 +14,8 @@ export async function render(_params, el) {
   const today = new Date().toISOString().slice(0, 10);
 
   el.innerHTML = `
-    <div class="head"><h1>Strategy</h1></div>
+    <div class="head"><h1>Strategy</h1>
+      <button class="btn" id="downloadPdf" type="button">Download playbook PDF</button></div>
     <section class="card muted">Frozen strategy. Any wording change is a red flag by standing rule - propose it, see how Claude classifies it, then decide.</section>
     ${STRATEGY_ORDER.map(k => `
       <section class="card" style="margin-top:12px">
@@ -42,6 +44,21 @@ export async function render(_params, el) {
       </tbody></table>
     </section>
   `;
+
+  el.querySelector('#downloadPdf').addEventListener('click', async function () {
+    this.disabled = true; this.textContent = 'Building…';
+    try {
+      const orderedRules = STRATEGY_ORDER.map(k => [k, STRATEGY_LABELS[k], rules[k] || '']);
+      const effectiveByKey = {};
+      for (const k of STRATEGY_ORDER) effectiveByKey[k] = await ruleEffectiveFrom(k);
+      const bytes = await buildPlaybookPdf(orderedRules, log, effectiveByKey, SEED_DATE);
+      downloadPdf(`Strategy_Playbook_${today}.pdf`, bytes);
+    } catch (err) {
+      alert('Could not build the PDF: ' + (err.message || err));
+      console.error(err);
+    }
+    this.disabled = false; this.textContent = 'Download playbook PDF';
+  });
 
   el.querySelectorAll('.proposeForm').forEach(form => {
     const ruleKey = form.dataset.rule;
