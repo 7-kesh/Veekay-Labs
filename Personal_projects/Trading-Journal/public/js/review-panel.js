@@ -5,7 +5,7 @@
 import { listAttachments, uploadAttachment, deleteAttachment, listReviews, saveReview, attachmentToBase64 } from './db.js';
 import { getSession } from './auth.js';
 import { GATE_LABELS } from './constants.js';
-import { esc } from './format.js';
+import { esc, localDatetime } from './format.js';
 import { md } from './markdown.js';
 
 function shrink(file) {
@@ -27,7 +27,7 @@ function shrink(file) {
 
 function renderReviewOut(out, rev) {
   if (!rev) { out.innerHTML = ''; return; }
-  out.innerHTML = `<div class="muted">Latest review, ${esc(String(rev.created_at).replace('T', ' ').slice(0, 19))} (${esc(rev.model)})</div>
+  out.innerHTML = `<div class="muted">Latest review, ${esc(localDatetime(rev.created_at))} (${esc(rev.model)})</div>
     <div class="md">${md(rev.text_body)}</div>`;
   const stored = rev.proposed_json;
   if (stored && stored.gates) {
@@ -65,7 +65,7 @@ export async function mountReviewPanel(container, opts) {
       </div>
       <div id="reviewOut" class="review"></div>
       ${revs.length > 1 ? `<details><summary>${revs.length - 1} earlier review(s)</summary>
-        ${revs.slice(1).map(r => `<div class="muted">${esc(String(r.created_at).replace('T', ' ').slice(0, 19))} (${esc(r.model)})</div><div class="md">${md(r.text_body)}</div>`).join('')}
+        ${revs.slice(1).map(r => `<div class="muted">${esc(localDatetime(r.created_at))} (${esc(r.model)})</div><div class="md">${md(r.text_body)}</div>`).join('')}
       </details>` : ''}
     </section>
   `;

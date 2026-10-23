@@ -5,7 +5,7 @@ import { getScalpTrade, saveScalpTrade, deleteScalpTrade, getSettings, listScalp
 import { scalpResult, parseExits, num as calcNum } from '../calc.js';
 import { run as ruleEngineRun } from '../rule-engine.js';
 import { SETUPS, CATEGORIES, VIOLATIONS, EMOTIONS, ORDER_TYPES } from '../constants.js';
-import { money, px, num as fmtNum, signclass, esc } from '../format.js';
+import { money, px, num as fmtNum, signclass, esc, localDatetime } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import * as setupC from '../setup-c.js';
 import { rulesTextFor } from '../strategy.js';
@@ -166,7 +166,7 @@ export async function render(params, el) {
 
     ${trade && history.length ? `<section class="card" style="margin-top:16px"><h2>History</h2>
       <table class="dense"><thead><tr><th>When</th><th>Field</th><th>Old</th><th>New</th><th>Source</th></tr></thead><tbody>
-      ${history.map(h => `<tr><td>${esc(String(h.created_at).replace('T', ' ').slice(0, 19))}</td><td>${esc(h.field)}</td>
+      ${history.map(h => `<tr><td>${esc(localDatetime(h.created_at))}</td><td>${esc(h.field)}</td>
         <td>${esc(h.old_value || '(empty)')}</td><td>${esc(h.new_value || '(empty)')}</td>
         <td>${h.source === 'claude-suggested' ? 'Claude suggested' : 'Manual'}</td></tr>`).join('')}
       </tbody></table></section>` : ''}

@@ -30,3 +30,14 @@ export function px(v) {
   if (r2 === r4) return v.toFixed(2);
   return v.toFixed(4).replace(/0+$/, '');
 }
+
+// Supabase stores timestamps in UTC (Postgres timestamptz); the old SQLite app stored naive
+// local time and just reformatted the string. Converts to the viewer's local time so this
+// still reads the same way - "YYYY-MM-DD HH:MM:SS" in the browser's own timezone.
+export function localDatetime(iso) {
+  if (blank(iso)) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return String(iso);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
