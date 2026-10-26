@@ -193,7 +193,7 @@ export async function render(params, el) {
     // whatever is currently in the form (Veekay's "always enable Claude to upload
     // screenshots" - screenshots and review work before the first explicit Save).
     ensureRefId: async () => {
-      const id = await saveScalpTrade(trade ? trade.id : null, collectFormValues(), settings);
+      const id = await persist(collectFormValues());
       trade = await getScalpTrade(id);
       history.length = 0; // stale now; next natural re-render (e.g. after Save) will refresh it
       if (!window.location.hash.endsWith('/scalp/' + id)) window.history.replaceState(null, '', '#/scalp/' + id);
@@ -203,6 +203,18 @@ export async function render(params, el) {
 
   // ---- everything below shares `trade`/`t`/`el` via closure, same as before but as nested
   // functions so a lazily-created draft (see ensureRefId above) stays the single source of truth.
+
+  // Every save goes through here: one at a time, and once a new trade has an id later saves update
+  // that row instead of inserting another (frozen page + repeated Save used to create duplicates).
+  let savedId = trade ? trade.id : null, saveChain = Promise.resolve();
+  function persist(formObj) {
+    const run = saveChain.then(async () => {
+      savedId = await saveScalpTrade(savedId, formObj, settings);
+      return savedId;
+    });
+    saveChain = run.catch(() => {});
+    return run;
+  }
 
   function collectFormValues() {
     const form = el.querySelector('#scalpForm');
@@ -367,13 +379,15 @@ export async function render(params, el) {
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (form.dataset.saving) return; // a save is already running; ignore repeated clicks
+      form.dataset.saving = '1';
       const then = (e.submitter && e.submitter.value) || 'save'; // "new" | "save" | "complete"
       const formObj = collectFormValues();
       formObj.review_status = then === 'complete' ? 'complete' : 'draft';
       const submitBtns = form.querySelectorAll('button[type=submit]');
       submitBtns.forEach(b => { b.disabled = true; });
       try {
-        const id = await saveScalpTrade(trade ? trade.id : null, formObj, settings);
+        const id = await persist(formObj);
         const before = window.location.hash;
         if (then === 'new') {
           navigate(`scalp/new?ticker=${encodeURIComponent(formObj.ticker || '')}`);
@@ -388,6 +402,7 @@ export async function render(params, el) {
         console.error(err);
       }
       submitBtns.forEach(b => { b.disabled = false; });
+      delete form.dataset.saving;
     });
 
     document.addEventListener('keydown', function saveShortcut(e) {

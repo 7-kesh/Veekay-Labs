@@ -68,11 +68,14 @@ function renderReviewOut(out, rev) {
 export async function mountReviewPanel(container, opts) {
   let refId = opts.refId || null;
   let tradeData = opts.tradeData;
+  let pendingRef = null; // concurrent uploads/reviews must share ONE draft creation, not make one each
   async function ensureRefId() {
     if (refId) return refId;
-    const r = await opts.ensureRefId();
-    refId = r.id; tradeData = r.tradeData;
-    return refId;
+    if (!pendingRef) {
+      pendingRef = opts.ensureRefId().then(r => { refId = r.id; tradeData = r.tradeData; return refId; })
+        .finally(() => { pendingRef = null; });
+    }
+    return pendingRef;
   }
 
   const shots = refId ? await listAttachments(opts.kind, refId) : [];

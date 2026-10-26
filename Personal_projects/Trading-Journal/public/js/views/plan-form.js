@@ -219,6 +219,8 @@ function wireForm(kind, el, settings, plan) {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (form.dataset.saving) return;
+    form.dataset.saving = '1';
     const then = (e.submitter && e.submitter.name === 'cancel') ? 'cancel' : (e.submitter && e.submitter.name === 'reopen') ? 'reopen' : 'save';
     const fd = new FormData(form);
     const formObj = {};
@@ -237,6 +239,7 @@ function wireForm(kind, el, settings, plan) {
       console.error(err);
     }
     btns.forEach(b => { b.disabled = false; });
+    delete form.dataset.saving;
   });
 
   document.addEventListener('keydown', function saveShortcut(e) {
