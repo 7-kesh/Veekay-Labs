@@ -418,3 +418,8 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 - Set up the API key and run one real review end to end (not yet exercised against the API).
 - Offer to run it on the second machine to test sync and the lock.
 - Then candidates: Futures fields, weekly report page, nightly CSV export, premium estimator.
+
+### 2026-10-26 - Win-rate gauge + trading-score radar
+- `public/js/score.js` (+ `score.test.mjs`): six 0-100 axes (Win %, Profit factor, Risk:Reward, Expectancy in R, Discipline, Consistency) against fixed targets; overall score = average of available axes; low-sample note under 20 trades.
+- Gauge + radar cards shown above the stats on Portfolio, Scalp, Options and Swing pages (`views/stats-portfolio.js`, `views/stats-kind.js`; styles at end of `app.css`). Portfolio has no Discipline axis unless scalp rule data exists.
+- Not yet deployed: redesign and charts are committed locally only.

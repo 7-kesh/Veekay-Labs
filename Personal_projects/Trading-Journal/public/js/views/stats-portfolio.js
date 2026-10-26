@@ -5,6 +5,7 @@ import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters, kpisHtml, focusListHtml } from './stats-macros.js';
 import { money, signclass, num as fmtNum, esc } from '../format.js';
 import { listImprovements, listScalpTrades } from '../db.js';
+import { tradingScore, overviewHtml } from '../score.js';
 import { rankImprovements } from '../improvement-rank.js';
 
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
@@ -41,6 +42,7 @@ export async function render(params, el) {
   el.innerHTML = `
     <div class="head"><h1>Portfolio <small>all trade types</small></h1>${filtersHtml(period, account, 'stats/portfolio', years)}</div>
     ${kpisHtml(t)}
+    ${overviewHtml(tradingScore({ m: t, points: p.total.points, entryOk: d.scalp.entry_ok, exitOk: d.scalp.exit_ok }), t)}
     ${await improvementsCard()}
 
     <section class="card focus"><h2>Biggest leaks across everything <small class="muted">the specific habits costing you most, from all areas</small></h2>

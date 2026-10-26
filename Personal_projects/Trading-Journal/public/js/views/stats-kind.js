@@ -4,6 +4,7 @@ import { statsData } from '../stats.js';
 import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters, rate, focusBlockHtml, areasBlockHtml, chartBlockHtml } from './stats-macros.js';
 import { money, signclass, num as fmtNum, esc } from '../format.js';
+import { tradingScore, overviewHtml } from '../score.js';
 import { CATEGORIES } from '../constants.js';
 
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
@@ -53,6 +54,7 @@ export async function render(kind, params, el) {
 
   el.innerHTML = `
     <div class="head"><h1>${title} stats</h1>${filtersHtml(period, account, kind === 'scalp' ? 'stats/scalp' : `stats/${kind}`, years)}</div>
+    ${overviewHtml(tradingScore({ m: d.charts[kind].m, points: d.charts[kind].points, entryOk: (kind === 'scalp' ? d.scalp : d.plans[kind]).entry_ok, exitOk: (kind === 'scalp' ? d.scalp : d.plans[kind]).exit_ok }), d.charts[kind].m)}
     ${focusBlockHtml(d.focus[kind])}
     ${areasBlockHtml(d.areas[kind])}
     ${chartBlockHtml(kind, title, d.charts[kind])}

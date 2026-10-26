@@ -340,3 +340,24 @@ tr.win{background:color-mix(in srgb,var(--pos) 5%,#fff)}tr.loss{background:color
 .drop{background:#FAFBFE;border-color:#CBD3E6;border-radius:12px}
 .actions{border-top:1px solid var(--line);background:color-mix(in srgb,var(--bg) 94%,transparent)}
 .area-card,.focus-item{background:#fff}
+
+/* Overview: win-rate gauge + trading-score radar */
+.overview{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2fr);gap:16px;margin:0 0 16px}
+.overview .card{margin:0}
+.overview h2 small{font-weight:400;color:var(--muted);margin-left:6px;font-size:12px}
+.gaugewrap{position:relative;max-width:260px;margin:6px auto 0}
+.gauge{width:100%;display:block}
+.gnum{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:30px;font-weight:700;color:var(--ink)}
+.gbadges{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.gb{padding:3px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.gb.w{background:#149B8826;color:var(--pos)}.gb.l{background:#C4505F26;color:var(--neg)}.gb.f{background:var(--line);color:var(--muted)}
+.scorebody{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.radarwrap{flex:1 1 280px;min-width:240px}
+.radar{width:100%;max-width:340px;display:block;margin:0 auto;font-size:11px}
+.radar text{fill:var(--ink)}
+.scoreside{flex:0 1 150px;text-align:center}
+.scorebig{display:block;font-size:44px;line-height:1.1;color:var(--sec)}
+.scorebar{position:relative;height:8px;border-radius:4px;margin:10px 0 4px;background:linear-gradient(90deg,var(--neg),var(--warn),var(--pos))}
+.scorebar i{position:absolute;top:-3px;width:4px;height:14px;background:var(--ink);border-radius:2px;transform:translateX(-50%)}
+.scorescale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+@media(max-width:760px){.overview{grid-template-columns:1fr}}
