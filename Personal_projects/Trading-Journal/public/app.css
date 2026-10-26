@@ -383,3 +383,6 @@ tr.win{background:color-mix(in srgb,var(--pos) 5%,#fff)}tr.loss{background:color
 .picklist label span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .picklist label b{font-variant-numeric:tabular-nums}
 .pickdlg .actions{position:static;margin:16px 0 0;padding:0;border:0;background:none}
+
+/* number field auto-corrected on blur */
+input.autofixed{border-color:var(--warn);box-shadow:0 0 0 3px #D9963833}

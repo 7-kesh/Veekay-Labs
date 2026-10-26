@@ -2,6 +2,7 @@ import { signIn, signOut, onAuthChange } from './auth.js';
 import { ensureSettings, purgeOldScreenshots } from './db.js';
 import { seedIfEmpty as seedStrategyIfEmpty } from './strategy.js';
 import { register, mount, dispatch, navigate } from './router.js';
+import { installNumberAutocorrect } from './numeric.js';
 import * as today from './views/today.js';
 import * as scalpList from './views/scalp-list.js';
 import * as scalpForm from './views/scalp-form.js';
@@ -106,3 +107,5 @@ onAuthChange((session) => {
     showLogin();
   }
 });
+
+installNumberAutocorrect();

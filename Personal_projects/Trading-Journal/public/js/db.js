@@ -1,6 +1,7 @@
 // Data layer over Supabase - port of app/db.py + the trade-save logic in app/routes.py's
 // _save_scalp / _next_trade_no / _suggest_category, plus app/audit.py's log_changes.
 import { supabase } from './supabase-client.js';
+import { cleanNumber } from './numeric.js';
 import { DEFAULT_SETTINGS } from './constants.js';
 import { scalpResult, optionsPlan, swingPlan, realized, num as calcNum } from './calc.js';
 import * as setupC from './setup-c.js';
@@ -512,8 +513,8 @@ export async function deleteScalpTrade(id) {
 
 function numOrNull(v, fallback = null) {
   if (v === null || v === undefined || v === '') return fallback;
-  const f = typeof v === 'number' ? v : parseFloat(String(v).replace(/[$,%]/g, ''));
-  return Number.isNaN(f) ? fallback : f;
+  const { value } = cleanNumber(v);
+  return value === null ? fallback : value;
 }
 
 function round2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }

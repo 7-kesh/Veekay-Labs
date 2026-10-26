@@ -1,6 +1,7 @@
 // Port of app/setup_c.py - per-trade evidence log for experimental Setup C.
 import { supabase } from './supabase-client.js';
 import { ruleEffectiveFrom } from './strategy.js';
+import { cleanNumber } from './numeric.js';
 
 // Setup-C-specific only - known Support/Resistance/Confluence and MOM/TTM moved onto every
 // scalp trade (scalp_trades columns, see constants.js), since Section 3's assessment applies
@@ -25,6 +26,12 @@ export async function save(tradeId, tradeDate, form) {
   for (const k of FIELDS) {
     const raw = k === 'notes' ? form.setup_c_notes : form[k];
     values[k] = raw || null;
+  }
+  // invalidation_price is a numeric column: keep the number, and move any words typed with it into notes.
+  if (values.invalidation_price) {
+    const { value, extra } = cleanNumber(values.invalidation_price);
+    values.invalidation_price = value;
+    if (extra) values.notes = [values.notes, `Invalidation note: ${extra}`].filter(Boolean).join('\n');
   }
   const version = await ruleEffectiveFrom('setup_c', tradeDate);
   const existing = await get(tradeId);

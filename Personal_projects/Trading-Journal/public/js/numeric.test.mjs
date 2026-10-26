@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { cleanNumber } from './numeric.js';
+const c = (s) => cleanNumber(s);
+assert.deepEqual(c('at 4.67 invalidation'), { value: 4.67, extra: 'at invalidation' });
+assert.equal(c('$4.67').value, 4.67);
+assert.equal(c('1,234.50').value, 1234.5);
+assert.equal(c('-0.48').value, -0.48);
+assert.equal(c('.5').value, 0.5);
+assert.equal(c('7.12').extra, '');
+assert.deepEqual(c(''), { value: null, extra: '' });
+assert.equal(c('n/a').value, null);
+assert.equal(c(12).value, 12);
+console.log('numeric ok');
