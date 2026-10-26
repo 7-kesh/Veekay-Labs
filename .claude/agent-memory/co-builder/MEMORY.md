@@ -1,9 +1,22 @@
-# Co-builder Memory Index — Veekay Labs
+# Co-builder Memory Index — Veekay Labs (umbrella repo)
 
-> Co-builder is now Veekay's **universal** build-partner agent (defined at `~/.claude/agents/co-builder.md`, available in every project). This folder holds the project-specific context it reads whenever it's operating inside the **Veekay Labs** repo (main platform + `websites/venara/` sub-project). The old project-scoped **PRO** agent (`.claude/agents/pro.md`) has been retired — its persona/build-sequence content is preserved below, not lost.
+> Co-builder is Veekay's **universal** build-partner agent (`~/.claude/agents/co-builder.md`). On "start co-builder" it **asks which project** (AskUserQuestion), then reads only that project's entries below. Never blend two projects' context.
 
-- [Project Context](project-context.md) — Who Veekay is, the platform vision, tech stack, the phase-gated build sequence (Phases 1–5), and the risk table PRO used to track. Read this at the start of any Veekay Labs session.
-- Canonical live state still lives in the repo's own tracked docs, not here: `../../docs/PROJECT-SUMMARY.md` (session log, current snapshot) and `../../docs/build-pipeline/ROADMAP.md` (phase/gate/checklist tracker). This memory folder is co-builder's *working notes*, not the source of truth — never treat it as authoritative over those two files.
-- For the Venara Inc sub-project specifically, read `../../websites/venara/docs/PROJECT-SUMMARY.md` and `../../websites/venara/CLAUDE.md` instead — it tracks its own checklist independently of the Phase 1–5 gates here.
-- [Piggy Payday](piggy-payday.md) — side project (family chore bank + Market Investment, live on Cloudflare Pages + Supabase, `Personal_projects/piggy-payday-site/`, shipped 2026-10-22): state, decisions, gotchas, what to pick up next. Its own `docs/PROJECT-SUMMARY.md` and `CLAUDE.md` are authoritative; read those first.
-- [Trading-Journal](trading-journal.md) — side project (local trade-logging web app, `Personal_projects/Trading-Journal/`, built 2026-10-22): state, decisions, gotchas, what to pick up next. Its own `docs/PROJECT-SUMMARY.md` and `docs/1_PRD.md` are authoritative; read those first.
+Veekay Labs is an umbrella repo. Each sub-project is separate, with its own state, docs and memory file. Authoritative state always lives in the project's own tracked docs; the files here are co-builder's working notes.
+
+## Projects (pick one)
+
+| Project | Path | Working notes | Authoritative docs |
+|---|---|---|---|
+| **Professional Profile** (main platform, Phase 1) | repo root | [project-context.md](project-context.md) | `docs/PROJECT-SUMMARY.md`, `docs/build-pipeline/ROADMAP.md`, `CLAUDE.md` |
+| **Piggy Payday** (family chore bank, live) | `Personal_projects/piggy-payday-site/` | [piggy-payday.md](piggy-payday.md) | its `CLAUDE.md`, `docs/PROJECT-SUMMARY.md` |
+| **Trading-Journal** (local Flask + SQLite) | `Personal_projects/Trading-Journal/` | [trading-journal.md](trading-journal.md) | its `CLAUDE.md`, `docs/PROJECT-SUMMARY.md`, `docs/1_PRD.md` |
+| **Venara Inc site** (React + Vite) | `websites/venara/` | none yet; create `venara.md` on first session | its `CLAUDE.md`, `docs/PROJECT-SUMMARY.md` |
+
+Outside this repo: **Product ER AI Assist** (`~/Documents/GitHub/Product-er-ai-assist-system`, ON HOLD) keeps its own memory in its own repo's `.claude/agent-memory/co-builder/`.
+
+## Rules
+- Professional Profile's Phase 1–5 gates do not include Piggy Payday, Trading-Journal, or Venara; each tracks its own progress.
+- Venara Inc copy stays separate from Veekay Labs copy.
+- `Personal_projects/piggy-payday/` is the superseded single-file version; use `piggy-payday-site/`.
+- Notes in `project-context.md` apply only to the Professional Profile project, not the side projects.

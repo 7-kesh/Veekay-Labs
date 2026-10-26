@@ -1,5 +1,6 @@
 import { listScalpTrades } from '../db.js';
 import { money, signclass, px, esc } from '../format.js';
+import { exportDay } from '../export-bundle.js';
 
 export async function render(_params, el) {
   const d = new Date().toISOString().slice(0, 10);
@@ -23,6 +24,15 @@ export async function render(_params, el) {
         <td><a href="#/scalp/${t.id}">edit</a></td></tr>`).join('') || '<tr><td colspan="6" class="muted">No trades yet today.</td></tr>'}
       </tbody></table>
     </section>
-    <div class="actions" style="margin-top:16px"><a class="btn primary" href="#/scalp/new">+ New scalp trade</a></div>
+    <div class="actions" style="margin-top:16px"><a class="btn primary" href="#/scalp/new">+ New scalp trade</a>
+      <button class="btn" id="exportDay" type="button">Export day for Claude</button>
+      <span class="muted" id="exportStatus"></span></div>
   `;
+  el.querySelector('#exportDay').addEventListener('click', async function () {
+    const st = el.querySelector('#exportStatus');
+    this.disabled = true; st.textContent = 'Building export…';
+    try { st.textContent = 'Downloaded ' + await exportDay(d); }
+    catch (err) { st.textContent = err.message || String(err); }
+    this.disabled = false;
+  });
 }

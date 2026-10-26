@@ -107,4 +107,21 @@ SQLite rollback mode; Python/Flask; `Trade_Log.csv` is the scalp source of truth
 5. Rules files need Veekay's confirmation against the strategy in force; categories D and E in the ledger have no definition.
 6. Futures field list.
 7. Not yet run on the second machine (committed to git 2026-10-22).
-8. Possible later: nightly CSV export, premium estimator (greeks), weekly report page, strategy-change log inside the app.
+8. Claude-chat workflow steps 2-4 (section 12): import + improvement items, target-based ranking, skill update.
+9. Possible later: nightly CSV export, premium estimator (greeks), weekly report page, strategy-change log inside the app.
+
+## 12. Claude-chat workflow (decided 2026-10-26)
+
+**Why:** in-app API reviews were unreliable (screenshots shrunk to 1200px, thin rules copy, low-effort single pass, no conversation). Claude chat with the `trade-journal` skill gives much better assessments. The app's role changes from reviewer to capture, export and import.
+
+**Roles**
+- App: capture Veekay's fields; keep original-resolution screenshots; export bundles; import the wrap-up; rank improvements from the data.
+- Claude chat + skill: unbiased assessment, asks questions, and on "wrap up for today" produces the journal entry, learnings and improvements.
+
+**Build order** (status in `PROJECT-SUMMARY.md`)
+1. **Capture + export** - full-resolution screenshots; "Export for Claude" zip per trade and per day (`tj-export/1`: `trade.json`/`day.json`, README, screenshots). API review button switched off (code kept behind `API_REVIEW_ENABLED`). DONE 2026-10-26, pending deploy.
+2. **Import + improvement items** - strict, versioned JSON schema for the wrap-up (`journal_entry`, `learnings`, `improvements`); paste/upload in the app with validation and a preview-then-confirm step; new tables for the three outputs. Improvements carry a `target` (a violation tag or a metric).
+3. **Target-based ranking + before/after** - the app ranks active improvements by the dollar cost of their target from real trades, and shows target frequency/cost before vs after the adoption date (status: proposed / adopted / resolved). Plain arithmetic, no AI.
+4. **Skill update** - see `docs/skill-changes.md` (includes a drop-folder flow: zips saved to `TradeVenture/App_Exports/`, read directly by the skill; unverified until tested with a real zip). Needs Veekay's sign-off on the export and wrap-up formats first.
+
+**Rules:** the import never edits strategy rules (a strategy change is a red flag and goes through Veekay's confirm-and-log path). The skill's frozen-strategy text is the single source of truth for grading; the app's `rules/*.md` copy is no longer used for assessment. Screenshots still auto-purge after 30 days, so export promptly (open question: lengthen or make export-triggered).

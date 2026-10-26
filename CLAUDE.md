@@ -6,7 +6,9 @@ AI-native personal platform for Venkat Krishnan Chellappa (Veekay) — see `read
 
 ## Session Protocol
 
-**At the start of every session**, before doing anything else, read:
+**Which project?** This repo is an umbrella. When Veekay says "start co-builder", ask which project (Professional Profile, Piggy Payday, Trading-Journal, Venara site, or Product ER AI Assist) and read only that project's docs; routing table in `.claude/agent-memory/co-builder/MEMORY.md`. The steps below apply to the **Professional Profile** project (repo root).
+
+**At the start of every Professional Profile session**, before doing anything else, read:
 1. `docs/PROJECT-SUMMARY.md` — Current Snapshot section for fast context, Session Log for history
 2. `docs/build-pipeline/ROADMAP.md` — current phase/initiative status and what's checked off
 

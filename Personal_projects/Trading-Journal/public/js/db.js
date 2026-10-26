@@ -365,6 +365,13 @@ export async function attachmentToBase64(path) {
   return { mime: data.type || 'image/jpeg', dataBase64: btoa(binary) };
 }
 
+// Raw bytes of a stored screenshot, for the "Export for Claude" bundles.
+export async function downloadAttachment(path) {
+  const { data, error } = await supabase.storage.from('screenshots').download(path);
+  rethrow(error);
+  return { mime: data.type || 'image/jpeg', bytes: new Uint8Array(await data.arrayBuffer()) };
+}
+
 // ---------- Claude review ----------
 
 export async function listReviews(kind, refId) {

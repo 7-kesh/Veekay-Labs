@@ -1,24 +1,22 @@
 ---
 name: trading-journal
-description: Working notes on the Trading-Journal side project (local trade-logging web app under Personal_projects/): state as of 2026-10-22, decisions, gotchas, what to pick up next.
+description: Working notes on Trading-Journal (Veekay Labs side project): now hosted on Cloudflare Worker + Supabase; state as of 2026-10-26, open items, what to pick up next.
 metadata:
   type: project
 ---
 
-# Trading-Journal (side project, built 2026-10-22)
+# Trading-Journal
 
-**Where:** `Personal_projects/Trading-Journal/`. Its own docs are authoritative: `docs/PROJECT-SUMMARY.md` (snapshot, gotchas, session log) and `docs/1_PRD.md`. This file is only co-builder's working notes. It is not part of the Veekay Labs Phase 1-5 gates; don't count it toward them.
+**Authoritative docs:** `Personal_projects/Trading-Journal/docs/PROJECT-SUMMARY.md` (snapshot, session log) and `docs/1_PRD.md`. These notes are only co-builder's pointers. Not part of the Phase 1-5 gates.
 
-**What it is:** Flask + SQLite web app on 127.0.0.1:5057 for Veekay's trade logging. Sections: Scalp (log after the trade), Options and Swing (plan first, actuals later, plan-vs-actual), Futures ("Coming soon"). Left-sidebar navigation (Journal and Stats groups). Stats = Portfolio page (all areas side by side, combined result, biggest leaks) plus one page per type; each has a narrow "Focus now" list (exact habits to stop, impact judged from data), the broader "Key areas to improve", charts and margin analysis. Claude trade review (API key or copy-packet) graded against `rules/*.md`. Every entry has a Paper/Live field; all 103 imported scalp trades (from `TradeVenture/Trade_Log.csv`) are Paper.
+**State (2026-10-26):** hosted at `veekay-labs-trade-journal.venkatkrishnanchellappa.workers.dev` (Cloudflare Worker via Workers Builds + Supabase), full feature parity with the original local Flask app (still at `./run.sh`, not retired; Veekay's call). 103 scalp trades migrated and verified to the cent. Scalp form redesigned into 5 sections on 2026-10-23; `migrate-section3-assessments.sql` run successfully (confirmed 2026-10-26). Exposed Anthropic key rotated and updated (confirmed 2026-10-26).
 
-**Why it exists:** Veekay's Google Sheet ("Live Trade Journal") was slow to fill (zig-zag entry), had no plan-vs-actual, and showed nothing about where money is lost. He is paper-trading small-cap scalps (1R = $20, 50 shares standard) and starting options/swing journals.
+**Violation-tag silent-drop:** resolved 2026-10-26 by extending the list with 6 real tags (not yet deployed). Five trades (3 "(tag to confirm)" variants, 2 "None") deliberately left uncategorized and unchanged, still counted in stats; they are paper.
 
-**Decisions Veekay made:** SQLite in rollback mode (the folder syncs to the cloud, so no WAL); Python/Flask; one machine at a time (lock file); `Trade_Log.csv` is the scalp source of truth; app lives in this repo; Futures deferred; all scalp is paper for now. Preferences: more colour, row-wise left-to-right entry to cut eye strain, quick tabs for sections.
+**Open (Veekay's call):** New scalp form's first real use (draft-save on first screenshot, Save vs Complete review, Claude filling Section 3) not yet reported on. Futures fields, retiring local app.
 
-**Open (waiting on Veekay):** wireframe/UI feedback (he is reviewing); API key not set up on any machine and the live review call has never been exercised; options risk budget ($75 from the sheet's 5% vs a $30 mention); confirm Options/Swing default to Paper; confirm the `rules/*.md` match the strategy in force; Futures fields; not yet run on the second machine; committed and pushed to GitHub (main) on 2026-10-22.
+**Gotchas:** Cloudflare dashboard can't add Variables to this static-assets-origin Worker; use `wrangler secret put`. Never have Veekay paste secrets into chat or inline commands; use a temp file (`printf "$(cat ~/.tmp-secret)" | npx wrangler secret put NAME && rm ~/.tmp-secret`). Strategy changes are a red flag per `TradeVenture/Strategy_Change_Log.md`; confirm before editing `rules/*.md`.
 
-**Gotchas:** restart the server after changes (not in debug mode; process shows as `Python run.py`, stop with SIGTERM). Costs in "Key areas to improve" overlap. Python 3.9 is the system Python; the venv is per machine at `~/.venvs/trading-journal`. Any change to the trading strategy is a red flag per Veekay's `TradeVenture/Strategy_Change_Log.md` rule, so confirm before editing the rubric.
+**Direction change 2026-10-26:** the app no longer reviews trades via API; it captures fields + original-res screenshots, exports zips (`tj-export/1`, per trade and per day), and will import Claude chat's "wrap up for today" block (`tj-wrapup/1`) and rank improvements from the data. Build order is in the project's `docs/1_PRD.md` section 12: step 1 (capture + export) built, not deployed; step 2 (import + improvement items), step 3 (target-based ranking, before/after), step 4 (skill update, `docs/skill-changes.md`, awaiting Veekay's sign-off) pending. Reason: API reviews were weak (1200px JPEG screenshots, thin rules copy, low effort, no conversation).
 
-**Pick up next:** (1) apply Veekay's wireframe feedback (sidebar, Focus now and Portfolio were built after the first screenshots; he said he would review further and pick up again later on 2026-10-22); (2) API key + one real review; (3) second-machine test; (4) commit any new changes; (5) then Futures / weekly report / CSV export.
-
-Related: [project-context](project-context.md) for the main platform; root `docs/PROJECT-SUMMARY.md` has a short 2026-10-22 entry for this work.
+**Pick up next (supersedes the older list below):** get Veekay's feedback on a real export; deploy step 1 (`npm install` first if wrangler fails with an esbuild platform error); then step 2. Older list: commit/push the tag change (awaiting Veekay's go), then test a new scalp trade end to end.
