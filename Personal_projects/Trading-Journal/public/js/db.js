@@ -412,6 +412,13 @@ export async function saveWrapup(data) {
       improvements.map(i => ({ date, text: i.text, target_type: i.target.type, target_value: i.target.value, target_setup: i.target.setup, trade_nos: i.trade_nos, status: i.status || 'proposed', adopted_on: i.adopted_on || null, resolved_on: i.resolved_on || null })),
       { onConflict: 'date,text', ignoreDuplicates: true })).error);
   }
+  // Loading the wrap-up is the sign-off that the review is done: trades it covers become complete.
+  const nos = [...new Set((entry.trades || []).map(t => t.trade_no).filter(Boolean))];
+  if (!nos.length) return 0;
+  const done = await supabase.from('scalp_trades').update({ review_status: 'complete' })
+    .in('trade_no', nos).eq('date', date).neq('review_status', 'complete').select('id');
+  rethrow(done.error);
+  return (done.data || []).length;
 }
 
 // What a wrap-up for this date would add vs already have, for the import preview.

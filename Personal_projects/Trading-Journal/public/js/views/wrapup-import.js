@@ -59,8 +59,9 @@ export async function render(_params, el) {
       const st = el.querySelector('#saveStatus');
       this.disabled = true; st.textContent = 'Saving…';
       try {
-        for (const d of days) await saveWrapup(d);
-        st.textContent = 'Saved.';
+        let done = 0;
+        for (const d of days) done += await saveWrapup(d);
+        st.textContent = `Saved.${done ? ` ${done} trade${done === 1 ? '' : 's'} marked complete.` : ''}`;
         setTimeout(() => { window.location.hash = days.length === 1 ? `#/journal/${days[0].date}` : '#/journal'; }, 500);
       } catch (err) {
         st.textContent = '';
