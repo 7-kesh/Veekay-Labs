@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cleanNumber } from './numeric.js';
+import { cleanNumber, cleanTime } from './numeric.js';
 const c = (s) => cleanNumber(s);
 assert.deepEqual(c('at 4.67 invalidation'), { value: 4.67, extra: 'at invalidation' });
 assert.equal(c('$4.67').value, 4.67);
@@ -10,4 +10,10 @@ assert.equal(c('7.12').extra, '');
 assert.deepEqual(c(''), { value: null, extra: '' });
 assert.equal(c('n/a').value, null);
 assert.equal(c(12).value, 12);
+const T = cleanTime;
+assert.equal(T('942'), '09:42'); assert.equal(T('9.42'), '09:42'); assert.equal(T('9 42'), '09:42');
+assert.equal(T('9:42'), '09:42'); assert.equal(T('9:42 am'), '09:42'); assert.equal(T('1:05pm'), '13:05');
+assert.equal(T('12:10 am'), '00:10'); assert.equal(T('09:42:15'), '09:42:15'); assert.equal(T('1342'), '13:42');
+assert.equal(T('9'), '09:00'); assert.equal(T('25:00'), null); assert.equal(T('9:75'), null); assert.equal(T('abc'), null);
+assert.equal(T(''), null);
 console.log('numeric ok');
