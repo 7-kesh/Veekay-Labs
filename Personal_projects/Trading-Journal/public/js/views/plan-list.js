@@ -15,7 +15,7 @@ function acct(a) {
 }
 
 export async function render(kind, params, el) {
-  const status = params.status || 'all', account = params.account || 'all';
+  const status = params.status || 'all', account = params.account || 'live';
   const period = params.period || 'all';
   const [lo, hi] = periodBounds(period);
   const years = await allYears();

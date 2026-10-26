@@ -25,7 +25,7 @@ function yearMonthBounds(year, month) {
 }
 
 export async function render(params, el) {
-  const account = params.account || 'all', q = (params.q || '').toUpperCase();
+  const account = params.account || 'live', q = (params.q || '').toUpperCase();
   const year = /^\d{4}$/.test(params.year || '') ? params.year : '';
   const month = year && /^(1[0-2]|[1-9])$/.test(params.month || '') ? params.month : '';
   const period = year ? 'custom' : (params.period || '30d');

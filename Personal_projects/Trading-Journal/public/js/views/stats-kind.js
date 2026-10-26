@@ -10,7 +10,7 @@ import { CATEGORIES } from '../constants.js';
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
 
 export async function render(kind, params, el) {
-  const period = params.period || 'all', account = params.account || 'all';
+  const period = params.period || 'all', account = params.account || 'live';
   const [d, years] = await Promise.all([statsData(period, account), allYears()]);
   const title = KIND_LABEL[kind];
 

@@ -25,7 +25,7 @@ async function improvementsCard() {
 }
 
 export async function render(params, el) {
-  const period = params.period || 'all', account = params.account || 'all';
+  const period = params.period || 'all', account = params.account || 'live';
   const [d, years] = await Promise.all([statsData(period, account), allYears()]);
   const p = portfolio(d);
 
