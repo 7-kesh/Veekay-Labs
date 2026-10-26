@@ -21,7 +21,10 @@ export const CATEGORIES = {
 export const VIOLATIONS = ["No established support", "Inadequate room to resistance", "Extended / chase",
   "Anticipated trigger", "MOM/TTM not confirming", "Late entry / setup expired",
   "Planned risk over $20", "No stop set before entry", "Moved or removed stop",
-  "Early exit", "Held past stop"];
+  "Early exit", "Held past stop",
+  "Operational error", "Missed trigger / chase", "5-min reset violated",
+  "Setup C: 8 EMA hold failed", "Stop order removed (operational - partial workflow, Open Item 54)",
+  "No stop order"];
 
 export const EMOTIONS = ["FOMO", "Fear exit", "Panic", "Revenge", "Overconfident", "Hesitated", "Calm / planned"];
 
