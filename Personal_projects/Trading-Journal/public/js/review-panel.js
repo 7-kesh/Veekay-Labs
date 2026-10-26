@@ -78,8 +78,16 @@ export async function mountReviewPanel(container, opts) {
     return pendingRef;
   }
 
-  const shots = refId ? await listAttachments(opts.kind, refId) : [];
-  const revs = refId ? await listReviews(opts.kind, refId) : [];
+  // Screenshots attach only to a saved trade. Creating the record as a side effect of the first
+  // upload froze the page and could make duplicate records, so a new trade is saved first.
+  if (!refId) {
+    container.innerHTML = `<section class="card" id="review"><h2>Screenshots and review</h2>
+      <p class="muted">Click <b>Save</b> first, then this page reopens with screenshot upload and the export button ready.</p></section>`;
+    return;
+  }
+
+  const shots = await listAttachments(opts.kind, refId);
+  const revs = await listReviews(opts.kind, refId);
 
   container.innerHTML = `
     <section class="card" id="review">
