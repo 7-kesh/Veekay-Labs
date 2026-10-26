@@ -11,7 +11,7 @@
 - **Scalp entry form redesigned (2026-10-23, Veekay's spec) - BLOCKED on a SQL migration he needs to run:** `supabase/migrate-section3-assessments.sql` (new fields on `scalp_trades`: support/resistance/confluence, structure/trigger/extended/EMA-alignment, MOM/TTM, review_status). New 5-section flow (Trade+Setup -> Entry/exit+S/R/confluence -> Assessments -> Screenshots/review -> Judgement), free-text date/time, screenshots+review now available before the first Save (auto-drafts), Save vs. Complete-review split. See Session Log - this is also where the color palette got more vibrant.
 - **Violation-tag silent-drop, resolved 2026-10-26 (Veekay chose "extend the list"):** added 6 real tags from the data to `VIOLATIONS` in `public/js/constants.js` and `app/config.py` (Operational error, Missed trigger / chase, 5-min reset violated, Setup C: 8 EMA hold failed, Stop order removed (operational...), No stop order). Left alone by decision: the 3 trades tagged `Planned risk over $20 (tag to confirm / new tag - to confirm)` and the 2 tagged `None` stay uncategorized and unchanged (paper trades; still counted in stats). Claude-review tag enum unchanged. Not yet deployed.
 - **Update 2026-10-26:** `migrate-section3-assessments.sql` was run successfully (all data shows up); the exposed Anthropic key is rotated.
-- **Direction change 2026-10-26 (Veekay): the app no longer reviews trades; Claude chat does.** App = capture fields + original-resolution screenshots + export bundles; Claude chat with the `trade-journal` skill does the unbiased assessment (and asks questions); on "wrap up for today" it returns journal entry, learnings, improvements, which Veekay imports back into the app; the app ranks improvements from the data. Build order in `docs/1_PRD.md` section 12: (1) capture + export - **DONE, not deployed**; (2) import + improvement items; (3) target-based ranking + before/after; (4) skill update (`docs/skill-changes.md`, awaiting sign-off). API review button is off (`API_REVIEW_ENABLED = false` in `review-panel.js`).
+- **Direction change 2026-10-26 (Veekay): the app no longer reviews trades; Claude chat does.** App = capture fields + original-resolution screenshots + export bundles; Claude chat with the `trade-journal` skill does the unbiased assessment (and asks questions); on "wrap up for today" it returns journal entry, learnings, improvements, which Veekay imports back into the app; the app ranks improvements from the data. Build order in `docs/1_PRD.md` section 12: (1) capture + export - **pushed (4f144a7), build was cancelled so not live**; (2) import + improvement items - **built locally, uncommitted**; (3) target-based ranking + before/after - **built locally, uncommitted**; (4) skill update (`docs/skill-changes.md`, awaiting sign-off). API review button is off (`API_REVIEW_ENABLED = false` in `review-panel.js`).
 - **Open, Veekay's call needed (carried over, not addressed this session):** the violation-tag silent-drop bug from the local app (15 of 91 trades at risk - a tag like `"Planned risk over $20 (tag to confirm)"` doesn't exactly match `config.VIOLATIONS` so its checkbox never renders checked, silently dropping on next save). Needs a decision: extend `config.VIOLATIONS`, strip suffixes before matching, show unmatched tags as a separate preserved badge, or warn on open. Full trade list in git history (search this file's history for "silent-drop").
 - **GitGuardian alert on `piggy-payday-site`'s committed Supabase anon key: confirmed non-issue**, live-verified via PostgREST introspection that RLS actually blocks `anon` - no action needed.
 
@@ -58,6 +58,34 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 
 ## Session Log
 
+### 2026-10-26 (co-builder, later still): Journal pages, year/month filters everywhere, 7-day screenshot retention
+
+**Decisions (Veekay):** the app's journal is final; metric targets stay (avg_r, win_rate, avg_loser, avg_winner); drop folder `TradeVenture/App_Exports/`; export size unchanged (original PNGs); screenshots deleted after 7 days; consumed export zips deleted by end of day; year/month filters on Stats and plan lists too.
+
+**Built (local, uncommitted until the single deploy):**
+- `public/js/period.js` shared period handling: a period is one string (`week|month|30d|all` or `y2026` / `y2026-10`), so all existing links keep working. Year + Month dropdowns on the Stats pages (Portfolio, Scalp, Options, Swing) and the Options/Swing lists; `allYears()` in `db.js` lists years from trades and plans. Scalp list keeps its own year/month params.
+- Journal: `#/journal` (days list, year/month filters, download all shown as Markdown or JSON), `#/journal/<date>` (summary, per-trade assessment with the app's P&L and links to trades, learnings, improvements; prev/next day; download that day as Markdown or JSON), `#/import` ("Load journal") accepts a Claude wrap-up block or a downloaded JSON, one day or a batch (`tj-wrapup-batch/1`), preserving improvement status and dates. Downloads are valid import files, so a backup can be loaded back. `journal-export.js`, `download.js`, `views/journal*.js`. Sidebar: Improvements, Daily journal.
+- Screenshot retention 7 days (`purgeOldScreenshots` default).
+- Tests: `period.test.mjs`, extended `wrapup.test.mjs` (round trip, batch errors, markdown pipe escaping). All JS tests pass.
+
+**Skill proposal updated** (`docs/skill-changes.md`): app journal final, skill stops writing weekly markdown / `Trade_Log.csv`, consumed zips deleted by end of day, decisions recorded.
+
+**Not verified in a browser:** all new pages. **Run before using:** `supabase/migrate-wrapup.sql`.
+
+### 2026-10-26 (co-builder, later): Steps 2-3 built; year/month filter on the Scalp list (all local, uncommitted, one deploy planned)
+
+**Why held back:** Veekay cancelled the Cloudflare build for 4f144a7 because it was taking too long, and wants to avoid repeat deployments, so everything below is local until one final push.
+
+**Did**
+- **Scalp list:** Year and Month dropdowns next to the quick period (This week / This month / Last 30 days / All time). A chosen year (optionally a month) overrides the quick period; month is disabled until a year is picked; years come from the data. (`views/scalp-list.js`, `scalpYears()` in `db.js`). Stats pages and the Options/Swing lists unchanged.
+- **Step 2 - import:** `supabase/migrate-wrapup.sql` (tables `journal_entries`, `learnings`, `improvements`, same RLS); `public/js/wrapup.js` strict validator for `tj-wrapup/1` (reports every error, accepts a ```json fence, rejects unknown tags/metrics, never saves `strategy_flags`); `views/wrapup-import.js` at `#/import` (paste or upload -> Check -> preview with new/already-saved per item -> Confirm). Re-importing the same date replaces the journal entry and skips duplicate learnings/improvements, so statuses are never reset. DB helpers in `db.js`.
+- **Step 3 - ranking + before/after:** `public/js/improvement-rank.js` (pure) + `views/improvements.js` at `#/improvements`. Violation-target items are ranked by the net P&L lost on trades carrying that tag; metric/no-target items follow, newest first. Status flow proposed -> adopted (stamps today) -> resolved/dropped; before/after splits trades at the adoption date and shows "after N trades" until 5 exist. Metrics: avg_r, win_rate, avg_loser, avg_winner (optional Setup A/B/C). Portfolio stats page gets a "Improvements to work on" card (top 3, hidden if the tables don't exist yet). Sidebar links: Improvements, Wrap-up.
+- Tests: `wrapup.test.mjs` (validator accept/reject cases, ranking order, before/after, metric values) plus all existing JS tests pass.
+
+**Not verified:** none of the new pages has been opened in a browser against Supabase (syntax-checked and unit-tested only). Needs `supabase/migrate-wrapup.sql` run in the Supabase SQL editor before the import or Improvements pages work.
+
+**Open:** run the migration; one deploy of everything; try an export, then a hand-made wrap-up block (the format is in `docs/skill-changes.md` section 3); skill update (step 4) awaiting sign-off; whether to add year/month filters to Stats and plan lists; Cloudflare build slowness (need the build log).
+
 ### 2026-10-26 (co-builder): Direction change to Claude-chat workflow; step 1 (capture + export) built
 
 **Why:** Veekay found in-app API reviews unreliable (wrong references, weaker than Claude chat with the skill). Diagnosis from the code: screenshots were shrunk to 1200px JPEG q0.78, Claude had only the form fields + a 3.3 KB rules copy (the skill is 38 KB with dated clarifications), no broker screenshot or levels, low reasoning effort, single forced-JSON pass, no conversation. Decision: the app captures and exports; Claude chat assesses.
@@ -71,7 +99,7 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 
 **Not verified:** the buttons in a real browser against Supabase (no live session in this environment); `wrangler deploy --dry-run` fails here with an esbuild platform mismatch (node_modules from another machine; same on the unmodified tree) - run `npm install` on this machine or deploy from the machine that built it. Not committed or deployed.
 
-**Open / next:** Veekay to try an export on a real trade and confirm the bundle is what he wants to upload to Claude. Then step 2 (import schema + improvement tables; a Supabase migration will be needed). Screenshots still auto-purge at 30 days. Skill changes proposed in `docs/skill-changes.md`, not applied.
+**Open / next:** Veekay to try an export on a real trade and confirm the bundle is what he wants to upload to Claude. Then step 2 (import schema + improvement tables; a Supabase migration will be needed). Screenshots auto-purge at 7 days (changed from 30 on 2026-10-26). Skill changes proposed in `docs/skill-changes.md`, not applied.
 
 ### 2026-10-23 (co-builder, later): Scalp form flow redesign - 5 sections, always-on screenshots, vibrant palette
 

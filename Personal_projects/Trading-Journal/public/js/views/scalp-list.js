@@ -1,4 +1,4 @@
-import { listScalpTrades, deleteScalpTrade } from '../db.js';
+import { listScalpTrades, deleteScalpTrade, scalpYears } from '../db.js';
 import { money, signclass, px, esc } from '../format.js';
 import { downloadCsv } from '../csv.js';
 import { dispatch } from '../router.js';
@@ -12,9 +12,26 @@ function periodBounds(period) {
   return [null, null];
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// A chosen year (and optionally month) overrides the quick period.
+function yearMonthBounds(year, month) {
+  const y = Number(year), m = Number(month);
+  if (!y) return null;
+  if (!m) return [`${y}-01-01`, `${y}-12-31`];
+  const last = new Date(y, m, 0).getDate();
+  const mm = String(m).padStart(2, '0');
+  return [`${y}-${mm}-01`, `${y}-${mm}-${String(last).padStart(2, '0')}`];
+}
+
 export async function render(params, el) {
-  const period = params.period || '30d', account = params.account || 'all', q = (params.q || '').toUpperCase();
-  const [lo, hi] = periodBounds(period);
+  const account = params.account || 'all', q = (params.q || '').toUpperCase();
+  const year = /^\d{4}$/.test(params.year || '') ? params.year : '';
+  const month = year && /^(1[0-2]|[1-9])$/.test(params.month || '') ? params.month : '';
+  const period = year ? 'custom' : (params.period || '30d');
+  const [lo, hi] = year ? yearMonthBounds(year, month) : periodBounds(period);
+  const years = await scalpYears();
+  if (year && !years.includes(year)) years.unshift(year);
   const rows = await listScalpTrades({ lo, hi, account, q });
   const net = rows.reduce((s, r) => s + (r.net_pnl || 0), 0);
 
@@ -23,7 +40,9 @@ export async function render(params, el) {
     <div class="head"><h1>Scalp trades</h1>
       <div class="actions"><input type="date" id="dayPick" value="${new Date().toISOString().slice(0, 10)}"><button class="btn" id="exportDay" type="button">Export day for Claude</button><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/scalp/new">+ New</a></div></div>
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <select name="period">${opt('week', period, 'This week')}${opt('month', period, 'This month')}${opt('30d', period, 'Last 30 days')}${opt('all', period, 'All time')}</select>
+      <select name="period" ${year ? 'disabled' : ''}>${opt('week', period, 'This week')}${opt('month', period, 'This month')}${opt('30d', period, 'Last 30 days')}${opt('all', period, 'All time')}</select>
+      <select name="year"><option value="">All years</option>${years.map(y => opt(y, year, y)).join('')}</select>
+      <select name="month" ${year ? '' : 'disabled'}><option value="">All months</option>${MONTHS.map((n, i) => opt(String(i + 1), month, n)).join('')}</select>
       <select name="account">${opt('all', account, 'All accounts')}${opt('paper', account, 'Paper')}${opt('live', account, 'Live')}</select>
       <input type="text" name="q" placeholder="Ticker" value="${esc(q)}" style="width:100px">
       <span class="muted">${rows.length} trades · Net <b class="${signclass(net)}">${money(net)}</b></span>
@@ -38,7 +57,9 @@ export async function render(params, el) {
   `;
   const form = el.querySelector('#filters');
   form.addEventListener('change', () => {
-    const p = new URLSearchParams(new FormData(form));
+    if (!form.year.value) form.month.value = '';
+    const p = new URLSearchParams(new FormData(form)); // disabled fields are omitted
+    if (!form.year.value) { p.delete('year'); p.delete('month'); }
     window.location.hash = '#/scalp?' + p.toString();
   });
   form.q.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); form.dispatchEvent(new Event('change')); } });

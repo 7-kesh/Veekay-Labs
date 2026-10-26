@@ -4,17 +4,12 @@ import { listScalpTrades, listPlans, getSettings } from './db.js';
 import { analyse } from './perf.js';
 import { scalpAreas, planAreas, focus } from './improve.js';
 import { EXIT_SCENARIOS } from './constants.js';
+import { periodBounds } from './period.js';
 
 export const KINDS = ['options', 'swing'];
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
 
-export function periodBounds(period) {
-  const t = new Date(); const iso = d => d.toISOString().slice(0, 10);
-  if (period === 'week') { const d = new Date(t); d.setDate(t.getDate() - ((t.getDay() + 6) % 7)); return [iso(d), iso(t)]; }
-  if (period === 'month') { const d = new Date(t.getFullYear(), t.getMonth(), 1); return [iso(d), iso(t)]; }
-  if (period === '30d') { const d = new Date(t); d.setDate(t.getDate() - 30); return [iso(d), iso(t)]; }
-  return [null, null];
-}
+export { periodBounds };
 
 function win(v) { return v !== null && v !== undefined && v > 0; }
 function avg(vals) { vals = vals.filter(v => v !== null && v !== undefined); return vals.length ? Math.round(vals.reduce((s, v) => s + v, 0) / vals.length * 100) / 100 : null; }

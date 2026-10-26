@@ -1,3 +1,4 @@
+import { periodSelectsHtml, readPeriod } from '../period.js';
 // Port of app/templates/_stats_macros.html - shared markup builders for the stats pages.
 import { money, signclass, num as fmtNum, esc } from '../format.js';
 
@@ -10,18 +11,18 @@ export function rate(r) {
 function usdOrDash(v) { return v !== null && v !== undefined ? money(v) : '–'; }
 function numOrDash(v) { return v !== null && v !== undefined ? fmtNum(v) : '–'; }
 
-export function filtersHtml(period, account, basePath) {
+export function filtersHtml(period, account, basePath, years = []) {
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
   return `<form method="get" class="filters" id="statsFilters" style="margin:0" data-base="${basePath}">
     <select name="account">${opt('all', account, 'Paper + live')}${opt('paper', account, 'Paper only')}${opt('live', account, 'Live only')}</select>
-    <select name="period">${opt('week', period, 'This week')}${opt('month', period, 'This month')}${opt('30d', period, 'Last 30 days')}${opt('all', period, 'All time')}</select>
+    ${periodSelectsHtml(period, years)}
   </form>`;
 }
 export function wireFilters(el) {
   const form = el.querySelector('#statsFilters');
   if (!form) return;
   form.addEventListener('change', () => {
-    const p = new URLSearchParams(new FormData(form));
+    const p = new URLSearchParams({ account: form.elements.account.value, period: readPeriod(form) });
     window.location.hash = `#/${form.dataset.base}?` + p.toString();
   });
 }

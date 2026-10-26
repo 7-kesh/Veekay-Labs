@@ -1,5 +1,6 @@
 // Port of app/templates/plans_list.html.
-import { listPlans, deletePlan } from '../db.js';
+import { listPlans, deletePlan, allYears } from '../db.js';
+import { periodBounds, periodSelectsHtml, readPeriod } from '../period.js';
 import { money, signclass, px, num as fmtNum, esc } from '../format.js';
 import { downloadCsv } from '../csv.js';
 import { dispatch } from '../router.js';
@@ -15,7 +16,10 @@ function acct(a) {
 
 export async function render(kind, params, el) {
   const status = params.status || 'all', account = params.account || 'all';
-  const rows = await listPlans(kind, { status, account });
+  const period = params.period || 'all';
+  const [lo, hi] = periodBounds(period);
+  const years = await allYears();
+  const rows = (await listPlans(kind, { status, account })).filter(p => !lo || (p.plan_date >= lo && p.plan_date <= hi));
   const net = rows.filter(r => r.status === 'closed').reduce((s, r) => s + (r.realized_pl || 0), 0);
 
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
@@ -25,6 +29,7 @@ export async function render(kind, params, el) {
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <select name="status">${opt('all', status, 'All')}${opt('planned', status, 'Planned')}${opt('open', status, 'Open')}${opt('closed', status, 'Closed')}${opt('cancelled', status, 'Cancelled')}</select>
       <select name="account">${opt('all', account, 'Paper + live')}${opt('paper', account, 'Paper only')}${opt('live', account, 'Live only')}</select>
+      ${periodSelectsHtml(period, years)}
       <span class="muted">${rows.length} · realized <b class="${signclass(net)}">${money(net)}</b></span>
     </form>
     <div class="scroll"><table class="dense"><thead><tr>
@@ -44,7 +49,7 @@ export async function render(kind, params, el) {
   `;
   const form = el.querySelector('#filters');
   form.addEventListener('change', () => {
-    const p = new URLSearchParams(new FormData(form));
+    const p = new URLSearchParams({ status: form.elements.status.value, account: form.elements.account.value, period: readPeriod(form) });
     window.location.hash = `#/${kind}?` + p.toString();
   });
   el.querySelector('#exportCsv').addEventListener('click', () => {

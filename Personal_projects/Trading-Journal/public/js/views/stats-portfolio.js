@@ -1,19 +1,35 @@
 // Port of app/templates/stats_portfolio.html.
+import { allYears } from '../db.js';
 import { statsData, portfolio } from '../stats.js';
 import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters, kpisHtml, focusListHtml } from './stats-macros.js';
 import { money, signclass, num as fmtNum, esc } from '../format.js';
+import { listImprovements, listScalpTrades } from '../db.js';
+import { rankImprovements } from '../improvement-rank.js';
 
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
 const IMPACT_LABEL = { high: 'High', med: 'Medium', low: 'Low' };
 
+// Top imported improvements (from Claude chat wrap-ups), ranked by what their target costs. Never
+// breaks the stats page: if the wrap-up tables don't exist yet, the card is simply left out.
+async function improvementsCard() {
+  try {
+    const [items, trades] = await Promise.all([listImprovements(), listScalpTrades({})]);
+    const top = rankImprovements(items, trades).slice(0, 3);
+    if (!top.length) return '';
+    return `<section class="card focus"><h2>Improvements to work on <small class="muted">from your Claude wrap-ups, ranked by what they cost you</small></h2>
+      <ol>${top.map(i => `<li>${esc(i.text)} <span class="muted">${i.cost != null ? `- ${money(i.cost)} lost on ${i.n} tagged trade(s)` : '- no dollar target'}${i.status === 'adopted' ? ' · adopted' : ''}</span></li>`).join('')}</ol>
+      <p class="muted note"><a href="#/improvements">All improvements</a></p></section>`;
+  } catch { return ''; }
+}
+
 export async function render(params, el) {
   const period = params.period || 'all', account = params.account || 'all';
-  const d = await statsData(period, account);
+  const [d, years] = await Promise.all([statsData(period, account), allYears()]);
   const p = portfolio(d);
 
   if (p.total.m.n === 0) {
-    el.innerHTML = `<div class="head"><h1>Portfolio <small>all trade types</small></h1>${filtersHtml(period, account, 'stats/portfolio')}</div>
+    el.innerHTML = `<div class="head"><h1>Portfolio <small>all trade types</small></h1>${filtersHtml(period, account, 'stats/portfolio', years)}</div>
       <section class="card"><p class="muted">No closed trades with a P&amp;L in this period yet.</p></section>`;
     wireFilters(el);
     return;
@@ -23,8 +39,9 @@ export async function render(params, el) {
   const numOrDash = v => v !== null && v !== undefined ? fmtNum(v) : '–';
 
   el.innerHTML = `
-    <div class="head"><h1>Portfolio <small>all trade types</small></h1>${filtersHtml(period, account, 'stats/portfolio')}</div>
+    <div class="head"><h1>Portfolio <small>all trade types</small></h1>${filtersHtml(period, account, 'stats/portfolio', years)}</div>
     ${kpisHtml(t)}
+    ${await improvementsCard()}
 
     <section class="card focus"><h2>Biggest leaks across everything <small class="muted">the specific habits costing you most, from all areas</small></h2>
       ${p.leaks.length ? focusListHtml(p.leaks, true) + '<p class="muted note">Measured per habit on its own trades, so the savings overlap and should not be added together.</p>'

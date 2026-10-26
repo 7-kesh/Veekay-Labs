@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { parsePeriod, encodePeriod, periodBounds, yearMonthBounds } from './period.js';
+assert.deepEqual(parsePeriod('y2026-10'), { quick: '', year: '2026', month: '10' });
+assert.deepEqual(parsePeriod('y2026'), { quick: '', year: '2026', month: '' });
+assert.deepEqual(parsePeriod('y2026-3'), { quick: '', year: '2026', month: '3' });
+assert.deepEqual(parsePeriod('30d'), { quick: '30d', year: '', month: '' });
+assert.deepEqual(parsePeriod('garbage'), { quick: 'all', year: '', month: '' });
+assert.equal(encodePeriod({ quick: 'week', year: '', month: '' }), 'week');
+assert.equal(encodePeriod({ quick: 'week', year: '2026', month: '3' }), 'y2026-03');
+assert.equal(encodePeriod({ quick: 'week', year: '2026', month: '' }), 'y2026');
+assert.equal(encodePeriod({ quick: 'week', year: '', month: '5' }), 'week', 'month without year is ignored');
+assert.deepEqual(periodBounds('y2026-02'), ['2026-02-01', '2026-02-28']);
+assert.deepEqual(periodBounds('y2028-02'), ['2028-02-01', '2028-02-29']);
+assert.deepEqual(periodBounds('y2026'), ['2026-01-01', '2026-12-31']);
+assert.deepEqual(periodBounds('all'), [null, null]);
+assert.equal(periodBounds('week')[0] <= periodBounds('week')[1], true);
+assert.deepEqual(yearMonthBounds('', '3'), null);
+console.log('period ok');

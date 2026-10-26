@@ -10,10 +10,10 @@ function rethrow(error) { if (error) throw error; }
 
 // ---------- settings ----------
 
-// Screenshots auto-expire after 30 days - the review's text output is the durable record, not
-// the raw image. Lazy, same as app/db.py's purge_old_screenshots(): runs once per app load,
-// no cron needed.
-export async function purgeOldScreenshots(days = 30) {
+// Screenshots auto-expire after 7 days (Veekay, 2026-10-26) - the journal entry and the exported
+// bundle are the durable record, not the raw image, so export before the week is up. Lazy, same
+// as app/db.py's purge_old_screenshots(): runs once per app load, no cron needed.
+export async function purgeOldScreenshots(days = 7) {
   const cutoff = new Date(Date.now() - days * 86400000).toISOString();
   const { data, error } = await supabase.from('attachments').select('id,filename').lt('created_at', cutoff);
   rethrow(error);
@@ -52,6 +52,27 @@ export async function listScalpTrades({ date, lo, hi, account, q, limit } = {}) 
   const { data, error } = await query;
   rethrow(error);
   return data;
+}
+
+// Distinct years across scalp trades and options/swing plans (newest first), for the Stats and
+// plan-list year filters.
+export async function allYears() {
+  const [t, p] = await Promise.all([
+    supabase.from('scalp_trades').select('date'),
+    supabase.from('plans').select('plan_date'),
+  ]);
+  rethrow(t.error); rethrow(p.error);
+  const years = new Set();
+  for (const r of t.data || []) years.add(String(r.date || '').slice(0, 4));
+  for (const r of p.data || []) years.add(String(r.plan_date || '').slice(0, 4));
+  return [...years].filter(y => /^\d{4}$/.test(y)).sort().reverse();
+}
+
+// Distinct years that have scalp trades (newest first), for the list's year filter.
+export async function scalpYears() {
+  const { data, error } = await supabase.from('scalp_trades').select('date');
+  rethrow(error);
+  return [...new Set((data || []).map(r => String(r.date || '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)))].sort().reverse();
 }
 
 export async function getScalpTrade(id) {
@@ -370,6 +391,100 @@ export async function downloadAttachment(path) {
   const { data, error } = await supabase.storage.from('screenshots').download(path);
   rethrow(error);
   return { mime: data.type || 'image/jpeg', bytes: new Uint8Array(await data.arrayBuffer()) };
+}
+
+// ---------- Claude-chat wrap-up: journal entries, learnings, improvements (supabase/migrate-wrapup.sql) ----------
+
+// Saves a validated tj-wrapup/1 block (see wrapup.js). The journal entry for a date is replaced;
+// learnings and improvements are added unless the same (date, text) already exists, so
+// re-importing the same wrap-up never duplicates items or resets an improvement's status.
+export async function saveWrapup(data) {
+  const { date, entry, learnings, improvements } = data;
+  rethrow((await supabase.from('journal_entries').upsert({ date, summary: entry.summary, trades: entry.trades }, { onConflict: 'date' })).error);
+  if (learnings.length) {
+    rethrow((await supabase.from('learnings').upsert(
+      learnings.map(l => ({ date, text: l.text, trade_nos: l.trade_nos })),
+      { onConflict: 'date,text', ignoreDuplicates: true })).error);
+  }
+  if (improvements.length) {
+    rethrow((await supabase.from('improvements').upsert(
+      improvements.map(i => ({ date, text: i.text, target_type: i.target.type, target_value: i.target.value, target_setup: i.target.setup, trade_nos: i.trade_nos, status: i.status || 'proposed', adopted_on: i.adopted_on || null, resolved_on: i.resolved_on || null })),
+      { onConflict: 'date,text', ignoreDuplicates: true })).error);
+  }
+}
+
+// What a wrap-up for this date would add vs already have, for the import preview.
+export async function wrapupExisting(date) {
+  const [e, l, i] = await Promise.all([
+    supabase.from('journal_entries').select('id').eq('date', date),
+    supabase.from('learnings').select('text').eq('date', date),
+    supabase.from('improvements').select('text').eq('date', date),
+  ]);
+  rethrow(e.error); rethrow(l.error); rethrow(i.error);
+  return { entry: (e.data || []).length > 0, learnings: new Set((l.data || []).map(r => r.text)), improvements: new Set((i.data || []).map(r => r.text)) };
+}
+
+export async function listJournalEntries({ lo, hi, limit } = {}) {
+  let q = supabase.from('journal_entries').select('*').order('date', { ascending: false });
+  if (lo) q = q.gte('date', lo).lte('date', hi);
+  if (limit) q = q.limit(limit);
+  const { data, error } = await q;
+  rethrow(error);
+  return data || [];
+}
+
+// Everything the app holds for one date (entry, learnings, improvements) plus that day's trades.
+export async function getJournalDay(date) {
+  const [e, l, i, trades] = await Promise.all([
+    supabase.from('journal_entries').select('*').eq('date', date).maybeSingle(),
+    supabase.from('learnings').select('*').eq('date', date).order('id'),
+    supabase.from('improvements').select('*').eq('date', date).order('id'),
+    listScalpTrades({ date }),
+  ]);
+  rethrow(e.error); rethrow(l.error); rethrow(i.error);
+  return { date, entry: e.data, learnings: l.data || [], improvements: i.data || [], trades };
+}
+
+// All three tables, optionally limited to a date range - the source for "download all".
+export async function listJournalAll({ lo, hi } = {}) {
+  const ranged = (q) => (lo ? q.gte('date', lo).lte('date', hi) : q);
+  const [e, l, i] = await Promise.all([
+    ranged(supabase.from('journal_entries').select('*')),
+    ranged(supabase.from('learnings').select('*').order('id')),
+    ranged(supabase.from('improvements').select('*').order('id')),
+  ]);
+  rethrow(e.error); rethrow(l.error); rethrow(i.error);
+  return { entries: e.data || [], learnings: l.data || [], improvements: i.data || [] };
+}
+
+// Distinct years that have journal data, newest first.
+export async function journalYears() {
+  const { data, error } = await supabase.from('journal_entries').select('date');
+  rethrow(error);
+  return [...new Set((data || []).map(r => String(r.date).slice(0, 4)))].sort().reverse();
+}
+
+export async function listLearnings(limit = 40) {
+  const { data, error } = await supabase.from('learnings').select('*').order('date', { ascending: false }).order('id', { ascending: false }).limit(limit);
+  rethrow(error);
+  return data || [];
+}
+
+export async function listImprovements() {
+  const { data, error } = await supabase.from('improvements').select('*').order('date', { ascending: false }).order('id', { ascending: false });
+  rethrow(error);
+  return data || [];
+}
+
+// status: proposed | adopted | resolved | dropped. Adopting stamps adopted_on (today unless given)
+// so before/after has a date to split on; resolving stamps resolved_on.
+export async function setImprovementStatus(id, status, onDate) {
+  const today = onDate || new Date().toISOString().slice(0, 10);
+  const patch = { status };
+  if (status === 'adopted') { patch.adopted_on = today; patch.resolved_on = null; }
+  if (status === 'resolved') patch.resolved_on = today;
+  if (status === 'proposed') { patch.adopted_on = null; patch.resolved_on = null; }
+  rethrow((await supabase.from('improvements').update(patch).eq('id', id)).error);
 }
 
 // ---------- Claude review ----------

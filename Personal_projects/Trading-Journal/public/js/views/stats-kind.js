@@ -1,4 +1,5 @@
 // Port of app/templates/stats_kind.html.
+import { allYears } from '../db.js';
 import { statsData } from '../stats.js';
 import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters, rate, focusBlockHtml, areasBlockHtml, chartBlockHtml } from './stats-macros.js';
@@ -9,7 +10,7 @@ const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
 
 export async function render(kind, params, el) {
   const period = params.period || 'all', account = params.account || 'all';
-  const d = await statsData(period, account);
+  const [d, years] = await Promise.all([statsData(period, account), allYears()]);
   const title = KIND_LABEL[kind];
 
   let detail = '';
@@ -51,7 +52,7 @@ export async function render(kind, params, el) {
   }
 
   el.innerHTML = `
-    <div class="head"><h1>${title} stats</h1>${filtersHtml(period, account, kind === 'scalp' ? 'stats/scalp' : `stats/${kind}`)}</div>
+    <div class="head"><h1>${title} stats</h1>${filtersHtml(period, account, kind === 'scalp' ? 'stats/scalp' : `stats/${kind}`, years)}</div>
     ${focusBlockHtml(d.focus[kind])}
     ${areasBlockHtml(d.areas[kind])}
     ${chartBlockHtml(kind, title, d.charts[kind])}
