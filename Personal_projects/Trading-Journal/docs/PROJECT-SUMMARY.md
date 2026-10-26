@@ -58,6 +58,14 @@ Sidebar (collapses to a top bar on narrow screens): **Today**; **Journal** (Scal
 
 ## Session Log
 
+### 2026-10-26 (co-builder, later): UI redesign - Veekay's palette and layout spec (local commit, not deployed)
+
+**Spec (Veekay):** palette bg #F3F5FA, sidebar #E9EDF6, cards white, navy #182B4D, indigo #5367C9, violet #8064C8, teal #149B88, amber #D99638; tinted section headers; 36-40px fields with soft borders and an indigo focus ring; obvious but unsaturated selected states; Risk/Gross/Net as compact metric cards (teal gains, muted red losses); sidebar active state = subtle indigo background + narrow indicator; separation without extra height; dashboard look from the TradeBase sample (`docs/ChatGPT Image Oct 26, 2026, 08_43_11 AM.jpg`).
+
+**Did (`public/app.css`, `public/js/main.js`):** tokens replaced with the palette (muted red #C4505F for losses; section colors: scalp indigo, options violet, swing teal, futures amber); a clearly marked override block at the end of `app.css` (delete it to get the old look). Sidebar tinted with the active item shown as indigo tint + a 3px indicator. Cards white with soft shadow and small uppercase headers. Inputs 38px high, soft border, indigo focus ring. Numbered circles hidden; each row's label is now a tinted header rail. Setup/Account/Y-N/chip selected states use a tint + border instead of solid fills. Risk/Gross/Net/R are metric cards. Stat tiles restyled dashboard-style.
+**Found while doing it:** the hosted app never set the sidebar's active item or the section color (`body.sec-*`, `.sn.on` were Flask-era and nothing in the SPA set them). `updateChrome()` in `main.js` now sets both on every route change.
+**Verified:** a static mock preview of the sidebar, tiles and form rows rendered in Chrome and matches the spec. **Not verified:** the real pages (logged-in app), mobile width, charts. Not covered: the TradeBase-style win-rate gauge and radar "score" widgets are new chart types, not restyling, and were not added.
+
 ### 2026-10-26 (co-builder, later still): Journal pages, year/month filters everywhere, 7-day screenshot retention
 
 **Decisions (Veekay):** the app's journal is final; metric targets stay (avg_r, win_rate, avg_loser, avg_winner); drop folder `TradeVenture/App_Exports/`; export size unchanged (original PNGs); screenshots deleted after 7 days; consumed export zips deleted by end of day; year/month filters on Stats and plan lists too.
