@@ -1,4 +1,8 @@
-# Proposed changes to the `trade-journal` skill (not yet applied)
+# Changes to the `trade-journal` skill
+
+**Drafted 2026-10-26, not yet installed:** the full updated skill is `claude-skills-repository/skills/trade-journal/SKILL_261026.md`, built on the latest saved version `SKILL_261011.md` (the copy currently installed in the Claude app is older, `SKILL_261007_v3` content, so it also lacks the 10-11 progress-measurement section). It adds Mode D (app export assessment, wrap-up, cleanup) as the primary flow and marks Mode A, Mode B, the spreadsheet block and Git as the legacy flow. Install it by uploading that file as the `trade-journal` skill in the Claude app. The sections below are the design notes it implements.
+
+(Original heading: Proposed changes, not yet applied)
 
 Skill location: the Claude app's `trade-journal` skill (source of truth for the frozen strategy). These changes make it consume the app's export bundle and return a structured wrap-up. Apply only after Veekay signs off on the formats below. Per the skill's own rule, none of this changes the strategy itself.
 
