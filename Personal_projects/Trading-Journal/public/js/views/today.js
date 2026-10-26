@@ -1,6 +1,6 @@
 import { listScalpTrades } from '../db.js';
 import { money, signclass, px, esc } from '../format.js';
-import { exportDay } from '../export-bundle.js';
+import { pickAndExportDay } from '../export-picker.js';
 
 export async function render(_params, el) {
   const d = new Date().toISOString().slice(0, 10);
@@ -25,13 +25,13 @@ export async function render(_params, el) {
       </tbody></table>
     </section>
     <div class="actions" style="margin-top:16px"><a class="btn primary" href="#/scalp/new">+ New scalp trade</a>
-      <button class="btn" id="exportDay" type="button">Export day for Claude</button>
+      <button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button>
       <span class="muted" id="exportStatus"></span></div>
   `;
   el.querySelector('#exportDay').addEventListener('click', async function () {
     const st = el.querySelector('#exportStatus');
-    this.disabled = true; st.textContent = 'Building export…';
-    try { st.textContent = 'Downloaded ' + await exportDay(d); }
+    this.disabled = true; st.textContent = '';
+    try { const f = await pickAndExportDay(d); st.textContent = f ? 'Downloaded ' + f : ''; }
     catch (err) { st.textContent = err.message || String(err); }
     this.disabled = false;
   });

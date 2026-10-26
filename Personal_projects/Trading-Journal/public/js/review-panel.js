@@ -84,7 +84,7 @@ export async function mountReviewPanel(container, opts) {
       <div class="drop" id="drop" tabindex="0">Paste a screenshot (Ctrl/Cmd+V), drop images here, or <label class="link">choose files<input type="file" id="pick" accept="image/*" multiple hidden></label></div>
       <div class="thumbs" id="thumbs">${shots.map(s => `<figure data-aid="${s.id}"><a href="${esc(s.url)}" target="_blank"><img src="${esc(s.url)}" alt="screenshot"></a><button type="button" class="x" title="Remove">×</button></figure>`).join('')}</div>
       <div class="row">
-        <button type="button" class="btn primary" id="exportBundle">Export for Claude</button>
+        <button type="button" class="btn primary" id="exportBundle">Export for AI-Assist-Review</button>
         ${API_REVIEW_ENABLED ? '<button type="button" class="btn" id="runReview">Review with Claude</button>' : ''}
         <span class="muted" id="reviewStatus">Exports the last saved version of this trade with its screenshots (.zip).</span>
       </div>

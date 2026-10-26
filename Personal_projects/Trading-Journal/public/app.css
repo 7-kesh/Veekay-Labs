@@ -361,3 +361,15 @@ tr.win{background:color-mix(in srgb,var(--pos) 5%,#fff)}tr.loss{background:color
 .scorebar i{position:absolute;top:-3px;width:4px;height:14px;background:var(--ink);border-radius:2px;transform:translateX(-50%)}
 .scorescale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
 @media(max-width:760px){.overview{grid-template-columns:1fr}}
+
+/* Export picker dialog */
+.pickdlg{border:1px solid var(--line);border-radius:12px;padding:20px;width:min(440px,92vw);background:var(--card);color:var(--ink)}
+.pickdlg::backdrop{background:rgba(24,43,77,.35)}
+.pickdlg h2{margin:0 0 12px}
+.pickall{display:block;font-weight:600;margin-bottom:8px}
+.picklist{max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.picklist label{display:flex;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line)}
+.picklist label:last-child{border-bottom:0}
+.picklist label span{flex:1}
+.picklist .pos{color:var(--pos)}.picklist .neg{color:var(--neg)}
+.pickdlg .actions{justify-content:flex-end;margin-top:14px}

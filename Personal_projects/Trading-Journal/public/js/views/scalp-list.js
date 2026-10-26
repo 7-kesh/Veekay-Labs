@@ -2,7 +2,7 @@ import { listScalpTrades, deleteScalpTrade, scalpYears } from '../db.js';
 import { money, signclass, px, esc } from '../format.js';
 import { downloadCsv } from '../csv.js';
 import { dispatch } from '../router.js';
-import { exportDay } from '../export-bundle.js';
+import { pickAndExportDay } from '../export-picker.js';
 
 function periodBounds(period) {
   const t = new Date(); const iso = d => d.toISOString().slice(0, 10);
@@ -38,7 +38,7 @@ export async function render(params, el) {
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
   el.innerHTML = `
     <div class="head"><h1>Scalp trades</h1>
-      <div class="actions"><input type="date" id="dayPick" value="${new Date().toISOString().slice(0, 10)}"><button class="btn" id="exportDay" type="button">Export day for Claude</button><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/scalp/new">+ New</a></div></div>
+      <div class="actions"><input type="date" id="dayPick" value="${new Date().toISOString().slice(0, 10)}"><button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/scalp/new">+ New</a></div></div>
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <select name="period" ${year ? 'disabled' : ''}>${opt('week', period, 'This week')}${opt('month', period, 'This month')}${opt('30d', period, 'Last 30 days')}${opt('all', period, 'All time')}</select>
       <select name="year"><option value="">All years</option>${years.map(y => opt(y, year, y)).join('')}</select>
@@ -64,8 +64,8 @@ export async function render(params, el) {
   });
   form.q.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); form.dispatchEvent(new Event('change')); } });
   el.querySelector('#exportDay').addEventListener('click', async function () {
-    this.disabled = true; const old = this.textContent; this.textContent = 'Building…';
-    try { await exportDay(el.querySelector('#dayPick').value); }
+    this.disabled = true; const old = this.textContent;
+    try { await pickAndExportDay(el.querySelector('#dayPick').value); }
     catch (err) { alert(err.message || String(err)); }
     this.textContent = old; this.disabled = false;
   });

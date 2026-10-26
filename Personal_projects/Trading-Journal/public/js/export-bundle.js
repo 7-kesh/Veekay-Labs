@@ -1,4 +1,4 @@
-// IO side of "Export for Claude": fetches rows and screenshot bytes, builds the zip with
+// IO side of "Export for AI-Assist-Review": fetches rows and screenshot bytes, builds the zip with
 // export-format.js, and triggers the browser download.
 import { getScalpTrade, getPlan, listScalpTrades, listPlans, listAttachments, downloadAttachment, priorExitTime } from './db.js';
 import * as setupC from './setup-c.js';
@@ -41,12 +41,22 @@ export async function exportTrade(kind, id) {
   return download(buildTradeZip(await itemFor(kind, row)));
 }
 
-export async function exportDay(date) {
+// Everything logged on a date, as picker rows: { key, kind, id, label }.
+export async function listDayItems(date) {
   const scalp = await listScalpTrades({ date });
   const plans = [...await listPlans('options'), ...await listPlans('swing')].filter(p => p.plan_date === date);
-  if (!scalp.length && !plans.length) throw new Error(`Nothing logged on ${date}.`);
+  return [
+    ...scalp.map(t => ({ key: `scalp:${t.id}`, kind: 'scalp', id: t.id, row: t, label: `${t.trade_no || '#' + t.id} ${t.ticker || ''} ${t.entry_time || ''}`.trim(), pnl: t.net_pnl })),
+    ...plans.map(p => ({ key: `${p.kind}:${p.id}`, kind: p.kind, id: p.id, row: p, label: `${p.kind} ${p.ticker || ''}`.trim(), pnl: null })),
+  ];
+}
+
+// only: optional Set of picker keys; omitted means the whole day.
+export async function exportDay(date, only) {
+  const all = await listDayItems(date);
+  const picked = only ? all.filter(x => only.has(x.key)) : all;
+  if (!picked.length) throw new Error(only ? 'No trades selected.' : `Nothing logged on ${date}.`);
   const items = [];
-  for (const t of scalp) items.push(await itemFor('scalp', t));
-  for (const p of plans) items.push(await itemFor(p.kind, p));
+  for (const x of picked) items.push(await itemFor(x.kind, x.row));
   return download(buildDayZip(date, items));
 }
