@@ -624,3 +624,7 @@ html[data-theme="dark"] .cd.up{background:linear-gradient(160deg,rgba(47,217,182
 html[data-theme="dark"] .cd.down{background:linear-gradient(160deg,rgba(255,111,134,.34),rgba(255,111,134,.10))}
 html[data-theme="dark"] .cd.wk{background:linear-gradient(160deg,color-mix(in srgb,var(--sec) 20%,#0C1628),#0C1628)}
 html[data-theme="dark"] .cd.up b{color:#5EF0CF}html[data-theme="dark"] .cd.down b{color:#FF8FA2}
+
+/* header button groups are not the sticky save bar */
+.head .actions{position:static;padding:0;margin:0;background:none;border:0;backdrop-filter:none}
+.areasecs{align-items:start}
