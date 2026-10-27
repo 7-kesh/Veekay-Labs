@@ -1,8 +1,7 @@
-// Port of app/templates/strategy.html + app/static/strategy.js. Propose a change -> Claude
-// classifies the effect (via the /api/classify-change Pages Function) -> red-flag banner ->
+// Port of app/templates/strategy.html + app/static/strategy.js. Propose a change ->
+// you pick the effect (tighter / looser / ...) -> red-flag banner ->
 // pick an effective date -> confirm and apply. Nothing is written until "Confirm and apply".
-import { STRATEGY_ORDER, STRATEGY_LABELS, SEED_DATE, currentRules, changeLog, applyChange, classifyChange, ruleEffectiveFrom } from '../strategy.js';
-import { getSettings } from '../db.js';
+import { STRATEGY_ORDER, STRATEGY_LABELS, SEED_DATE, currentRules, changeLog, applyChange, ruleEffectiveFrom, CHANGE_EFFECTS } from '../strategy.js';
 import { esc } from '../format.js';
 import { dispatch } from '../router.js';
 import { buildPlaybookPdf, downloadPdf } from '../playbook-pdf.js';
@@ -10,7 +9,6 @@ import { buildPlaybookPdf, downloadPdf } from '../playbook-pdf.js';
 export async function render(_params, el) {
   const rules = await currentRules('scalp');
   const log = await changeLog('scalp');
-  const settings = await getSettings();
   const today = new Date().toISOString().slice(0, 10);
 
   el.innerHTML = `
@@ -25,7 +23,8 @@ export async function render(_params, el) {
           <form class="proposeForm" data-rule="${esc(k)}" style="margin-top:10px">
             <textarea name="new_text" rows="3" placeholder="New wording">${esc(rules[k] || '')}</textarea>
             <div class="actions" style="margin-top:8px">
-              <button type="button" class="btn checkBtn">Check with Claude</button>
+              <label>This change is <select name="effect">${CHANGE_EFFECTS.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join('')}</select></label>
+              <button type="button" class="btn checkBtn">Review change</button>
             </div>
             <div class="classifyOut"></div>
             <div class="applyRow" hidden>
@@ -72,10 +71,10 @@ export async function render(_params, el) {
       if (!newText) return;
       out.textContent = 'Checking…'; checkBtn.disabled = true;
       try {
-        const result = await classifyChange(ruleKey, rules[ruleKey] || '', newText, settings.review_model);
-        lastClassification = result;
-        out.innerHTML = `<div class="flagrow neg"><b>Red flag: this changes the strategy</b> - classified <b>${esc(result.effect)}</b></div>
-          <p>${esc(result.explanation)}</p>`;
+        const effect = form.effect.value;
+        lastClassification = { effect };
+        out.innerHTML = `<div class="flagrow neg"><b>Red flag: this changes the strategy</b> - recorded as <b>${esc(effect)}</b></div>
+          <p class="muted">Confirm only if this is a deliberate change. It is logged with today's date and applies from the date below.</p>`;
         applyRow.hidden = false;
       } catch (err) {
         out.innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`;

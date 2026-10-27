@@ -1,16 +1,9 @@
-// Single Worker entry point (Cloudflare Workers Builds, not Pages - this project's deploy
-// method, confirmed by its *.workers.dev URL and "Build command / Deploy command" settings
-// rather than Pages' "Build output directory"). Routes /api/* to the Claude-backed handlers;
-// everything else falls through to the static site in public/ via the ASSETS binding
-// (wrangler.jsonc's assets.directory).
-import { handleReview } from './routes/review.js';
-import { handleClassifyChange } from './routes/classifyChange.js';
-
+// Single Worker entry point (Cloudflare Workers, deployed with `npx wrangler deploy`). It only serves
+// the static site in public/ through the ASSETS binding (wrangler.jsonc's assets.directory). The
+// Claude-backed /api/review and /api/classify-change routes were removed 2026-10-27 - the app no
+// longer calls Claude; reviews happen in Claude chat from the export zip.
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    if (request.method === 'POST' && url.pathname === '/api/review') return handleReview(request, env);
-    if (request.method === 'POST' && url.pathname === '/api/classify-change') return handleClassifyChange(request, env);
     return env.ASSETS.fetch(request);
   },
 };

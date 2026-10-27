@@ -236,54 +236,6 @@ export async function saveScalpTrade(id, form, settings) {
   return tradeId;
 }
 
-// Aggregated history for the review prompt - evidence about Veekay's PATTERNS over time, never
-// evidence about the trade being reviewed right now. review.js walls this off from gate grading
-// (see HISTORY_ADDENDUM there); this function only computes the numbers.
-// Deliberately ticker-agnostic: the strategy's setups (A/B/C) are defined by chart structure and
-// location, not by which stock it is, and most tickers only get traded once or twice anyway, so
-// grouping by symbol would just be noise (or superstition) dressed up as a pattern.
-export async function getPatternDigest({ setup, excludeId, limit = 80 } = {}) {
-  const { data, error } = await supabase.from('scalp_trades')
-    .select('id,setup,category,violations,date')
-    .order('date', { ascending: false }).limit(limit);
-  rethrow(error);
-  const rows = (data || []).filter(r => r.id !== excludeId);
-  if (!rows.length) return '';
-
-  function tally(list) {
-    const cat = {}, viol = {};
-    for (const r of list) {
-      if (r.category) cat[r.category] = (cat[r.category] || 0) + 1;
-      for (const v of (r.violations || '').split('; ').filter(Boolean)) viol[v] = (viol[v] || 0) + 1;
-    }
-    return { count: list.length, cat, viol };
-  }
-  function fmtCat(cat, total) {
-    return Object.entries(cat).sort((a, b) => b[1] - a[1])
-      .map(([k, n]) => `${k} ${n} (${Math.round(100 * n / total)}%)`).join(', ');
-  }
-  function fmtViol(viol, top = 3) {
-    return Object.entries(viol).sort((a, b) => b[1] - a[1]).slice(0, top)
-      .map(([k, n]) => `${k} (${n})`).join(', ');
-  }
-
-  const lines = [];
-  const overall = tally(rows);
-  lines.push(`Last ${overall.count} trades: ${fmtCat(overall.cat, overall.count) || 'no categories recorded yet'}.`);
-  if (Object.keys(overall.viol).length) lines.push(`Most frequent violations: ${fmtViol(overall.viol)}.`);
-
-  if (setup) {
-    const sameSetup = rows.filter(r => r.setup === setup);
-    if (sameSetup.length) {
-      const s = tally(sameSetup);
-      const cleanPct = s.count ? Math.round(100 * (s.cat.A || 0) / s.count) : 0;
-      lines.push(`Setup ${setup} trades, ${s.count} prior: clean ${s.cat.A || 0} (${cleanPct}%)` +
-        `${Object.keys(s.viol).length ? `, repeat issue(s): ${fmtViol(s.viol, 2)}` : ''}.`);
-    }
-  }
-  return lines.join('\n');
-}
-
 // ---------- options / swing plans ----------
 
 export async function listPlans(kind, { status = 'all', account = 'all' } = {}) {
@@ -420,19 +372,6 @@ export async function deleteAttachment(id) {
   rethrow((await supabase.from('attachments').delete().eq('id', id)).error);
 }
 
-// Base64-encodes a stored screenshot for the review Pages Function (it never gets Storage
-// access itself - the client, under its own authenticated session, reads the bytes and sends
-// them along with the review request).
-export async function attachmentToBase64(path) {
-  const { data, error } = await supabase.storage.from('screenshots').download(path);
-  rethrow(error);
-  const buf = await data.arrayBuffer();
-  let binary = '';
-  const bytes = new Uint8Array(buf);
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return { mime: data.type || 'image/jpeg', dataBase64: btoa(binary) };
-}
-
 // Raw bytes of a stored screenshot, for the "Export for Claude" bundles.
 export async function downloadAttachment(path) {
   const { data, error } = await supabase.storage.from('screenshots').download(path);
@@ -539,21 +478,6 @@ export async function setImprovementStatus(id, status, onDate) {
   if (status === 'resolved') patch.resolved_on = today;
   if (status === 'proposed') { patch.adopted_on = null; patch.resolved_on = null; }
   rethrow((await supabase.from('improvements').update(patch).eq('id', id)).error);
-}
-
-// ---------- Claude review ----------
-
-export async function listReviews(kind, refId) {
-  const { data, error } = await supabase.from('reviews').select('*').eq('kind', kind).eq('ref_id', refId).order('id', { ascending: false });
-  rethrow(error);
-  return data;
-}
-
-export async function saveReview(kind, refId, model, text, gates, proposed) {
-  const stored = gates || proposed ? { gates, proposed } : null;
-  rethrow((await supabase.from('reviews').insert({
-    kind, ref_id: refId, model, text_body: text, proposed_json: stored,
-  })).error);
 }
 
 export async function deleteScalpTrade(id) {

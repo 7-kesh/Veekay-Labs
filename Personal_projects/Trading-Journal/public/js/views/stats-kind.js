@@ -30,9 +30,25 @@ async function improvementsCard(kind, title) {
   }
 }
 
+// Where the problems are, as a share of trades: category mix and how often each violation shows up.
+function problemRatesHtml(s) {
+  const n = s.n;
+  if (!n) return '';
+  const pc = c => Math.round(1000 * c / n) / 10;
+  const rows = (items, label) => items.map(([k, c]) => `<div class="prow"><span class="pname">${esc(label(k))}</span>
+      <span class="pbar"><i style="width:${Math.min(100, pc(c))}%"></i></span><span class="pnum"><b>${pc(c)}%</b> <small>${c} of ${n}</small></span></div>`).join('');
+  const cats = s.categories.filter(([k]) => k && k !== '-').sort((a, b) => b[1] - a[1]);
+  return `<section class="card probs"><h2>Where the problems are <small class="muted">share of ${n} scalp trades</small></h2>
+    <div class="cols"><div><h3>By category</h3>${rows(cats, k => CATEGORIES[k] || k)}</div>
+      <div><h3>Most common violations</h3>${s.violations.length ? rows(s.violations, k => k) : '<p class="muted">None tagged.</p>'}</div></div></section>`;
+}
+
 export async function render(kind, params, el) {
   const period = params.period || 'all', account = params.account || 'live';
-  const [d, years] = await Promise.all([statsData(period, account), allYears()]);
+  // Habits (leaks, areas to improve, problem rates) are judged on paper + live together: the same
+  // behaviour shows up in both. The score, KPIs and charts still follow the account filter.
+  const [d, years, dAll] = await Promise.all([statsData(period, account), allYears(), account === 'all' ? null : statsData(period, 'all')]);
+  const h = dAll || d;
   const title = KIND_LABEL[kind];
 
   let detail = '';
@@ -76,8 +92,10 @@ export async function render(kind, params, el) {
   el.innerHTML = `
     <div class="head pagehero"><h1>${title} stats</h1>${filtersHtml(period, account, kind === 'scalp' ? 'stats/scalp' : `stats/${kind}`, years)}</div>
     ${overviewHtml(tradingScore({ m: d.charts[kind].m, points: d.charts[kind].points, entryOk: (kind === 'scalp' ? d.scalp : d.plans[kind]).entry_ok, exitOk: (kind === 'scalp' ? d.scalp : d.plans[kind]).exit_ok }), d.charts[kind].m)}
-    <div class="improve">${focusBlockHtml(d.focus[kind])}${await improvementsCard(kind, title)}</div>
-    ${areasBlockHtml(d.areas[kind])}
+    <p class="muted note habitnote">Leaks, areas to improve and problem rates below use <b>paper + live</b> trades together (${h.charts[kind].m.n} with a result${period === 'all' ? '' : ' in this period'}) - the same habits show up in both.</p>
+    <div class="improve">${focusBlockHtml(h.focus[kind])}${await improvementsCard(kind, title)}</div>
+    ${areasBlockHtml(h.areas[kind])}
+    ${kind === 'scalp' ? problemRatesHtml(h.scalp) : ''}
     ${chartBlockHtml(kind, title, d.charts[kind])}
     ${detail}
   `;

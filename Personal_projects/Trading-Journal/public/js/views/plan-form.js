@@ -2,13 +2,13 @@
 import { getPlan, savePlan, deletePlan, getSettings, getCapitalData } from '../db.js';
 import { capitalSummary, stripHtml } from '../capital.js';
 import { optionsPlan, swingPlan, num as calcNum, liquidityVerdict, pctOf, premiumAt, stockAtPremium, premiumAtModel, stockAtPremiumModel, optionsSanity, LIQUIDITY } from '../calc.js';
-import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS, TIMEFRAMES, RULES_TEXT } from '../constants.js';
+import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS, TIMEFRAMES } from '../constants.js';
 import { money, px, num as fmtNum, signclass, esc, pct } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import { fld, yn, acctPick } from '../fields.js';
 import { cleanDate, formatUsd } from '../numeric.js';
 import { trackNewButton } from '../dirty.js';
-import { mountReviewPanel } from '../review-panel.js';
+import { mountShotsPanel } from '../shots-panel.js';
 
 const KIND_LABEL = { options: 'Options', swing: 'Swing' };
 
@@ -193,16 +193,14 @@ export async function render(kind, params, el) {
     </form>
 
     ${plan ? `<div id="reviewMount" style="margin-top:16px"></div>`
-           : `<section class="card muted" style="margin-top:16px">Save the plan to attach screenshots and run a Claude review.</section>`}
+           : `<section class="card muted" style="margin-top:16px">Save the plan to attach screenshots and export it.</section>`}
   `;
 
   wireForm(kind, el, settings, plan, { capFor, availStr });
 
   const reviewMount = el.querySelector('#reviewMount');
   if (reviewMount && plan) {
-    // No onApplyProposed - options/swing reviews aren't structured (no proposed fields) yet,
-    // so the "Fill in" button never renders for these kinds.
-    mountReviewPanel(reviewMount, { kind, refId: plan.id, tradeData: plan, rulesText: RULES_TEXT[kind], model: settings.review_model });
+    mountShotsPanel(reviewMount, { kind, refId: plan.id, tradeData: plan });
   }
 }
 

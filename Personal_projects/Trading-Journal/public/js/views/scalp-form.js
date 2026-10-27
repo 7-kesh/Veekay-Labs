@@ -6,15 +6,16 @@
 import { getScalpTrade, saveScalpTrade, deleteScalpTrade, getSettings, listScalpTrades, getTradeHistory, priorExitTime, getCapitalData } from '../db.js';
 import { capitalSummary, stripHtml } from '../capital.js';
 import { scalpResult, parseExits, num as calcNum, pctOf } from '../calc.js';
-import { run as ruleEngineRun } from '../rule-engine.js';
+import { runStrategy } from '../rule-engine.js';
 import { SETUPS, CATEGORIES, VIOLATIONS, EMOTIONS, ORDER_TYPES, MOM_SIGNS, TTM_COLORS, DIRECTIONS } from '../constants.js';
 import { money, px, num as fmtNum, signclass, esc, localDatetime, pct } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import * as setupC from '../setup-c.js';
-import { rulesTextFor } from '../strategy.js';
-import { mountReviewPanel } from '../review-panel.js';
+import { currentRules, STRATEGY_LABELS } from '../strategy.js';
+import { mountShotsPanel } from '../shots-panel.js';
 import { fld, yn, chips, acctPick } from '../fields.js';
 import { trackNewButton } from '../dirty.js';
+import { mountWatchouts } from './watchouts.js';
 
 export async function render(params, el) {
   const isNew = params.id === 'new';
@@ -38,6 +39,7 @@ export async function render(params, el) {
       <div class="actions"><a class="btn" href="#/scalp">All scalp trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New trade</button></div></div>
     <div id="capStrip">${stripHtml(capFor(t.account || 'paper'), 'Scalp')}</div>
+    <div id="watchMount"></div>
 
     <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" data-balance="${capFor(t.account || 'paper').level || ''}" data-available="${capFor(t.account || 'paper').set ? capFor(t.account || 'paper').available : ''}" autocomplete="off">
     <div class="sheet">
@@ -155,10 +157,12 @@ export async function render(params, el) {
               ${[['success', 'Success'], ['fail', 'Fail'], ['contaminated', 'Contaminated'], ['', '–']].map(([v, lbl]) =>
                 `<label><input type="radio" name="tally_2candle" value="${v}" ${(t.tally_2candle || '') === v ? 'checked' : ''}><span>${lbl}</span></label>`).join('')}
             </div></div>
+          ` : ''}
           <div class="fld f-fill">
-            <button type="button" class="btn" id="checkRules">Check against rules</button>
+            <button type="button" class="btn" id="checkRules">Check against strategy rules</button>
+            <span class="muted note">Grades what is on this form against your strategy; nothing is saved.</span>
             <div id="rulesOut" class="rules-out"></div>
-          </div>` : ''}
+          </div>
         </div>
         <div></div>
         <div class="cells" style="grid-column:2;flex-direction:column;align-items:stretch;gap:8px;margin-top:4px">
@@ -192,15 +196,10 @@ export async function render(params, el) {
 
   wireForm();
 
+  mountWatchouts(el.querySelector('#watchMount'));
   const reviewMount = el.querySelector('#reviewMount');
-  const rulesText = await rulesTextFor('scalp', t.date);
-  mountReviewPanel(reviewMount, {
+  mountShotsPanel(reviewMount, {
     kind: 'scalp', refId: trade ? trade.id : null, tradeData: trade,
-    rulesText, model: settings.review_model,
-    onApplyProposed: (proposed) => applyProposed(proposed),
-    // Called on first upload/review action if no trade exists yet - saves a draft from
-    // whatever is currently in the form (Veekay's "always enable Claude to upload
-    // screenshots" - screenshots and review work before the first explicit Save).
     ensureRefId: async () => {
       const id = await persist(collectFormValues());
       trade = await getScalpTrade(id);
@@ -235,27 +234,6 @@ export async function render(params, el) {
     }
     formObj.violations ||= []; formObj.emotions ||= [];
     return formObj;
-  }
-
-  function applyProposed(p) {
-    const form = el.querySelector('#scalpForm');
-    if (!form) return;
-    ['setup', 'setup_valid', 'entry_valid', 'exit_valid',
-      'structure_valid', 'trigger_valid', 'extended', 'ema_alignment'].forEach((name) => {
-      if (!p[name]) return;
-      const r = form.querySelector(`input[name="${name}"][value="${p[name]}"]`);
-      if (r) r.checked = true;
-    });
-    ['category', 'mom_sign', 'mom_direction', 'ttm_color', 'ttm_direction'].forEach((name) => {
-      if (!p[name]) return;
-      const sel = form.querySelector(`select[name="${name}"]`);
-      if (sel) sel.value = p[name];
-    });
-    ['violations', 'emotions'].forEach((name) => {
-      const vals = p[name] || [];
-      form.querySelectorAll(`input[name="${name}"]`).forEach((cb) => { cb.checked = vals.includes(cb.value); });
-    });
-    form.dispatchEvent(new Event('change'));
   }
 
   function wireForm() {
@@ -375,25 +353,41 @@ export async function render(params, el) {
 
     update();
 
-    // Rule engine check - runs against the CURRENT form values, nothing is saved by this.
+    // Full manual rule check: grades the CURRENT form values against the strategy rules (as written
+    // on the trade's date). Nothing is saved and no AI is involved.
     const checkBtn = el.querySelector('#checkRules');
     if (checkBtn) {
+      const ICON = { pass: '✓', fail: '✗', warn: '!', insufficient_evidence: '–', manual: '◎' };
+      const CLS = { pass: 'ok', fail: 'neg', warn: 'warn', insufficient_evidence: 'dim', manual: 'dim' };
       checkBtn.addEventListener('click', async () => {
         const out = el.querySelector('#rulesOut');
         out.textContent = 'Checking…'; checkBtn.disabled = true;
         try {
+          const v = n => (form.elements[n] ? String(form.elements[n].value) : ''); // radio groups give the checked value
           const formTrade = {
-            entry_price: $('entry_price').value, stop: $('stop').value, shares: $('shares').value,
-            entry_time: $('entry_time').value, category: $('category').value,
+            setup: v('setup'), entry_price: v('entry_price'), stop: v('stop'), shares: v('shares'), entry_time: v('entry_time'),
+            exit_time: v('exit_time'), exits_text: v('exits_text'), support_below: v('support_below'), resistance_above: v('resistance_above'),
+            structure_valid: v('structure_valid'), trigger_valid: v('trigger_valid'), extended: v('extended'), ema_alignment: v('ema_alignment'),
+            mom_sign: v('mom_sign'), mom_direction: v('mom_direction'), ttm_color: v('ttm_color'), ttm_direction: v('ttm_direction'),
+            entry_valid: v('entry_valid'), exit_valid: v('exit_valid'), category: v('category'),
             violations: Array.from(form.querySelectorAll('[name=violations]:checked')).map(c => c.value),
           };
-          const prior = trade ? await priorExitTime(t.ticker.toUpperCase(), $('date').value, trade.id, formTrade.entry_time) : null;
-          const riskDollars = parseFloat(settings.scalp_risk_dollars || 20) || 20;
-          const flags = ruleEngineRun(formTrade, prior, riskDollars);
-          out.innerHTML = flags.map(fl => {
-            const cls = fl.status === 'pass' ? 'ok' : (fl.status === 'insufficient_evidence' ? 'warn' : 'neg');
-            return `<div class="flagrow ${cls}"><b>${fl.check.replace(/_/g, ' ')}</b> ${esc(fl.message)}</div>`;
-          }).join('');
+          const date = v('date');
+          const [prior, rules] = await Promise.all([
+            v('ticker') ? priorExitTime(v('ticker').toUpperCase(), date, trade ? trade.id : -1, formTrade.entry_time) : null,
+            currentRules('scalp', date || null),
+          ]);
+          const { checks, summary } = runStrategy(formTrade, {
+            priorExitTime: prior, riskDollars: parseFloat(settings.scalp_risk_dollars || 20) || 20,
+            setupC: { room_vs_risk: v('room_vs_risk'), declared_before_entry: v('declared_before_entry'), ema_hold_2candle: v('ema_hold_2candle'),
+              crossed_prev_candle_high: v('crossed_prev_candle_high'), danger_structure: v('danger_structure') },
+          });
+          const groups = [...new Set(checks.map(c => c.group))];
+          out.innerHTML = `<div class="rulesum"><b class="neg">${summary.fail} fail</b> · <b class="warn">${summary.warn} warn</b> · <b class="pos">${summary.pass} pass</b>
+              · ${summary.insufficient_evidence} not recorded · ${summary.manual} need the chart</div>`
+            + groups.map(g => `<div class="rgroup"><h4>${esc(g)}</h4>${checks.filter(c => c.group === g).map(c => `
+              <div class="flagrow ${CLS[c.status]}" title="${esc(rules[c.rule] || '')}"><span class="ric">${ICON[c.status]}</span><b>${esc(c.title)}</b> ${esc(c.message)}
+                <span class="rulekey">${esc(STRATEGY_LABELS[c.rule] || c.rule)}</span></div>`).join('')}</div>`).join('');
         } catch (e) {
           out.textContent = 'Could not run the checks.';
           console.error(e);

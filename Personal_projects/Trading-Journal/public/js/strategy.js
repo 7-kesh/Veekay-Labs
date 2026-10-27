@@ -3,7 +3,6 @@
 // never edited in place - apply_change() closes the old row (effective_to) and opens a new one
 // (effective_from), so every trade is graded against what was in force on ITS OWN date.
 import { supabase } from './supabase-client.js';
-import { getSession } from './auth.js';
 
 export const SEED_DATE = '2026-10-19';
 
@@ -131,16 +130,9 @@ export async function applyChange(kind, ruleKey, newText, effectiveFrom, effect,
   })).error);
 }
 
-// Calls the /api/classify-change Pages Function (keeps the Anthropic key server-side).
-export async function classifyChange(ruleKey, originalText, newText, model) {
-  const session = await getSession();
-  if (!session) throw new Error('Not signed in.');
-  const res = await fetch('/api/classify-change', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${session.access_token}` },
-    body: JSON.stringify({ ruleKey, originalText, newText, model }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error([data.error, data.reason].filter(Boolean).join(': ') || 'Could not classify the change.');
-  return data;
-}
+// What a rule change does to the strategy. Chosen by you on the Strategy page (it used to be a
+// Claude classification); stored in strategy_change_log.effect as before.
+export const CHANGE_EFFECTS = [
+  ['tighter', 'tighter (stricter than before)'], ['looser', 'looser (easier than before)'],
+  ['addition', 'an addition (new rule)'], ['definition', 'a clearer definition (same meaning)'], ['reversal', 'a reversal'],
+];

@@ -661,3 +661,17 @@ html[data-theme="dark"] .head .actions{background:none;border:0}
 .lvsvg .ln{stroke:var(--sec);fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
 .lvsvg .dot{fill:var(--card);stroke:var(--sec);stroke-width:2}
 @media (max-width:900px){.lvrow{grid-template-columns:70px 1fr}.lvnum{grid-column:1/-1}}
+
+/* rule check output, problem rates */
+.rules-out .rulesum{padding:6px 2px 8px;font-size:13px}.rules-out .rgroup{margin-bottom:10px}
+.rules-out h4{margin:6px 0 4px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.flagrow.dim{background:var(--field);color:var(--muted);border-left-color:var(--line)}
+.flagrow .ric{display:inline-block;width:16px;font-weight:800}.flagrow .rulekey{float:right;font-size:11px;opacity:.75;margin-left:10px}
+.habitnote{margin:0 0 10px}
+.prow{display:grid;grid-template-columns:minmax(120px,1.3fr) minmax(80px,1fr) auto;gap:10px;align-items:center;padding:5px 0;font-size:13px}
+.pbar{height:9px;border-radius:5px;background:var(--field);border:1px solid var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--warn),var(--neg))}
+.pnum small{color:var(--muted)}
+.card.watch{background:linear-gradient(90deg,var(--warn),#F2C46E) top/100% 3px no-repeat,linear-gradient(180deg,#fff,#FFFCF6);margin-bottom:14px}
+html[data-theme="dark"] .card.watch{background:linear-gradient(90deg,var(--warn),#FFD38C) top/100% 3px no-repeat,linear-gradient(165deg,#1B1A22 0%,#0E1A2E 100%)}
+.watchlist{margin:0;padding-left:20px}.watchlist li{margin:6px 0}.watchlist .muted{display:block;font-size:12.5px}
