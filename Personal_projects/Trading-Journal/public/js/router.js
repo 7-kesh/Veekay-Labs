@@ -19,7 +19,7 @@ export function navigate(path) {
 
 export async function dispatch() {
   if (!mountEl) return;
-  const path = (window.location.hash || '#/today').slice(2);
+  const path = (window.location.hash || '#/stats/portfolio').slice(2);
   const [route, qs] = path.split('?');
   const params = {};
   if (qs) for (const [k, v] of new URLSearchParams(qs)) params[k] = v;

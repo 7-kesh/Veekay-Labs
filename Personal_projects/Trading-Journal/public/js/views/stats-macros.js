@@ -55,7 +55,7 @@ export function focusListHtml(items, showArea = false) {
 }
 
 export function focusBlockHtml(focusItems) {
-  return `<section class="card focus"><h2>Focus now <small class="muted">the specific things costing you most, judged from your own data</small></h2>
+  return `<section class="card focus"><h2>Biggest leaks <small class="muted">the specific habits costing you most, judged from your own data</small></h2>
     ${focusItems.length ? focusListHtml(focusItems) + '<p class="muted note">Each item is measured on its own trades, so the savings overlap and should not be added together.</p>'
       : '<p class="muted">No single behaviour stands out yet. This fills in once there are about 5 or more closed, tagged trades.</p>'}
   </section>`;

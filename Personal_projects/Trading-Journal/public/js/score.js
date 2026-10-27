@@ -86,7 +86,7 @@ export function radarSvg(axes) {
 }
 
 // The two cards as one HTML block. `title` is the page's trade-type label.
-export function overviewHtml(score, m) {
+export function overviewHtml(score, m, { stack = false } = {}) {
   const gauge = `<section class="card ov-gauge"><h2>Trade win %</h2>
     <div class="gaugewrap">${gaugeSvg(m)}<div class="gnum">${m.win_pct == null ? '–' : Math.round(m.win_pct) + '%'}</div></div>
     <div class="gbadges"><span class="gb w">${m.wins} W</span>${m.flat ? `<span class="gb f">${m.flat} flat</span>` : ''}<span class="gb l">${m.losses} L</span></div></section>`;
@@ -97,5 +97,5 @@ export function overviewHtml(score, m) {
       <div class="scorebar"><i style="left:${pos}%"></i></div><div class="scorescale"><span>0</span><span>50</span><span>100</span></div>
       ${score.lowSample ? `<p class="muted note">Fewer than 20 trades here, so treat this as a rough read.</p>` : ''}</div></div>
     <p class="muted note">Each area is scored 0-100 against a target: ${score.axes.map(a => `${esc(a.label)} (${esc(a.target)})`).join(' · ')}. The score is their average.</p></section>`;
-  return `<div class="overview">${gauge}${card}</div>`;
+  return `<div class="overview${stack ? ' stack' : ''}">${gauge}${card}</div>`;
 }

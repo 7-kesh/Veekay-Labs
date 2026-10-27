@@ -1,13 +1,34 @@
 // Port of app/templates/stats_kind.html.
-import { allYears } from '../db.js';
+import { allYears, listImprovements, listScalpTrades } from '../db.js';
 import { statsData } from '../stats.js';
 import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters, rate, focusBlockHtml, areasBlockHtml, chartBlockHtml } from './stats-macros.js';
 import { money, signclass, num as fmtNum, esc } from '../format.js';
 import { tradingScore, overviewHtml } from '../score.js';
 import { CATEGORIES } from '../constants.js';
+import { rankImprovements } from '../improvement-rank.js';
 
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
+
+// Top imported improvements (from Claude chat wrap-ups), ranked by what their target costs. They
+// are measured on scalp trades, so only the Scalp page lists them. Never breaks the page: if the
+// wrap-up tables don't exist yet, the card just says so.
+async function improvementsCard(kind, title) {
+  const more = '<p class="muted note"><a href="#/improvements">All improvements</a></p>';
+  if (kind !== 'scalp') {
+    return `<section class="card imps"><h2>Improvements <small class="muted">from your Claude wrap-ups</small></h2>
+      <p class="muted">Wrap-up improvements are measured on scalp trades, so none apply to ${esc(title.toLowerCase())} yet.</p>${more}</section>`;
+  }
+  try {
+    const [items, trades] = await Promise.all([listImprovements(), listScalpTrades({})]);
+    const top = rankImprovements(items, trades).slice(0, 3);
+    if (!top.length) return `<section class="card imps"><h2>Improvements <small class="muted">from your Claude wrap-ups</small></h2><p class="muted">No active improvements. Import a wrap-up to add some.</p>${more}</section>`;
+    return `<section class="card imps"><h2>Improvements to work on <small class="muted">ranked by what they cost you</small></h2>
+      <ol class="implist">${top.map(i => `<li>${esc(i.text)} <span class="muted">${i.cost != null ? `- ${money(i.cost)} lost on ${i.n} tagged trade(s)` : '- no dollar target'}${i.status === 'adopted' ? ' · adopted' : ''}</span></li>`).join('')}</ol>${more}</section>`;
+  } catch {
+    return `<section class="card imps"><h2>Improvements</h2><p class="muted">Improvements are not set up yet.</p>${more}</section>`;
+  }
+}
 
 export async function render(kind, params, el) {
   const period = params.period || 'all', account = params.account || 'live';
@@ -53,9 +74,9 @@ export async function render(kind, params, el) {
   }
 
   el.innerHTML = `
-    <div class="head"><h1>${title} stats</h1>${filtersHtml(period, account, kind === 'scalp' ? 'stats/scalp' : `stats/${kind}`, years)}</div>
+    <div class="head pagehero"><h1>${title} stats</h1>${filtersHtml(period, account, kind === 'scalp' ? 'stats/scalp' : `stats/${kind}`, years)}</div>
     ${overviewHtml(tradingScore({ m: d.charts[kind].m, points: d.charts[kind].points, entryOk: (kind === 'scalp' ? d.scalp : d.plans[kind]).entry_ok, exitOk: (kind === 'scalp' ? d.scalp : d.plans[kind]).exit_ok }), d.charts[kind].m)}
-    ${focusBlockHtml(d.focus[kind])}
+    <div class="improve">${focusBlockHtml(d.focus[kind])}${await improvementsCard(kind, title)}</div>
     ${areasBlockHtml(d.areas[kind])}
     ${chartBlockHtml(kind, title, d.charts[kind])}
     ${detail}

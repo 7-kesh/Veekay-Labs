@@ -47,7 +47,7 @@ mount(app);
 
 // The sidebar's active item and the page's section color (scalp / options / swing / home) follow the route.
 function updateChrome() {
-  const path = (window.location.hash || '#/today').slice(2).split('?')[0];
+  const path = (window.location.hash || '#/stats/portfolio').slice(2).split('?')[0];
   const first = path.split('/')[0];
   const sec = path.startsWith('stats/') ? path.split('/')[1] : first;
   document.body.className = ['scalp', 'options', 'swing', 'futures'].includes(sec) ? 'sec-' + sec : '';
@@ -84,7 +84,7 @@ async function showAuthed(session) {
   await ensureSettings();
   await seedStrategyIfEmpty();
   purgeOldScreenshots().catch(err => console.error('screenshot purge failed', err));
-  if (!window.location.hash) navigate('today');
+  if (!window.location.hash) navigate('stats/portfolio');
   updateChrome();
   dispatch();
 }
