@@ -1,9 +1,9 @@
 // Data layer over Supabase - port of app/db.py + the trade-save logic in app/routes.py's
 // _save_scalp / _next_trade_no / _suggest_category, plus app/audit.py's log_changes.
 import { supabase } from './supabase-client.js';
-import { cleanNumber } from './numeric.js';
+import { cleanNumber, cleanDate } from './numeric.js';
 import { DEFAULT_SETTINGS } from './constants.js';
-import { scalpResult, optionsPlan, swingPlan, realized, num as calcNum } from './calc.js';
+import { scalpResult, optionsPlan, swingPlan, realized, estimateOptionPremiums, num as calcNum } from './calc.js';
 import * as setupC from './setup-c.js';
 import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS } from './constants.js';
 
@@ -254,7 +254,8 @@ export async function getPatternDigest({ setup, excludeId, limit = 80 } = {}) {
 export async function listPlans(kind, { status = 'all', account = 'all' } = {}) {
   let query = supabase.from('plans').select('*').eq('kind', kind);
   if (account !== 'all') query = query.eq('account', account);
-  if (status !== 'all') query = query.eq('status', status);
+  if (status === 'active') query = query.in('status', ['planned', 'open']);
+  else if (status !== 'all') query = query.eq('status', status);
   const { data, error } = await query;
   rethrow(error);
   const order = { open: 0, planned: 1 };
@@ -280,12 +281,18 @@ export async function savePlan(kind, id, form, settings) {
   const v = {};
   for (const k of ['plan_date', 'thesis', 'expiry', 'entry_date', 'exit_date', 'exit_reason', 'exit_scenario',
     'entry_followed', 'exit_followed', 'orders_text', 'notes']) v[k] = form[k] || '';
+  for (const k of ['plan_date', 'expiry', 'entry_date', 'exit_date']) {
+    if (!v[k]) continue;
+    const fixed = cleanDate(v[k]);
+    if (!fixed) throw new Error(`Could not read "${v[k]}" as a date (${k.replace('_', ' ')}). Use YYYY-MM-DD.`);
+    v[k] = fixed;
+  }
   v.ticker = (form.ticker || '').toUpperCase();
   v.direction = form.direction || '';
   v.account = form.account === 'live' ? 'live' : 'paper';
   for (const k of ['strike', 'delta', 'bid_ask_spread', 'volume', 'open_interest', 'underlying_entry', 'underlying_stop',
     'underlying_target', 'entry_price', 'stop_price', 'target_price', 'qty', 'account_balance', 'risk_pct',
-    'actual_entry', 'actual_exit', 'fees']) v[k] = numOrNull(form[k]);
+    'actual_entry', 'actual_exit', 'fees', 'gamma', 'theta', 'hold_days', 'iv', 'iv_shift', 'bid', 'ask']) v[k] = numOrNull(form[k]);
   if (v.account_balance === null) v.account_balance = calcNum(settings.account_balance);
   if (v.risk_pct === null) v.risk_pct = calcNum(kind === 'options' ? settings.options_risk_pct : settings.swing_risk_pct);
 
@@ -294,6 +301,10 @@ export async function savePlan(kind, id, form, settings) {
   for (const [key] of items) ticks[key] = !!form['chk_' + key];
   v.checklist = ticks;
 
+  if (kind === 'options') {
+    const est = estimateOptionPremiums(v);
+    v.est_premium_stop = est.stop; v.est_premium_target = est.target; v.est_method = est.method;
+  }
   const plan = planCalc(kind, v, settings);
   v.investment = plan.investment; v.planned_loss = plan.planned_loss;
   v.potential_profit = plan.potential_profit; v.rr = plan.rr;

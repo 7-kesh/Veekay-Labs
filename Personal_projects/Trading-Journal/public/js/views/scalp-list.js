@@ -1,5 +1,6 @@
-import { listScalpTrades, deleteScalpTrade, scalpYears } from '../db.js';
-import { money, signclass, px, esc } from '../format.js';
+import { listScalpTrades, deleteScalpTrade, scalpYears, getSettings } from '../db.js';
+import { pctOf, num as calcNum } from '../calc.js';
+import { money, signclass, px, esc, pct } from '../format.js';
 import { downloadCsv } from '../csv.js';
 import { dispatch } from '../router.js';
 import { pickAndExportDay } from '../export-picker.js';
@@ -34,6 +35,7 @@ export async function render(params, el) {
   if (year && !years.includes(year)) years.unshift(year);
   const rows = await listScalpTrades({ lo, hi, account, q });
   const net = rows.reduce((s, r) => s + (r.net_pnl || 0), 0);
+  const bal = calcNum((await getSettings()).account_balance);
 
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
   el.innerHTML = `
@@ -47,10 +49,10 @@ export async function render(params, el) {
       <input type="text" name="q" placeholder="Ticker" value="${esc(q)}" style="width:100px">
       <span class="muted">${rows.length} trades · Net <b class="${signclass(net)}">${money(net)}</b></span>
     </form>
-    <table class="dense"><thead><tr><th>Trade</th><th>Date</th><th>Ticker</th><th>Entry</th><th>Net</th><th>R</th><th>Cat</th><th>Status</th><th></th><th></th></tr></thead>
+    <table class="dense"><thead><tr><th>Trade</th><th>Date</th><th>Ticker</th><th>Entry</th><th>Net</th><th>% acct</th><th>R</th><th>Cat</th><th>Status</th><th></th><th></th></tr></thead>
     <tbody>${rows.map(r => `<tr>
       <td>${esc(r.trade_no)}</td><td>${esc(r.date)}</td><td><b>${esc(r.ticker)}</b></td><td>${px(r.entry_price)}</td>
-      <td class="${signclass(r.net_pnl)}">${money(r.net_pnl)}</td><td>${r.r_multiple ?? ''}</td><td>${esc(r.category || '')}</td>
+      <td class="${signclass(r.net_pnl)}">${money(r.net_pnl)}</td><td class="${signclass(r.net_pnl)}">${pct(pctOf(r.net_pnl, bal))}</td><td>${r.r_multiple ?? ''}</td><td>${esc(r.category || '')}</td>
       <td><span class="pill ${r.review_status === 'complete' ? 'closed' : 'open'}">${r.review_status === 'complete' ? 'complete' : 'draft'}</span></td>
       <td><a href="#/scalp/${r.id}">edit</a></td><td><a href="#" class="deleteRow neg" data-id="${r.id}" data-label="${esc(r.trade_no)}">delete</a></td></tr>`).join('') || '<tr><td colspan="10" class="muted">No trades in this range.</td></tr>'}
     </tbody></table>

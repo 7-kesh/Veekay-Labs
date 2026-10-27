@@ -1,10 +1,11 @@
 // Port of app/templates/plan_form.html + app/static/plan.js.
 import { getPlan, savePlan, deletePlan, getSettings } from '../db.js';
-import { optionsPlan, swingPlan, num as calcNum } from '../calc.js';
+import { optionsPlan, swingPlan, num as calcNum, liquidityVerdict, pctOf, premiumAt, stockAtPremium, premiumAtModel, stockAtPremiumModel, optionsSanity, LIQUIDITY } from '../calc.js';
 import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS, TIMEFRAMES, RULES_TEXT } from '../constants.js';
-import { money, px, num as fmtNum, signclass, esc } from '../format.js';
+import { money, px, num as fmtNum, signclass, esc, pct } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import { fld, yn, acctPick } from '../fields.js';
+import { cleanDate } from '../numeric.js';
 import { mountReviewPanel } from '../review-panel.js';
 
 const KIND_LABEL = { options: 'Options', swing: 'Swing' };
@@ -20,6 +21,16 @@ function planVsActual(p) {
     rows.push([`Exit price (plan: stop ${p.stop_price ?? ''} / target ${p.target_price ?? ''})`, null, p.actual_exit, where]);
     rows.push([`P/L ($) (plan: -${p.planned_loss ?? ''} / +${p.potential_profit ?? ''})`, null, p.realized_pl, null]);
     rows.push([`R multiple (plan reward-to-risk ${p.rr ?? 'n/a'})`, p.rr, p.realized_r, null]);
+    if (p.est_premium_stop !== null && p.est_premium_stop !== undefined) {
+      // A loser is judged against the stop estimate, a winner against the target estimate.
+      const loser = p.actual_exit < p.actual_entry;
+      const est = loser ? p.est_premium_stop : p.est_premium_target;
+      if (est !== null && est !== undefined) {
+        const off = p.actual_exit - est;
+        rows.push([`Premium estimate at stock ${loser ? 'stop' : 'target'} (${p.est_method})`, est, p.actual_exit,
+          `${off >= 0 ? '+' : '-'}$${Math.abs(off).toFixed(2)} per share vs estimate (${est ? (off / est * 100).toFixed(0) : '0'}%); estimate assumes the planned hold`]);
+      }
+    }
     if (p.planned_loss && p.realized_pl !== null && p.realized_pl < 0 && Math.abs(p.realized_pl) > p.planned_loss) {
       rows.push(['Loss vs planned loss', p.planned_loss, Math.abs(p.realized_pl), 'loss exceeded the plan']);
     }
@@ -55,11 +66,17 @@ export async function render(kind, params, el) {
           <div class="fld"><span class="lab">Direction</span>
             <div class="seg">${(opt ? ['call', 'put'] : ['long', 'short']).map(d =>
               `<label><input type="radio" name="direction" value="${d}" ${p.direction === d ? 'checked' : ''}><span>${d[0].toUpperCase() + d.slice(1)}</span></label>`).join('')}</div></div>
-          ${fld('plan_date', 'Plan date', p.plan_date, 'f-md', { type: 'date' })}
+          ${fld('plan_date', 'Plan date', p.plan_date, 'f-md', { hint: 'YYYY-MM-DD' })}
           ${opt ? fld('strike', 'Strike', px(p.strike), 'f-sm', { mode: 'decimal' }) : ''}
-          ${opt ? fld('expiry', 'Expiry', p.expiry || '', 'f-md', { type: 'date' }) : ''}
+          ${opt ? fld('expiry', 'Expiry', p.expiry || '', 'f-md', { hint: 'YYYY-MM-DD' }) : ''}
           ${opt ? fld('delta', 'Delta', fmtNum(p.delta), 'f-xs', { mode: 'decimal' }) : ''}
-          ${fld('thesis', 'Thesis', p.thesis || '', 'f-fill', { hint: 'trend, levels, trigger' })}
+          ${opt ? fld('gamma', 'Gamma', fmtNum(p.gamma), 'f-xs', { mode: 'decimal', hint: 'optional' }) : ''}
+          ${opt ? fld('theta', 'Theta', fmtNum(p.theta), 'f-xs', { mode: 'decimal', hint: '$/day' }) : ''}
+          ${opt ? fld('iv', 'IV %', fmtNum(p.iv), 'f-xs', { mode: 'decimal', hint: 'implied vol' }) : ''}
+          ${opt ? fld('iv_shift', 'IV change', fmtNum(p.iv_shift), 'f-xs', { mode: 'decimal', hint: 'pts at exit' }) : ''}
+          ${opt ? fld('hold_days', 'Hold days', fmtNum(p.hold_days), 'f-xs', { mode: 'decimal', hint: 'planned' }) : ''}
+          ${fld('thesis', 'Thesis', p.thesis || '', 'f-fill', { hint: 'trend · level · trigger',
+            placeholder: opt ? 'e.g. Daily uptrend; 4H pullback to 8 EMA near 768 support; enter on 15M reclaim, hold intraday' : 'e.g. Weekly uptrend; daily base breakout above 52; enter on 1H close above, hold days to weeks' })}
         </div></div>
 
       ${opt ? `<div class="rowline"><div class="rl"><i>·</i>Stock</div>
@@ -68,6 +85,11 @@ export async function render(kind, params, el) {
           ${fld('underlying_stop', 'Stock stop', px(p.underlying_stop), 'f-sm', { mode: 'decimal' })}
           ${fld('underlying_target', 'Stock target', px(p.underlying_target), 'f-sm', { mode: 'decimal' })}
           <p class="muted tf" style="align-self:center">${esc(TIMEFRAMES[kind])}</p>
+        </div>
+        <div></div>
+        <div class="cells" style="grid-column:2;flex-direction:column;align-items:stretch;gap:6px">
+          <div class="verdicts" id="fMove"></div>
+          <p class="muted" id="fMoveNote" style="margin:0;font-size:12px">Enter what you have. With IV, strike and expiry it reprices with Black-Scholes (covers gamma, theta, faster decay near expiry and IV change). Without IV it uses delta, plus gamma and theta if entered. Either way it's an approximation; the model is measured against your entry premium.</p>
         </div></div>` : ''}
 
       <div class="rowline plan"><div class="rl"><i>·</i>${opt ? 'Premiums' : 'Prices'}<br>and size</div>
@@ -86,7 +108,10 @@ export async function render(kind, params, el) {
             <div class="fc"><span>Investment</span><b id="fInvest">–</b></div>
             <div class="fc"><span>Risk budget</span><b id="fBudget">–</b></div>
             <div class="fc loss"><span>Planned loss</span><b id="fLoss">–</b></div>
+            <div class="fc loss"><span>Loss % of account</span><b id="fLossPct">–</b></div>
+            <div class="fc loss"><span>Loss % of cost</span><b id="fLossCost">–</b></div>
             <div class="fc gain"><span>Potential profit</span><b id="fProfit">–</b></div>
+            <div class="fc gain"><span>Profit % of account</span><b id="fProfitPct">–</b></div>
             <div class="fc rr"><span>Reward : risk</span><b id="fRR">–</b></div>
             <div class="fc"><span>${opt ? 'Max contracts' : 'Max shares'}</span><b id="fMax">–</b></div>
           </div>
@@ -95,9 +120,16 @@ export async function render(kind, params, el) {
 
       ${opt ? `<div class="rowline"><div class="rl"><i>·</i>Liquidity</div>
         <div class="cells">
-          ${fld('bid_ask_spread', 'Bid/ask $', px(p.bid_ask_spread), 'f-sm', { mode: 'decimal', hint: 'smaller' })}
+          <div class="fld f-xs"><label for="i_bid">Bid</label><input id="i_bid" name="bid" value="${esc(px(p.bid) ?? '')}" inputmode="decimal" autocomplete="off"></div>
+          <div class="fld f-xs"><label for="i_ask">Ask</label><input id="i_ask" name="ask" value="${esc(px(p.ask) ?? '')}" inputmode="decimal" autocomplete="off"></div>
+          ${fld('bid_ask_spread', 'Spread $', px(p.bid_ask_spread), 'f-sm', { mode: 'decimal', hint: 'ask − bid' })}
           ${fld('volume', 'Volume', fmtNum(p.volume), 'f-sm', { mode: 'numeric', hint: 'higher' })}
           ${fld('open_interest', 'Open interest', fmtNum(p.open_interest), 'f-md', { mode: 'numeric', hint: 'higher' })}
+        </div>
+        <div></div>
+        <div class="cells" style="grid-column:2;flex-direction:column;align-items:stretch;gap:6px">
+          <div class="verdicts" id="fLiq"></div>
+          <p class="muted" style="margin:0;font-size:12px">Spread is measured against the entry premium. Liquid = spread up to ${LIQUIDITY.spreadGoodPct}% (acceptable to ${LIQUIDITY.spreadOkPct}%), volume ${LIQUIDITY.minVolume}+, open interest ${LIQUIDITY.minOpenInterest}+. Type bid and ask and the spread fills in.</p>
         </div></div>` : ''}
 
       <div class="rowline" id="r-check"><div class="rl top0"><i>2</i>Entry<br>checklist</div>
@@ -105,16 +137,16 @@ export async function render(kind, params, el) {
           ${items.map(([key, text]) => `<label class="check"><input type="checkbox" name="chk_${key}" ${ticks[key] ? 'checked' : ''}> ${esc(text)}</label>`).join('')}
         </div></div>
 
-      <div class="rowline" id="r-entry"><div class="rl"><i>3</i>Entry<br>actuals</div>
+      <div class="rowline" id="r-entry"><div class="rl"><i>3</i>Entry<br>actuals<small class="muted" style="display:block;font-weight:400">after you enter</small></div>
         <div class="cells">
-          ${fld('entry_date', 'Entry date', p.entry_date || '', 'f-md', { type: 'date' })}
+          ${fld('entry_date', 'Entry date', p.entry_date || '', 'f-md', { hint: 'YYYY-MM-DD' })}
           ${fld('actual_entry', 'Actual entry', px(p.actual_entry), 'f-sm', { mode: 'decimal' })}
           ${yn('entry_followed', p.entry_followed, 'Entry strategy followed')}
         </div></div>
 
-      <div class="rowline" id="r-exit"><div class="rl"><i>4</i>Exit<br>actuals</div>
+      <div class="rowline" id="r-exit"><div class="rl"><i>4</i>Exit<br>actuals<small class="muted" style="display:block;font-weight:400">after you exit</small></div>
         <div class="cells">
-          ${fld('exit_date', 'Exit date', p.exit_date || '', 'f-md', { type: 'date' })}
+          ${fld('exit_date', 'Exit date', p.exit_date || '', 'f-md', { hint: 'YYYY-MM-DD' })}
           ${fld('actual_exit', 'Actual exit', px(p.actual_exit), 'f-sm', { mode: 'decimal' })}
           ${fld('fees', 'Fees $', px(p.fees), 'f-xs', { mode: 'decimal' })}
           <div class="fld f-fill"><label for="exit_scenario">What happened at the exit</label>
@@ -139,7 +171,7 @@ export async function render(kind, params, el) {
         <td><b>${actual !== null && actual !== undefined ? px(actual) : ''}</b></td><td class="muted">${esc(note || '')}</td></tr>`).join('')}
       ${plan && plan.realized_pl !== null && plan.realized_pl !== undefined ? `<tr class="total"><td>Realized</td><td></td>
         <td><b class="${signclass(plan.realized_pl)}">${money(plan.realized_pl)}</b></td>
-        <td class="muted">${plan.roi !== null && plan.roi !== undefined ? 'ROI ' + fmtNum(plan.roi) + '%' : ''}</td></tr>` : ''}
+        <td class="muted">${plan.roi !== null && plan.roi !== undefined ? 'ROI ' + fmtNum(plan.roi) + '%' : ''}${pctOf(plan.realized_pl, plan.account_balance) !== null ? ' · ' + pct(pctOf(plan.realized_pl, plan.account_balance)) + ' of account' : ''}</td></tr>` : ''}
       </tbody></table></section>` : ''}
 
     <div class="actions">
@@ -195,6 +227,8 @@ function wireForm(kind, el, settings, plan) {
     el.querySelector('#fBudget').textContent = moneyFmt(budget);
     el.querySelector('#fLoss').textContent = moneyFmt(loss);
     el.querySelector('#fProfit').textContent = moneyFmt(profit);
+    const pc = (id, v, sign = '') => { el.querySelector(id).textContent = v === null ? '–' : sign + v.toFixed(2) + '%'; };
+    pc('#fLossPct', pctOf(loss, bal), '-'); pc('#fLossCost', pctOf(loss, invest), '-'); pc('#fProfitPct', pctOf(profit, bal), '+');
     el.querySelector('#fRR').textContent = rr === null ? '–' : rr.toFixed(2) + ' : 1';
     el.querySelector('#fMax').textContent = max === null ? '–' : String(max);
     const v = [];
@@ -205,6 +239,50 @@ function wireForm(kind, el, settings, plan) {
     if (!opt && v.length === 3) v.push(`<span class="v ${v.join('').indexOf('bad') < 0 ? 'ok">QUALIFIED' : 'bad">NOT QUALIFIED'}</span>`);
     bad.forEach(b => v.push(`<span class="v bad">${b}</span>`));
     el.querySelector('#fVerdicts').innerHTML = v.join('');
+    if (opt) updateOptions({ e, s, t, q, mult, budget, loss });
+  }
+
+  function updateOptions({ e, s, t, q, mult, budget, loss }) {
+    const dir = (form.querySelector('[name=direction]:checked') || {}).value;
+    const se = num('underlying_entry'), ss = num('underlying_stop'), st = num('underlying_target'), d = num('delta');
+    const chip = (ok, text) => `<span class="v ${ok ? 'ok' : 'bad'}">${ok ? '✓ ' : '✗ '}${text}</span>`;
+    const info = text => `<span class="v">${text}</span>`;
+    const out = [];
+    optionsSanity(dir, se, ss, st, num('strike')).forEach(w => out.push(chip(false, w)));
+    const gk = { gamma: num('gamma') ?? 0, theta: num('theta') ?? 0, days: num('hold_days') ?? 0 };
+    const mp = { strike: num('strike'), iv: num('iv'), ivShift: num('iv_shift') ?? 0, expiry: cleanDate(form.elements.expiry.value),
+      planDate: cleanDate(form.elements.plan_date.value) || undefined, days: gk.days };
+    const useModel = premiumAtModel(se, se, e, dir, mp) !== null && e !== null;
+    const premAt = S => useModel ? premiumAtModel(S, se, e, dir, mp) : premiumAt(S, se, d, e, dir, gk);
+    const stockAt = P => useModel ? stockAtPremiumModel(P, se, e, dir, mp) : stockAtPremium(P, se, d, e, dir, gk);
+    const pStop = premAt(ss), pTgt = premAt(st);
+    if (pStop !== null) {
+      const l = (e - pStop) * mult * q;
+      out.push(info(`Stock stop ${px(ss)} → est. premium ${px(pStop)}`));
+      out.push(chip(l <= budget, `est. loss ${moneyFmt(l)} ${l <= budget ? 'within' : 'over'} the ${moneyFmt(budget)} risk budget`));
+      if (loss !== null && s !== null) out.push(chip(pStop >= s, pStop >= s ? `premium stop ${px(s)} is not hit before the stock stop` : `premium stop ${px(s)} is hit before the stock stop (est. at stock stop: ${px(pStop)})`));
+    }
+    if (pTgt !== null) out.push(info(`Stock target ${px(st)} → est. premium ${px(pTgt)} (${moneyFmt((pTgt - e) * mult * q)})`));
+    const sAtStop = stockAt(s), sAtTgt = stockAt(t);
+    if (sAtStop !== null) out.push(info(`Premium stop ≈ stock at ${px(sAtStop)}`));
+    if (sAtTgt !== null) out.push(info(`Premium target ≈ stock at ${px(sAtTgt)}`));
+    if (out.length) out.unshift(`<span class="v"><b>${useModel ? `Black-Scholes at IV ${mp.iv}%${mp.ivShift ? ` (${mp.ivShift > 0 ? '+' : ''}${mp.ivShift} pts at exit)` : ''}` : 'Delta / gamma / theta'}</b></span>`);
+    el.querySelector('#fMove').innerHTML = out.join('') || '<span class="muted">Enter stock entry, stop, target, delta and the entry premium to see the estimated premium move.</span>';
+
+    const lq = liquidityVerdict(num('bid_ask_spread'), e, num('volume'), num('open_interest'));
+    const label = { liquid: 'Liquid', marginal: 'Marginal', illiquid: 'Illiquid' };
+    el.querySelector('#fLiq').innerHTML = lq.verdict
+      ? `<span class="v ${lq.verdict === 'liquid' ? 'ok' : lq.verdict === 'illiquid' ? 'bad' : ''}"><b>${label[lq.verdict]}</b></span>` + lq.checks.map(c => chip(c.ok, c.text)).join('')
+      : '<span class="muted">Enter the spread (or bid and ask), volume and open interest for a verdict.</span>';
+  }
+
+  const bid = form.querySelector('#i_bid'), ask = form.querySelector('#i_ask');
+  if (bid && ask) {
+    const fill = () => {
+      const b = parseFloat(bid.value), a = parseFloat(ask.value);
+      if (!Number.isNaN(b) && !Number.isNaN(a) && a >= b) { form.elements.bid_ask_spread.value = (Math.round((a - b) * 100) / 100).toString(); update(); }
+    };
+    bid.addEventListener('input', fill); ask.addEventListener('input', fill);
   }
   form.addEventListener('input', update); form.addEventListener('change', update); update();
 

@@ -30,7 +30,7 @@ export async function render(params, el) {
     <div class="head"><h1>${trade ? `Edit ${esc(trade.trade_no)} &middot; ${esc(trade.ticker)}` : 'New scalp trade'}</h1>
       <a class="btn" href="#/scalp">All scalp trades</a></div>
 
-    <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" autocomplete="off">
+    <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" data-balance="${esc(settings.account_balance)}" autocomplete="off">
     <div class="sheet">
 
       <!-- 1: Trade + Setup -->
@@ -92,8 +92,8 @@ export async function render(params, el) {
             </details>
           </div>
           <div class="live" id="calc">
-            <div class="n"><span>Risk</span><b id="cRisk">–</b></div><div class="n"><span>Gross</span><b id="cGross">–</b></div>
-            <div class="n"><span>Net</span><b id="cNet">–</b></div><div class="n"><span>R</span><b id="cR">–</b></div>
+            <div class="n"><span>Risk</span><b id="cRisk">–</b></div><div class="n"><span>Risk % acct</span><b id="cRiskPct">–</b></div><div class="n"><span>Gross</span><b id="cGross">–</b></div>
+            <div class="n"><span>Net</span><b id="cNet">–</b></div><div class="n"><span>Net % acct</span><b id="cNetPct">–</b></div><div class="n"><span>R</span><b id="cR">–</b></div>
             <span id="cWarn" class="warn neg"></span>
           </div>
           <div id="manualNet" hidden>${fld('net_manual', 'Net P&L $', trade ? px(trade.net_pnl) : '', 'f-sm', { mode: 'decimal', hint: 'only if exits can’t be parsed' })}</div>
@@ -274,6 +274,9 @@ export async function render(params, el) {
       if (st && e && st >= e) warn.push('Stop should be below the entry.');
       if (res.planned_risk && res.planned_risk > budget) warn.push(`Planned risk is over your ${money(budget)} 1R.`);
       el.querySelector('#cRisk').textContent = money(res.planned_risk);
+      const bal = calcNum(form.dataset.balance), rp = pctOf(res.planned_risk, bal), np = pctOf(res.net_pnl, bal);
+      el.querySelector('#cRiskPct').textContent = rp === null ? '–' : rp.toFixed(2) + '%';
+      const npEl = el.querySelector('#cNetPct'); npEl.textContent = np === null ? '–' : pct(np); npEl.className = np === null ? '' : (np >= 0 ? 'pos' : 'neg');
       el.querySelector('#cGross').textContent = money(res.gross_pnl);
       const n = el.querySelector('#cNet'); n.textContent = money(res.net_pnl); n.className = res.net_pnl === null ? '' : (res.net_pnl >= 0 ? 'pos' : 'neg');
       el.querySelector('#cR').textContent = res.r_multiple === null ? '–' : res.r_multiple.toFixed(2) + 'R';

@@ -2,9 +2,9 @@
 import { esc } from './format.js';
 
 export function fld(name, label, value, cls, opts = {}) {
-  const { type = 'text', mode = '', extra = '', hint = '' } = opts;
+  const { type = 'text', mode = '', extra = '', hint = '', placeholder = '' } = opts;
   return `<div class="fld ${cls}"><label for="i_${name}">${label}${hint ? ` <small>${hint}</small>` : ''}</label>
-    <input id="i_${name}" type="${type}" name="${name}" value="${esc(value ?? '')}" ${mode ? `inputmode="${mode}"` : ''} ${extra}></div>`;
+    <input id="i_${name}" type="${type}" name="${name}" value="${esc(value ?? '')}" ${mode ? `inputmode="${mode}"` : ''} ${placeholder ? `placeholder="${esc(placeholder)}"` : ''} ${extra}></div>`;
 }
 
 export function yn(name, value, label) {
