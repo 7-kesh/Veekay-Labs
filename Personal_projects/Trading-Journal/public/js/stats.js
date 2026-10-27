@@ -32,8 +32,10 @@ function monday(dateStr) {
 
 export async function statsData(period = 'all', account = 'all') {
   const [lo, hi] = periodBounds(period);
-  const settings = await getSettings();
-  const rows = await listScalpTrades({ lo, hi, account });
+  // Everything is independent, so fetch it together (one round trip instead of four in a row).
+  const [settings, rows, planRows] = await Promise.all([
+    getSettings(), listScalpTrades({ lo, hi, account }), Promise.all(KINDS.map(k => listPlans(k, { account }))),
+  ]);
   const known = rows.filter(r => r.net_pnl !== null);
   const wins = known.filter(r => win(r.net_pnl));
   const rs = known.map(r => r.r_multiple).filter(v => v !== null && v !== undefined);
@@ -68,8 +70,8 @@ export async function statsData(period = 'all', account = 'all') {
   }
 
   const plans = {};
-  for (const kind of KINDS) {
-    const pr = await listPlans(kind, { account });
+  for (const [ki, kind] of KINDS.entries()) {
+    const pr = planRows[ki];
     const prFiltered = lo ? pr.filter(p => p.plan_date >= lo && p.plan_date <= hi) : pr;
     const closed = prFiltered.filter(p => p.status === 'closed');
     const byExit = [...closed].sort((a, b) => ((a.exit_date || a.plan_date) + '').localeCompare((b.exit_date || b.plan_date) + '') || a.id - b.id);
@@ -90,7 +92,7 @@ export async function statsData(period = 'all', account = 'all') {
   for (const k of ['scalp', ...KINDS]) focusByKind[k] = focus(areas[k], charts[k].m, 3, k);
 
   return {
-    period, account, charts, areas, focus: focusByKind, scalp,
+    period, account, settings, charts, areas, focus: focusByKind, scalp,
     by_setup: [...bySetup.entries()].sort((a, b) => a[0].localeCompare(b[0])),
     by_week: [...byWeek.entries()].sort((a, b) => b[0].localeCompare(a[0])).slice(0, 12),
     plans, scenario_label: Object.fromEntries(EXIT_SCENARIOS.map(([k, t]) => [k, t])),

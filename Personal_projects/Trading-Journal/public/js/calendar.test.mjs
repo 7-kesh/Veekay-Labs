@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { dayTotals, monthGrid, yearMonths, calendarHtml } from './calendar.js';
+import { dayTotals, monthGrid, yearMonths, calendarHtml, splitFuture } from './calendar.js';
 
 const t = dayTotals([
   { date: '2026-10-15', pnl: 0.58 }, { date: '2026-10-15', pnl: -0.08 },
@@ -27,4 +27,8 @@ assert.ok(html.includes('2026/10') && html.includes('-$19.50') && html.includes(
 assert.ok(!/NaN|undefined/.test(html), 'no NaN/undefined');
 const yh = calendarHtml({ account: 'paper', view: 'year', y: 2026, m: 9 }, t, 0);
 assert.ok(yh.includes('Oct') && !/NaN|undefined/.test(yh), 'year html');
+const sp = splitFuture([{ date: '2026-10-27', pnl: 1 }, { date: '2026-10-30', pnl: 2 }, { date: '2026-10-28', pnl: 3 }], '2026-10-27');
+assert.deepEqual(sp.shown.map(e => e.date), ['2026-10-27']);
+assert.deepEqual(sp.future.map(e => e.date), ['2026-10-30', '2026-10-28'], 'anything after today is future');
+assert.ok(html.includes('data-area="scalp"') && html.includes('data-area="swing"') && html.includes('data-area="options"'), 'area toggle');
 console.log('calendar ok');

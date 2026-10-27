@@ -92,8 +92,7 @@ async function showAuthed(session) {
   shell.hidden = false;
   userEmailEl.textContent = session.user.email || '';
   userEmailEl.title = session.user.email || '';
-  await ensureSettings();
-  await seedStrategyIfEmpty();
+  await Promise.all([ensureSettings(), seedStrategyIfEmpty()]);
   purgeOldScreenshots().catch(err => console.error('screenshot purge failed', err));
   if (!window.location.hash) navigate('stats/portfolio');
   updateChrome();

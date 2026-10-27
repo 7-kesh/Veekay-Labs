@@ -1,7 +1,7 @@
 // Portfolio - the opening page. Order: one section per area (its own trade win % and trading
 // score), cumulative P&L, net P&L by area, area summaries, and the side-by-side table last.
 // Improvements and biggest leaks live on each area's own stats page, not here.
-import { allYears } from '../db.js';
+import { allYears, listCalendarEntries } from '../db.js';
 import { statsData, portfolio } from '../stats.js';
 import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters } from './stats-macros.js';
@@ -30,6 +30,9 @@ function areaSection(k, d, qs) {
 
 export async function render(params, el) {
   const period = params.period || 'all', account = params.account || 'live';
+  // The calendar's own query starts now, alongside the page's, so it is ready when the page is.
+  const calEntries = listCalendarEntries();
+  calEntries.catch(() => {});
   const [d, years] = await Promise.all([statsData(period, account), allYears()]);
   const p = portfolio(d);
   const qs = `period=${period}&account=${account}`;
@@ -59,7 +62,7 @@ export async function render(params, el) {
         <div class="chart" data-chart="areabars" data-kind="portfolio" role="img" aria-label="Net profit and loss for each trade type"></div></section>
     </div>
 
-    <section class="card cal"><h2>P&amp;L calendar <small class="muted">daily and monthly totals across all areas - % is of your account balance</small></h2>
+    <section class="card cal"><h2>P&amp;L calendar <small class="muted">daily and monthly totals by area - % is of your account balance</small></h2>
       <div id="calHost"><p class="muted">Loading calendar…</p></div></section>
 
     <h2 class="sect">Area summaries</h2>
@@ -93,5 +96,6 @@ export async function render(params, el) {
   `;
   wireFilters(el);
   renderCharts(el, p.chartjson);
-  mountCalendar(el.querySelector('#calHost')).catch(err => { el.querySelector('#calHost').innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`; });
+  calEntries.then(entries => mountCalendar(el.querySelector('#calHost'), entries, d.settings))
+    .catch(err => { const h = el.querySelector('#calHost'); if (h) h.innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`; });
 }

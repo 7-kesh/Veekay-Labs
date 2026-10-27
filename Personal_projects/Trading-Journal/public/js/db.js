@@ -69,6 +69,20 @@ export async function allYears() {
   return [...years].filter(y => /^\d{4}$/.test(y)).sort().reverse();
 }
 
+// Closed trades for the Portfolio calendar: only the few columns it needs, both accounts, all
+// areas, fetched in parallel. kind is scalp / options / swing; options and swing land on exit date.
+export async function listCalendarEntries() {
+  const [s, p] = await Promise.all([
+    supabase.from('scalp_trades').select('date,net_pnl,account'),
+    supabase.from('plans').select('kind,plan_date,exit_date,realized_pl,account').eq('status', 'closed'),
+  ]);
+  rethrow(s.error); rethrow(p.error);
+  return [
+    ...(s.data || []).filter(r => typeof r.net_pnl === 'number').map(r => ({ date: r.date, pnl: r.net_pnl, account: r.account || 'paper', kind: 'scalp' })),
+    ...(p.data || []).filter(r => typeof r.realized_pl === 'number').map(r => ({ date: r.exit_date || r.plan_date, pnl: r.realized_pl, account: r.account || 'paper', kind: r.kind })),
+  ];
+}
+
 // Distinct years that have scalp trades (newest first), for the list's year filter.
 export async function scalpYears() {
   const { data, error } = await supabase.from('scalp_trades').select('date');
