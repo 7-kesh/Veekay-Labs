@@ -13,7 +13,7 @@ A local web app for logging trades: Scalp, Options, Swing (Futures coming soon).
 - Daily backups: `data/backups/` (last 14).
 
 ## Claude review
-- Put `ANTHROPIC_API_KEY=sk-ant-...` in `~/.trading-journal.env` on each machine, or use "Copy review packet".
+- The hosted app makes no Claude calls: use "Export for AI-Assist-Review" and review in a Claude chat. (The old local Flask app's key lives in `~/.trading-journal.env`.)
 - Reviews grade against `rules/scalp.md`, `rules/options.md`, `rules/swing.md`. Edit those when the strategy changes.
 
 ## Dev
