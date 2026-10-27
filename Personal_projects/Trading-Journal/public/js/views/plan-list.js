@@ -35,18 +35,18 @@ export async function render(kind, params, el) {
     </form>
     <div class="scroll"><table class="dense"><thead><tr>
       <th></th><th>Date</th><th>Acct</th><th>Ticker</th><th>Status</th><th>Plan entry</th><th>Stop</th><th>Target</th><th>Qty</th><th>Planned loss</th><th>Loss % acct</th><th>R:R</th>
-      <th>Actual in</th><th>Actual out</th><th>P/L</th><th>P/L % acct</th><th>ROI</th><th>R</th><th>Entry</th><th>Exit</th></tr></thead><tbody>
+      <th>Actual in</th><th>Actual out</th><th>P/L</th><th>P/L % acct</th><th>ROI</th><th>R</th><th title="Entry / exit strategy followed">Followed</th></tr></thead><tbody>
       ${rows.map(p => `<tr class="${(p.realized_pl || 0) > 0 ? 'win' : (p.realized_pl || 0) < 0 ? 'loss' : ''}">
         <td class="rowact"><a href="#/${kind}/${p.id}">edit</a> · <a href="#" class="deleteRow neg" data-id="${p.id}" data-label="${esc(p.ticker)}">delete</a></td>
-        <td>${esc(p.plan_date)}</td><td>${acct(p.account)}</td>
+        <td class="nw">${esc(p.plan_date)}</td><td>${acct(p.account)}</td>
         <td><a href="#/${kind}/${p.id}"><b>${esc(p.ticker)}</b></a> <small>${esc(p.direction || '')}${p.strike ? ' ' + px(p.strike) : ''}</small></td>
         <td><span class="pill ${esc(p.status)}">${esc(p.status)}</span></td>
         <td>${px(p.entry_price)}</td><td>${px(p.stop_price)}</td><td>${px(p.target_price)}</td><td>${fmtNum(p.qty)}</td>
         <td>${money(p.planned_loss)}</td><td>${p.planned_loss ? pct(-pctOf(p.planned_loss, p.account_balance)) : ''}</td><td>${fmtNum(p.rr)}</td>
         <td>${px(p.actual_entry)}</td><td>${px(p.actual_exit)}</td>
         <td class="${signclass(p.realized_pl)}">${money(p.realized_pl)}</td><td class="${signclass(p.realized_pl)}">${pct(pctOf(p.realized_pl, p.account_balance))}</td><td>${p.roi !== null && p.roi !== undefined ? fmtNum(p.roi) + '%' : ''}</td><td>${fmtNum(p.realized_r)}</td>
-        <td>${ynv(p.entry_followed)}</td><td>${ynv(p.exit_followed)}</td>
-        </tr>`).join('') || '<tr><td colspan="20" class="muted">Nothing here yet.</td></tr>'}
+        <td class="nw">${ynv(p.entry_followed) || '–'} / ${ynv(p.exit_followed) || '–'}</td>
+        </tr>`).join('') || '<tr><td colspan="19" class="muted">Nothing here yet.</td></tr>'}
     </tbody></table></div>
   `;
   const form = el.querySelector('#filters');

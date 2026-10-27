@@ -391,3 +391,5 @@ input.autofixed{border-color:var(--warn);box-shadow:0 0 0 3px #D9963833}
 .usd{position:relative;display:block}.usd::before{content:'$';position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}.usd>input{padding-left:20px;width:100%;box-sizing:border-box}
 
 .rowact{white-space:nowrap;font-size:12.5px}
+.nw{white-space:nowrap}
+main{max-width:1560px}
