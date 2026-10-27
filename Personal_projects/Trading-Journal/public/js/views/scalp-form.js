@@ -31,7 +31,8 @@ export async function render(params, el) {
 
   el.innerHTML = `
     <div class="head"><h1>${trade ? `Edit ${esc(trade.trade_no)} &middot; ${esc(trade.ticker)}` : 'New scalp trade'}</h1>
-      <a class="btn" href="#/scalp">All scalp trades</a></div>
+      <div class="actions"><a class="btn" href="#/scalp">All scalp trades</a>
+        <button class="btn" type="button" id="newBtn" disabled>+ New trade</button></div></div>
 
     <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" data-balance="${esc(settings.account_balance)}" autocomplete="off">
     <div class="sheet">
@@ -166,7 +167,6 @@ export async function render(params, el) {
       ${!trade ? `<button class="btn" type="submit" name="then" value="new">Save and add another</button>` : ''}
       <button class="btn primary" type="submit" name="then" value="save">Save</button>
       <button class="btn primary" type="submit" name="then" value="complete">Complete review</button>
-      <button class="btn" type="button" id="newBtn" disabled>+ New trade</button>
       <span class="hint">Cmd/Ctrl+Enter saves · "Save" leaves it for later review, "Complete review" closes it out</span>
       ${trade ? `<button class="btn danger" type="button" id="deleteBtn">Delete</button>` : ''}
     </div>

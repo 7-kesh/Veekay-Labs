@@ -56,7 +56,8 @@ export async function render(kind, params, el) {
   el.innerHTML = `
     <div class="head"><h1>${plan ? `${esc(plan.ticker)} · ${KIND_LABEL[kind]}` : `New ${kind} plan`}
       ${plan ? `<span class="pill ${esc(plan.status)}">${esc(plan.status)}</span>` : ''}</h1>
-      <a class="btn" href="#/${kind}">All ${kind} trades</a></div>
+      <div class="actions"><a class="btn" href="#/${kind}">All ${kind} trades</a>
+        <button class="btn" type="button" id="newBtn" disabled>+ New ${kind} plan</button></div></div>
 
     <form id="planForm" data-kind="${kind}" data-min-rr="${esc(settings.swing_min_rr)}" autocomplete="off">
     <div class="sheet">
@@ -179,7 +180,6 @@ export async function render(kind, params, el) {
       <button class="btn primary" type="submit">Save</button>
       ${plan && plan.status !== 'cancelled' && plan.status !== 'closed' ? `<button class="btn" type="submit" name="cancel" value="1">Cancel plan</button>` : ''}
       ${plan && plan.status === 'cancelled' ? `<button class="btn" type="submit" name="reopen" value="1">Reopen</button>` : ''}
-      <button class="btn" type="button" id="newBtn" disabled>+ New ${kind} plan</button>
       <span class="hint">Cmd/Ctrl+Enter saves</span>
       ${plan ? `<button class="btn danger" type="button" id="deleteBtn">Delete</button>` : ''}
     </div>
