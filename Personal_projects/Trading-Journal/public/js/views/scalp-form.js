@@ -4,10 +4,10 @@
 // available, even before the first Save - a draft auto-saves on first use) -> 5 Judgement.
 // Date/time are free text now (sensitive to get exactly right, native pickers fought him).
 import { getScalpTrade, saveScalpTrade, deleteScalpTrade, getSettings, listScalpTrades, getTradeHistory, priorExitTime } from '../db.js';
-import { scalpResult, parseExits, num as calcNum } from '../calc.js';
+import { scalpResult, parseExits, num as calcNum, pctOf } from '../calc.js';
 import { run as ruleEngineRun } from '../rule-engine.js';
 import { SETUPS, CATEGORIES, VIOLATIONS, EMOTIONS, ORDER_TYPES, MOM_SIGNS, TTM_COLORS, DIRECTIONS } from '../constants.js';
-import { money, px, num as fmtNum, signclass, esc, localDatetime } from '../format.js';
+import { money, px, num as fmtNum, signclass, esc, localDatetime, pct } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import * as setupC from '../setup-c.js';
 import { rulesTextFor } from '../strategy.js';
