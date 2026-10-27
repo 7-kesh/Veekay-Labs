@@ -331,7 +331,7 @@ export async function render(params, el) {
         row.innerHTML =
           `<input type="text" class="exShares" placeholder="shares" inputmode="numeric" value="${esc(shares)}">` +
           `<span class="exAt">@</span>` +
-          `<input type="text" class="exPrice" placeholder="price" inputmode="decimal" value="${esc(price)}">` +
+          `<input type="text" class="exPrice" placeholder="price" inputmode="decimal" data-usd="1" value="${esc(price)}">` +
           `<input type="text" class="exNote" placeholder="time / note (optional)" value="${esc(note)}">` +
           `<button type="button" class="exRemove" title="Remove this exit">×</button>`;
         row.querySelector('.exRemove').addEventListener('click', () => { row.remove(); syncExits(); });

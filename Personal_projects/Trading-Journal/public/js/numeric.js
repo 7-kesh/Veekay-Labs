@@ -58,6 +58,15 @@ export function cleanDate(raw, today = new Date()) {
 // Date fields: plan_date, expiry, entry_date, exit_date, date, ...
 export const isDateField = name => /^(date|expiry|.*_date)$/.test(name || '');
 
+// Dollar amounts display with at least 2 decimals and keep up to 4 when typed (option premiums like 0.0525):
+// 4.5 -> "4.50", 4.675 -> "4.675", 1234.5 -> "1234.50".
+export function formatUsd(v) {
+  if (v === null || v === undefined || Number.isNaN(v)) return '';
+  const t = String(Math.round(v * 10000) / 10000);
+  const dec = (t.split('.')[1] || '').length;
+  return dec <= 2 ? v.toFixed(2) : t;
+}
+
 // Page-wide: when a price/number field (inputmode="decimal") loses focus holding extra text,
 // replace it with just the number and say so briefly.
 export function installNumberAutocorrect(root = document) {
@@ -90,8 +99,10 @@ export function installNumberAutocorrect(root = document) {
     }
     if (!t || t.tagName !== 'INPUT' || t.inputMode !== 'decimal') return;
     const { value, extra } = cleanNumber(t.value);
-    if (value === null || !extra) return; // clean already, or nothing numeric to keep
-    t.value = String(value);
+    if (value === null) return; // nothing numeric to keep
+    const shown = t.dataset.usd ? formatUsd(value) : String(value);
+    if (!extra) { if (t.dataset.usd && t.value !== shown) t.value = shown; return; } // clean already; only reformat dollars
+    t.value = shown;
     t.title = `Auto-corrected from "${extra}"`;
     t.classList.add('autofixed');
     setTimeout(() => t.classList.remove('autofixed'), 2500);

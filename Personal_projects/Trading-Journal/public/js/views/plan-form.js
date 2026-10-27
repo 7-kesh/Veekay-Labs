@@ -120,8 +120,8 @@ export async function render(kind, params, el) {
 
       ${opt ? `<div class="rowline"><div class="rl"><i>·</i>Liquidity</div>
         <div class="cells">
-          <div class="fld f-xs"><label for="i_bid">Bid</label><input id="i_bid" name="bid" value="${esc(px(p.bid) ?? '')}" inputmode="decimal" autocomplete="off"></div>
-          <div class="fld f-xs"><label for="i_ask">Ask</label><input id="i_ask" name="ask" value="${esc(px(p.ask) ?? '')}" inputmode="decimal" autocomplete="off"></div>
+          <div class="fld f-xs"><label for="i_bid">Bid</label><span class="usd"><input id="i_bid" name="bid" value="${esc(px(p.bid) ?? '')}" inputmode="decimal" data-usd="1" autocomplete="off"></span></div>
+          <div class="fld f-xs"><label for="i_ask">Ask</label><span class="usd"><input id="i_ask" name="ask" value="${esc(px(p.ask) ?? '')}" inputmode="decimal" data-usd="1" autocomplete="off"></span></div>
           ${fld('bid_ask_spread', 'Spread $', px(p.bid_ask_spread), 'f-sm', { mode: 'decimal', hint: 'ask − bid' })}
           ${fld('volume', 'Volume', fmtNum(p.volume), 'f-sm', { mode: 'numeric', hint: 'higher' })}
           ${fld('open_interest', 'Open interest', fmtNum(p.open_interest), 'f-md', { mode: 'numeric', hint: 'higher' })}

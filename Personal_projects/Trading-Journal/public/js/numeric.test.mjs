@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cleanNumber, cleanTime, cleanDate, isDateField } from './numeric.js';
+import { cleanNumber, cleanTime, cleanDate, isDateField, formatUsd } from './numeric.js';
 const c = (s) => cleanNumber(s);
 assert.deepEqual(c('at 4.67 invalidation'), { value: 4.67, extra: 'at invalidation' });
 assert.equal(c('$4.67').value, 4.67);
@@ -37,3 +37,11 @@ console.log('numeric ok');
   assert.equal(d(''), null);
   assert.ok(isDateField('plan_date') && isDateField('expiry') && isDateField('date') && !isDateField('update_x'));
 }
+
+assert.equal(formatUsd(4.5), '4.50');
+assert.equal(formatUsd(4), '4.00');
+assert.equal(formatUsd(4.675), '4.675');
+assert.equal(formatUsd(0.0525), '0.0525');
+assert.equal(formatUsd(1234.5), '1234.50');
+assert.equal(formatUsd(-0.5), '-0.50');
+assert.equal(formatUsd(null), '');
