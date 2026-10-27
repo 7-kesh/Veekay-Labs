@@ -19,6 +19,7 @@ export async function render(params, el) {
   const isNew = params.id === 'new';
   let dirty = null; // set in wireForm: tracks unsaved changes for the "+ New trade" button
   let trade = isNew ? null : await getScalpTrade(params.id);
+  let savedId = trade ? trade.id : null, saveChain = Promise.resolve(); // declared early: wireForm() reads savedId
   const settings = await getSettings();
   const t = trade || {
     date: new Date().toISOString().slice(0, 10), account: 'paper', ticker: params.ticker || '',
@@ -210,7 +211,6 @@ export async function render(params, el) {
 
   // Every save goes through here: one at a time, and once a new trade has an id later saves update
   // that row instead of inserting another (frozen page + repeated Save used to create duplicates).
-  let savedId = trade ? trade.id : null, saveChain = Promise.resolve();
   function persist(formObj) {
     const run = saveChain.then(async () => {
       savedId = await saveScalpTrade(savedId, formObj, settings);
