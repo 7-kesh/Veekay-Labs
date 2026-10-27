@@ -13,9 +13,11 @@ import * as setupC from '../setup-c.js';
 import { rulesTextFor } from '../strategy.js';
 import { mountReviewPanel } from '../review-panel.js';
 import { fld, yn, chips, acctPick } from '../fields.js';
+import { trackNewButton } from '../dirty.js';
 
 export async function render(params, el) {
   const isNew = params.id === 'new';
+  let dirty = null; // set in wireForm: tracks unsaved changes for the "+ New trade" button
   let trade = isNew ? null : await getScalpTrade(params.id);
   const settings = await getSettings();
   const t = trade || {
@@ -163,6 +165,7 @@ export async function render(params, el) {
       ${!trade ? `<button class="btn" type="submit" name="then" value="new">Save and add another</button>` : ''}
       <button class="btn primary" type="submit" name="then" value="save">Save</button>
       <button class="btn primary" type="submit" name="then" value="complete">Complete review</button>
+      <button class="btn" type="button" id="newBtn" disabled>+ New trade</button>
       <span class="hint">Cmd/Ctrl+Enter saves · "Save" leaves it for later review, "Complete review" closes it out</span>
       ${trade ? `<button class="btn danger" type="button" id="deleteBtn">Delete</button>` : ''}
     </div>
@@ -195,6 +198,7 @@ export async function render(params, el) {
     ensureRefId: async () => {
       const id = await persist(collectFormValues());
       trade = await getScalpTrade(id);
+      dirty && dirty.markClean(); // the draft just saved the current form
       history.length = 0; // stale now; next natural re-render (e.g. after Save) will refresh it
       if (!window.location.hash.endsWith('/scalp/' + id)) window.history.replaceState(null, '', '#/scalp/' + id);
       return { id, tradeData: trade };
@@ -252,6 +256,8 @@ export async function render(params, el) {
   function wireForm() {
     const form = el.querySelector('#scalpForm');
     const $ = n => form.elements[n];
+
+    dirty = trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => savedId !== null, newRoute: 'scalp/new' });
 
     function val(name) { const r = form.querySelector(`[name=${name}]:checked`); return r ? r.value : ''; }
     function suggest(setup, ev, xv, hasViol) {
