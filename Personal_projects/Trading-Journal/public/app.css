@@ -628,3 +628,4 @@ html[data-theme="dark"] .cd.up b{color:#5EF0CF}html[data-theme="dark"] .cd.down 
 /* header button groups are not the sticky save bar */
 .head .actions{position:static;padding:0;margin:0;background:none;border:0;backdrop-filter:none}
 .areasecs{align-items:start}
+html[data-theme="dark"] .head .actions{background:none;border:0}
