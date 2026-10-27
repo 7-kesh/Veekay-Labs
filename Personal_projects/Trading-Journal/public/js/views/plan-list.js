@@ -16,7 +16,7 @@ function acct(a) {
 }
 
 export async function render(kind, params, el) {
-  const status = params.status || 'active', account = params.account || 'live';
+  const status = params.status || 'all', account = params.account || 'live';
   const period = params.period || 'all';
   const [lo, hi] = periodBounds(period);
   const years = await allYears();
@@ -28,7 +28,7 @@ export async function render(kind, params, el) {
     <div class="head"><h1>${KIND_LABEL[kind]} trades</h1>
       <div class="actions"><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/${kind}/new">+ New plan</a></div></div>
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <select name="status">${opt('active', status, 'Active (planned + open)')}${opt('all', status, 'All')}${opt('planned', status, 'Planned')}${opt('open', status, 'Open')}${opt('closed', status, 'Closed')}${opt('cancelled', status, 'Cancelled')}</select>
+      <select name="status">${opt('all', status, 'All (active first)')}${opt('active', status, 'Active only (planned + open)')}${opt('planned', status, 'Planned')}${opt('open', status, 'Open')}${opt('closed', status, 'Closed')}${opt('cancelled', status, 'Cancelled')}</select>
       <select name="account">${opt('all', account, 'Paper + live')}${opt('paper', account, 'Paper only')}${opt('live', account, 'Live only')}</select>
       ${periodSelectsHtml(period, years)}
       <span class="muted">${rows.length} · realized <b class="${signclass(net)}">${money(net)}</b></span>
