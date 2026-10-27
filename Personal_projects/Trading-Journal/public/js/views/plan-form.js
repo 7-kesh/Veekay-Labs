@@ -5,7 +5,7 @@ import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS, TIMEFRAMES, RULES_T
 import { money, px, num as fmtNum, signclass, esc, pct } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import { fld, yn, acctPick } from '../fields.js';
-import { cleanDate } from '../numeric.js';
+import { cleanDate, formatUsd } from '../numeric.js';
 import { mountReviewPanel } from '../review-panel.js';
 
 const KIND_LABEL = { options: 'Options', swing: 'Swing' };
@@ -280,7 +280,7 @@ function wireForm(kind, el, settings, plan) {
   if (bid && ask) {
     const fill = () => {
       const b = parseFloat(bid.value), a = parseFloat(ask.value);
-      if (!Number.isNaN(b) && !Number.isNaN(a) && a >= b) { form.elements.bid_ask_spread.value = (Math.round((a - b) * 100) / 100).toString(); update(); }
+      if (!Number.isNaN(b) && !Number.isNaN(a) && a >= b) { form.elements.bid_ask_spread.value = formatUsd(Math.round((a - b) * 100) / 100); update(); }
     };
     bid.addEventListener('input', fill); ask.addEventListener('input', fill);
   }

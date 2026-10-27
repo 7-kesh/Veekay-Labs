@@ -282,7 +282,7 @@ export async function savePlan(kind, id, form, settings) {
   for (const k of ['plan_date', 'thesis', 'expiry', 'entry_date', 'exit_date', 'exit_reason', 'exit_scenario',
     'entry_followed', 'exit_followed', 'orders_text', 'notes']) v[k] = form[k] || '';
   for (const k of ['plan_date', 'expiry', 'entry_date', 'exit_date']) {
-    if (!v[k]) continue;
+    if (!v[k]) { v[k] = null; continue; } // empty date -> NULL (Postgres rejects '' for a date column)
     const fixed = cleanDate(v[k]);
     if (!fixed) throw new Error(`Could not read "${v[k]}" as a date (${k.replace('_', ' ')}). Use YYYY-MM-DD.`);
     v[k] = fixed;
