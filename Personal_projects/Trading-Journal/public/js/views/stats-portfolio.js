@@ -7,6 +7,7 @@ import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters } from './stats-macros.js';
 import { money, signclass, num as fmtNum, esc } from '../format.js';
 import { tradingScore, overviewHtml } from '../score.js';
+import { mountCalendar } from './portfolio-calendar.js';
 
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
 
@@ -58,6 +59,9 @@ export async function render(params, el) {
         <div class="chart" data-chart="areabars" data-kind="portfolio" role="img" aria-label="Net profit and loss for each trade type"></div></section>
     </div>
 
+    <section class="card cal"><h2>P&amp;L calendar <small class="muted">daily and monthly totals across all areas - % is of your account balance</small></h2>
+      <div id="calHost"><p class="muted">Loading calendar…</p></div></section>
+
     <h2 class="sect">Area summaries</h2>
     <div class="sumgrid">
       ${p.kinds.map(k => {
@@ -89,4 +93,5 @@ export async function render(params, el) {
   `;
   wireFilters(el);
   renderCharts(el, p.chartjson);
+  mountCalendar(el.querySelector('#calHost')).catch(err => { el.querySelector('#calHost').innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`; });
 }

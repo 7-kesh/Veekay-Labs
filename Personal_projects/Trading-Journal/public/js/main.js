@@ -70,6 +70,17 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
 });
 
+// Dark is the default; the choice is remembered in this browser only.
+const themeBtn = document.getElementById('themeBtn');
+const paintThemeBtn = () => { themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀ Light mode' : '☾ Dark mode'; };
+themeBtn.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('tj-theme', next); } catch { /* private window: the choice just won't stick */ }
+  paintThemeBtn();
+});
+paintThemeBtn();
+
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await signOut();
 });

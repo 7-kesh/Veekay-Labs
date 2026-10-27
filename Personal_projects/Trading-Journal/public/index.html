@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trading Journal</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('tj-theme')||'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
 <link rel="stylesheet" href="app.css">
 <style>
   #loginScreen { display: flex; align-items: center; justify-content: center; height: 100vh; }
@@ -51,6 +52,7 @@
 
     <div style="padding:0 16px 12px;min-width:0">
       <p id="userEmail" style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 0 6px"></p>
+      <button class="btn sm themebtn" id="themeBtn" type="button" style="margin-bottom:6px"></button>
       <button class="btn sm" id="logoutBtn" style="width:100%">Log out</button>
     </div>
     <p style="text-align:center;font-size:11px;color:var(--muted);padding:0 12px 10px">Property of VeekayLabs</p>
