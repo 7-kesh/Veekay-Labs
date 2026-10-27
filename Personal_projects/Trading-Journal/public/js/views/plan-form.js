@@ -1,5 +1,6 @@
 // Port of app/templates/plan_form.html + app/static/plan.js.
-import { getPlan, savePlan, deletePlan, getSettings } from '../db.js';
+import { getPlan, savePlan, deletePlan, getSettings, getCapitalData } from '../db.js';
+import { capitalSummary, stripHtml } from '../capital.js';
 import { optionsPlan, swingPlan, num as calcNum, liquidityVerdict, pctOf, premiumAt, stockAtPremium, premiumAtModel, stockAtPremiumModel, optionsSanity, LIQUIDITY } from '../calc.js';
 import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS, TIMEFRAMES, RULES_TEXT } from '../constants.js';
 import { money, px, num as fmtNum, signclass, esc, pct } from '../format.js';
@@ -44,9 +45,14 @@ export async function render(kind, params, el) {
   const plan = isNew ? null : await getPlan(params.id);
   const settings = await getSettings();
   const opt = kind === 'options';
+  // Sizing runs on what is left of this area's portfolio after the money tied up in open trades
+  // (never counting the plan being edited), for the account (paper / live) picked on the form.
+  const cap = await getCapitalData(settings);
+  const capFor = acct => capitalSummary(settings, kind, cap.entries, cap.open, { account: acct, excludeId: plan ? plan.id : null });
+  const availStr = s => (s.set && s.available > 0 ? String(s.available) : '');
   const p = plan || {
     plan_date: new Date().toISOString().slice(0, 10), account: 'paper',
-    direction: opt ? 'call' : 'long', account_balance: settings.account_balance,
+    direction: opt ? 'call' : 'long', account_balance: availStr(capFor('paper')),
     qty: opt ? 1 : '', risk_pct: opt ? settings.options_risk_pct : settings.swing_risk_pct, status: 'planned',
   };
   const ticks = plan ? (plan.checklist || {}) : {};
@@ -58,6 +64,7 @@ export async function render(kind, params, el) {
       ${plan ? `<span class="pill ${esc(plan.status)}">${esc(plan.status)}</span>` : ''}</h1>
       <div class="actions"><a class="btn" href="#/${kind}">All ${kind} trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New ${kind} plan</button></div></div>
+    <div id="capStrip">${stripHtml(capFor(p.account || 'paper'), KIND_LABEL[kind])}</div>
 
     <form id="planForm" data-kind="${kind}" data-min-rr="${esc(settings.swing_min_rr)}" autocomplete="off">
     <div class="sheet">
@@ -100,7 +107,7 @@ export async function render(kind, params, el) {
           ${fld('stop_price', opt ? 'Stop premium' : 'Stop $', px(p.stop_price), 'f-sm', { mode: 'decimal' })}
           ${fld('target_price', opt ? 'Target premium' : 'Target $', px(p.target_price), 'f-sm', { mode: 'decimal' })}
           ${fld('qty', opt ? 'Contracts' : 'Shares', fmtNum(p.qty), 'f-xs', { mode: 'numeric' })}
-          ${fld('account_balance', 'Account $', fmtNum(p.account_balance), 'f-sm', { mode: 'decimal' })}
+          ${fld('account_balance', 'Available $', fmtNum(p.account_balance), 'f-sm', { mode: 'decimal', hint: 'portfolio − open trades' })}
           ${fld('risk_pct', 'Risk %', fmtNum(p.risk_pct), 'f-xs', { mode: 'decimal' })}
         </div></div>
 
@@ -189,7 +196,7 @@ export async function render(kind, params, el) {
            : `<section class="card muted" style="margin-top:16px">Save the plan to attach screenshots and run a Claude review.</section>`}
   `;
 
-  wireForm(kind, el, settings, plan);
+  wireForm(kind, el, settings, plan, { capFor, availStr });
 
   const reviewMount = el.querySelector('#reviewMount');
   if (reviewMount && plan) {
@@ -199,7 +206,7 @@ export async function render(kind, params, el) {
   }
 }
 
-function wireForm(kind, el, settings, plan) {
+function wireForm(kind, el, settings, plan, { capFor, availStr }) {
   const form = el.querySelector('#planForm');
   const opt = kind === 'options';
   const minRR = parseFloat(form.dataset.minRr) || 2;
@@ -289,6 +296,21 @@ function wireForm(kind, el, settings, plan) {
   form.addEventListener('input', update); form.addEventListener('change', update); update();
 
   trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => !!plan, newRoute: `${kind}/new` });
+
+  // The strip (and, until you type your own, the Available $ box) follows the paper / live pick.
+  const balInput = form.elements.account_balance;
+  let balTouched = !!plan, programmatic = false;
+  balInput.addEventListener('input', () => { if (!programmatic) balTouched = true; });
+  form.addEventListener('change', (ev) => {
+    if (ev.target.name !== 'account') return;
+    const s = capFor(ev.target.value);
+    el.querySelector('#capStrip').innerHTML = stripHtml(s, KIND_LABEL[kind]);
+    if (balTouched) return;
+    programmatic = true;
+    balInput.value = availStr(s);
+    balInput.dispatchEvent(new Event('input', { bubbles: true }));
+    programmatic = false;
+  });
 
   const sc = el.querySelector('#exit_scenario');
   if (sc) sc.addEventListener('change', () => {

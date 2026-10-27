@@ -1,5 +1,6 @@
 // Port of app/templates/plans_list.html.
-import { listPlans, deletePlan, allYears } from '../db.js';
+import { listPlans, deletePlan, allYears, getSettings, getCapitalData } from '../db.js';
+import { capitalSummary, stripHtml } from '../capital.js';
 import { periodBounds, periodSelectsHtml, readPeriod } from '../period.js';
 import { money, signclass, px, num as fmtNum, esc, pct } from '../format.js';
 import { pctOf } from '../calc.js';
@@ -22,11 +23,15 @@ export async function render(kind, params, el) {
   const years = await allYears();
   const rows = (await listPlans(kind, { status, account })).filter(p => !lo || (p.plan_date >= lo && p.plan_date <= hi));
   const net = rows.filter(r => r.status === 'closed').reduce((s, r) => s + (r.realized_pl || 0), 0);
+  const settings = await getSettings();
+  const cap = await getCapitalData(settings);
+  const sum = capitalSummary(settings, kind, cap.entries, cap.open, { account });
 
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
   el.innerHTML = `
     <div class="head"><h1>${KIND_LABEL[kind]} trades</h1>
       <div class="actions"><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/${kind}/new">+ New plan</a></div></div>
+    ${stripHtml(sum, KIND_LABEL[kind])}
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <select name="status">${opt('all', status, 'All (active first)')}${opt('active', status, 'Active only (planned + open)')}${opt('planned', status, 'Planned')}${opt('open', status, 'Open')}${opt('closed', status, 'Closed')}${opt('cancelled', status, 'Cancelled')}</select>
       <select name="account">${opt('all', account, 'Paper + live')}${opt('paper', account, 'Paper only')}${opt('live', account, 'Live only')}</select>

@@ -1,5 +1,6 @@
 // Data layer over Supabase - port of app/db.py + the trade-save logic in app/routes.py's
 // _save_scalp / _next_trade_no / _suggest_category, plus app/audit.py's log_changes.
+import { openCost } from './capital.js';
 import { supabase } from './supabase-client.js';
 import { cleanNumber, cleanDate } from './numeric.js';
 import { DEFAULT_SETTINGS } from './constants.js';
@@ -81,6 +82,26 @@ export async function listCalendarEntries() {
     ...(s.data || []).filter(r => typeof r.net_pnl === 'number').map(r => ({ date: r.date, pnl: r.net_pnl, account: r.account || 'paper', kind: 'scalp' })),
     ...(p.data || []).filter(r => typeof r.realized_pl === 'number').map(r => ({ date: r.exit_date || r.plan_date, pnl: r.realized_pl, account: r.account || 'paper', kind: r.kind })),
   ];
+}
+
+// Open positions (money tied up): scalp trades with no result yet and options/swing plans in the
+// 'open' status. cost comes from capital.openCost; rows that are not real positions are dropped.
+export async function listOpenPositions() {
+  const [s, p] = await Promise.all([
+    supabase.from('scalp_trades').select('id,account,entry_price,shares,exits_text,net_pnl').is('net_pnl', null),
+    supabase.from('plans').select('id,kind,account,status,entry_price,actual_entry,qty').eq('status', 'open'),
+  ]);
+  rethrow(s.error); rethrow(p.error);
+  return [
+    ...(s.data || []).map(r => ({ kind: 'scalp', id: r.id, account: r.account || 'paper', cost: openCost('scalp', r) })),
+    ...(p.data || []).map(r => ({ kind: r.kind, id: r.id, account: r.account || 'paper', cost: openCost(r.kind, r) })),
+  ].filter(o => o.cost !== null);
+}
+
+// Everything the capital math needs: settings, realized results and open positions, fetched together.
+export async function getCapitalData(settings) {
+  const [st, entries, open] = await Promise.all([settings ? Promise.resolve(settings) : getSettings(), listCalendarEntries(), listOpenPositions()]);
+  return { settings: st, entries, open };
 }
 
 // Distinct years that have scalp trades (newest first), for the list's year filter.
@@ -307,7 +328,7 @@ export async function savePlan(kind, id, form, settings) {
   for (const k of ['strike', 'delta', 'bid_ask_spread', 'volume', 'open_interest', 'underlying_entry', 'underlying_stop',
     'underlying_target', 'entry_price', 'stop_price', 'target_price', 'qty', 'account_balance', 'risk_pct',
     'actual_entry', 'actual_exit', 'fees', 'gamma', 'theta', 'hold_days', 'iv', 'iv_shift', 'bid', 'ask']) v[k] = numOrNull(form[k]);
-  if (v.account_balance === null) v.account_balance = calcNum(settings.account_balance);
+  if (v.account_balance === null) v.account_balance = calcNum(settings['capital_' + kind]);
   if (v.risk_pct === null) v.risk_pct = calcNum(kind === 'options' ? settings.options_risk_pct : settings.swing_risk_pct);
 
   const items = kind === 'options' ? OPTIONS_CHECKLIST : SWING_CHECKLIST;

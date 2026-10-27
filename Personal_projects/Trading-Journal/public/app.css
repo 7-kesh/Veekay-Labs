@@ -629,3 +629,35 @@ html[data-theme="dark"] .cd.up b{color:#5EF0CF}html[data-theme="dark"] .cd.down 
 .head .actions{position:static;padding:0;margin:0;background:none;border:0;backdrop-filter:none}
 .areasecs{align-items:start}
 html[data-theme="dark"] .head .actions{background:none;border:0}
+
+/* ===================== Portfolio strip, levels graph, settings sections ===================== */
+.capstrip{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:9px 16px;margin:0 0 14px;border-radius:12px;border:1px solid var(--line);
+  background:linear-gradient(90deg,color-mix(in srgb,var(--sec) 12%,var(--card)),var(--card));font-size:13.5px}
+.capstrip b{font-weight:800;color:var(--sec)}.capstrip span{color:var(--muted)}.capstrip i{font-style:normal;font-weight:800;color:var(--ink)}
+.capstrip i.av{color:var(--pos)}.capstrip small{color:var(--muted)}
+.capstrip.over{border-color:var(--neg)}.capstrip.over i.av{color:var(--neg)}
+.capstrip.unset{color:var(--muted);border-style:dashed}
+.setgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.setcard .capstrip{margin:0 0 12px}.setfields{display:flex;flex-wrap:wrap;gap:0 14px}
+.sec-futures-card{--sec:var(--c-futures);--sec2:#F4BC6C}
+@media (max-width:900px){.setgrid{grid-template-columns:1fr}}
+
+.lvbars{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.lvrow{display:grid;grid-template-columns:78px minmax(120px,1fr) minmax(240px,auto);align-items:center;gap:12px;padding:8px 10px;border-radius:10px;
+  border:1px solid transparent;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.lvrow:hover{border-color:var(--line)}.lvrow.sel{border-color:var(--sec);background:color-mix(in srgb,var(--sec) 8%,transparent)}
+.lvname{font-weight:700}.lvnum{font-size:12.5px;color:var(--muted)}.lvnum b{color:var(--ink)}.lvnum b.av{color:var(--pos)}
+.lvrow.over .lvnum b.av{color:var(--neg)}
+.lvbar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:var(--field);border:1px solid var(--line)}
+.lvbar i{display:block;height:100%}.lvbar em{font-size:11px;color:var(--muted);padding:0 8px;line-height:14px;font-style:normal}
+.lvbar .open,.lvlegend .open{background:linear-gradient(90deg,var(--warn),#F2C46E)}
+.lvbar .avail,.lvlegend .avail{background:linear-gradient(90deg,var(--pos),#45CDB0)}
+.lvlegend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.lvlegend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.lvlegend i.start{background:none;border-top:2px dashed var(--muted);height:0;border-radius:0;vertical-align:middle}
+.lvsvg{width:100%;height:auto;display:block;overflow:visible}
+.lvsvg text{fill:var(--muted);font-size:11px;font-family:inherit}.lvsvg text.val{fill:var(--ink);font-weight:700;font-size:12px}
+.lvsvg .gl{stroke:var(--line);stroke-width:1}.lvsvg .startln{stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4;opacity:.7}
+.lvsvg .ln{stroke:var(--sec);fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.lvsvg .dot{fill:var(--card);stroke:var(--sec);stroke-width:2}
+@media (max-width:900px){.lvrow{grid-template-columns:70px 1fr}.lvnum{grid-column:1/-1}}

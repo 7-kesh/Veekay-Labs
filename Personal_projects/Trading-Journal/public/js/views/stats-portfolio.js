@@ -1,13 +1,14 @@
 // Portfolio - the opening page. Order: one section per area (its own trade win % and trading
 // score), cumulative P&L, net P&L by area, area summaries, and the side-by-side table last.
 // Improvements and biggest leaks live on each area's own stats page, not here.
-import { allYears, listCalendarEntries } from '../db.js';
+import { allYears, listCalendarEntries, listOpenPositions } from '../db.js';
 import { statsData, portfolio } from '../stats.js';
 import { renderCharts } from '../charts.js';
 import { filtersHtml, wireFilters } from './stats-macros.js';
 import { money, signclass, num as fmtNum, esc } from '../format.js';
 import { tradingScore, overviewHtml } from '../score.js';
 import { mountCalendar } from './portfolio-calendar.js';
+import { mountPortfolioGraph } from './portfolio-graph.js';
 
 const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
 
@@ -31,8 +32,8 @@ function areaSection(k, d, qs) {
 export async function render(params, el) {
   const period = params.period || 'all', account = params.account || 'live';
   // The calendar's own query starts now, alongside the page's, so it is ready when the page is.
-  const calEntries = listCalendarEntries();
-  calEntries.catch(() => {});
+  const calEntries = listCalendarEntries(), openPos = listOpenPositions();
+  calEntries.catch(() => {}); openPos.catch(() => {});
   const [d, years] = await Promise.all([statsData(period, account), allYears()]);
   const p = portfolio(d);
   const qs = `period=${period}&account=${account}`;
@@ -61,6 +62,9 @@ export async function render(params, el) {
       <section class="card"><h2>Net P&amp;L by area</h2>
         <div class="chart" data-chart="areabars" data-kind="portfolio" role="img" aria-label="Net profit and loss for each trade type"></div></section>
     </div>
+
+    <section class="card"><h2>Portfolio levels <small class="muted">each area and overall: starting capital + realized P&amp;L, split into money in open trades and what is available</small></h2>
+      <div id="lvHost"><p class="muted">Loading portfolio…</p></div></section>
 
     <section class="card cal"><h2>P&amp;L calendar <small class="muted">daily and monthly totals by area - % is of your account balance</small></h2>
       <div id="calHost"><p class="muted">Loading calendar…</p></div></section>
@@ -96,6 +100,7 @@ export async function render(params, el) {
   `;
   wireFilters(el);
   renderCharts(el, p.chartjson);
-  calEntries.then(entries => mountCalendar(el.querySelector('#calHost'), entries, d.settings))
-    .catch(err => { const h = el.querySelector('#calHost'); if (h) h.innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`; });
+  const fail = (sel, err) => { const h = el.querySelector(sel); if (h) h.innerHTML = `<p class="neg">${esc(err.message || String(err))}</p>`; };
+  calEntries.then(entries => mountCalendar(el.querySelector('#calHost'), entries, d.settings)).catch(err => fail('#calHost', err));
+  Promise.all([calEntries, openPos]).then(([entries, open]) => mountPortfolioGraph(el.querySelector('#lvHost'), entries, open, d.settings)).catch(err => fail('#lvHost', err));
 }

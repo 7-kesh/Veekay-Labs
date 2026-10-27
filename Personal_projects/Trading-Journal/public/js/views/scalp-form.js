@@ -3,7 +3,8 @@
 // 3 Assessments (structure/trigger/extended/EMA/MOM/TTM/Room) -> 4 Screenshots+review (always
 // available, even before the first Save - a draft auto-saves on first use) -> 5 Judgement.
 // Date/time are free text now (sensitive to get exactly right, native pickers fought him).
-import { getScalpTrade, saveScalpTrade, deleteScalpTrade, getSettings, listScalpTrades, getTradeHistory, priorExitTime } from '../db.js';
+import { getScalpTrade, saveScalpTrade, deleteScalpTrade, getSettings, listScalpTrades, getTradeHistory, priorExitTime, getCapitalData } from '../db.js';
+import { capitalSummary, stripHtml } from '../capital.js';
 import { scalpResult, parseExits, num as calcNum, pctOf } from '../calc.js';
 import { run as ruleEngineRun } from '../rule-engine.js';
 import { SETUPS, CATEGORIES, VIOLATIONS, EMOTIONS, ORDER_TYPES, MOM_SIGNS, TTM_COLORS, DIRECTIONS } from '../constants.js';
@@ -21,6 +22,9 @@ export async function render(params, el) {
   let trade = isNew ? null : await getScalpTrade(params.id);
   let savedId = trade ? trade.id : null, saveChain = Promise.resolve(); // declared early: wireForm() reads savedId
   const settings = await getSettings();
+  // Scalp portfolio for the account picked on the form: level, money in open trades, what is available.
+  const cap = await getCapitalData(settings);
+  const capFor = acct => capitalSummary(settings, 'scalp', cap.entries, cap.open, { account: acct, excludeId: trade ? trade.id : null });
   const t = trade || {
     date: new Date().toISOString().slice(0, 10), account: 'paper', ticker: params.ticker || '',
     shares: settings.default_shares, commission: settings.default_commission,
@@ -33,8 +37,9 @@ export async function render(params, el) {
     <div class="head"><h1>${trade ? `Edit ${esc(trade.trade_no)} &middot; ${esc(trade.ticker)}` : 'New scalp trade'}</h1>
       <div class="actions"><a class="btn" href="#/scalp">All scalp trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New trade</button></div></div>
+    <div id="capStrip">${stripHtml(capFor(t.account || 'paper'), 'Scalp')}</div>
 
-    <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" data-balance="${esc(settings.account_balance)}" autocomplete="off">
+    <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" data-balance="${capFor(t.account || 'paper').level || ''}" data-available="${capFor(t.account || 'paper').set ? capFor(t.account || 'paper').available : ''}" autocomplete="off">
     <div class="sheet">
 
       <!-- 1: Trade + Setup -->
@@ -258,6 +263,15 @@ export async function render(params, el) {
     const $ = n => form.elements[n];
 
     dirty = trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => savedId !== null, newRoute: 'scalp/new' });
+    // Portfolio strip, % base and the affordability check follow the paper / live pick.
+    form.addEventListener('change', (ev) => {
+      if (ev.target.name !== 'account') return;
+      const s = capFor(ev.target.value);
+      el.querySelector('#capStrip').innerHTML = stripHtml(s, 'Scalp');
+      form.dataset.balance = s.level || '';
+      form.dataset.available = s.set ? s.available : '';
+      update();
+    });
 
     function val(name) { const r = form.querySelector(`[name=${name}]:checked`); return r ? r.value : ''; }
     function suggest(setup, ev, xv, hasViol) {
@@ -278,6 +292,8 @@ export async function render(params, el) {
         if (sold > sh) warn.push('Exits sell more shares than you bought.');
       }
       if (st && e && st >= e) warn.push('Stop should be below the entry.');
+      const avail = parseFloat(form.dataset.available);
+      if (e && sh && !Number.isNaN(avail) && e * sh > avail) warn.push(`Position ${money(e * sh)} is more than the ${money(avail)} available.`);
       if (res.planned_risk && res.planned_risk > budget) warn.push(`Planned risk is over your ${money(budget)} 1R.`);
       el.querySelector('#cRisk').textContent = money(res.planned_risk);
       const bal = calcNum(form.dataset.balance), rp = pctOf(res.planned_risk, bal), np = pctOf(res.net_pnl, bal);

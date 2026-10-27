@@ -1,5 +1,6 @@
-import { listScalpTrades, deleteScalpTrade, scalpYears, getSettings } from '../db.js';
-import { pctOf, num as calcNum } from '../calc.js';
+import { listScalpTrades, deleteScalpTrade, scalpYears, getSettings, getCapitalData } from '../db.js';
+import { capitalSummary, stripHtml } from '../capital.js';
+import { pctOf } from '../calc.js';
 import { money, signclass, px, esc, pct } from '../format.js';
 import { downloadCsv } from '../csv.js';
 import { dispatch } from '../router.js';
@@ -35,12 +36,16 @@ export async function render(params, el) {
   if (year && !years.includes(year)) years.unshift(year);
   const rows = await listScalpTrades({ lo, hi, account, q });
   const net = rows.reduce((s, r) => s + (r.net_pnl || 0), 0);
-  const bal = calcNum((await getSettings()).account_balance);
+  const settings = await getSettings();
+  const cap = await getCapitalData(settings);
+  const sum = capitalSummary(settings, 'scalp', cap.entries, cap.open, { account });
+  const bal = sum.level || null;
 
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
   el.innerHTML = `
     <div class="head"><h1>Scalp trades</h1>
       <div class="actions"><input type="date" id="dayPick" value="${new Date().toISOString().slice(0, 10)}"><button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/scalp/new">+ New</a></div></div>
+    ${stripHtml(sum, 'Scalp')}
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <select name="period" ${year ? 'disabled' : ''}>${opt('week', period, 'This week')}${opt('month', period, 'This month')}${opt('30d', period, 'Last 30 days')}${opt('all', period, 'All time')}</select>
       <select name="year"><option value="">All years</option>${years.map(y => opt(y, year, y)).join('')}</select>

@@ -1,9 +1,13 @@
 // Port of app/config.py's one-tap lists and defaults. Edit freely, same as the Python file.
 
 export const DEFAULT_SETTINGS = {
-  account_balance: "1500",
+  capital_scalp: "2000",
+  capital_options: "3000",
+  capital_swing: "0",
+  capital_futures: "0",
   options_risk_pct: "5",
   swing_risk_pct: "1",
+  futures_risk_pct: "1",
   swing_min_rr: "2",
   scalp_risk_dollars: "20",
   default_shares: "50",
