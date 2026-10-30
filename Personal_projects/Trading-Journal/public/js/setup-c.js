@@ -56,3 +56,11 @@ export async function setResult(tradeId, tradeDate, result) {
   if (existing) rethrow((await supabase.from('setup_c_log').update({ result: result || null }).eq('trade_id', tradeId)).error);
   else rethrow((await supabase.from('setup_c_log').insert({ trade_id: tradeId, version: await ruleEffectiveFrom('setup_c', tradeDate), result: result || null })).error);
 }
+
+// Results for many trades in ONE query: Map of trade_id -> result ('' when not recorded).
+export async function resultsFor(tradeIds) {
+  if (!tradeIds.length) return new Map();
+  const { data, error } = await supabase.from('setup_c_log').select('trade_id,result').in('trade_id', tradeIds);
+  rethrow(error);
+  return new Map((data || []).map(r => [r.trade_id, r.result || '']));
+}

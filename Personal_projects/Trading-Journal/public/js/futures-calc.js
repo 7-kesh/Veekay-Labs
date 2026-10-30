@@ -51,3 +51,13 @@ export function futuresRealized(direction, contracts, actualEntry, actualExit, f
   if (plannedLoss) out.realized_r = round(out.realized_pl / plannedLoss);
   return out;
 }
+
+// The preset contract matching a trade's symbol and point value (e.g. 'MES Dec' + 5 -> MES), else null.
+// The first word of the symbol must be the root, so 'MES' never matches 'ES'.
+export function contractFor(contracts, symbol, pointValue) {
+  const root = String(symbol || '').trim().toUpperCase().split(/\s+/)[0].replace(/[FGHJKMNQUVXZ]\d{1,2}$/, '');
+  const hit = contracts.find(c => c[0] === root || c[0] === String(symbol || '').trim().toUpperCase().split(/\s+/)[0]);
+  if (!hit) return null;
+  const pv = num(pointValue);
+  return pv === null || pv === hit[2] ? hit : null;
+}

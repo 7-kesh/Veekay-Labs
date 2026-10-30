@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { futuresPlan, futuresRealized } from './futures-calc.js';
+import { futuresPlan, futuresRealized, contractFor } from './futures-calc.js';
+import { FUTURES_CONTRACTS } from './constants.js';
 
 const base = { entry: 5000, stop: 4995, target: 5010, contracts: 2, pointValue: 5, tickSize: 0.25, balance: 2000, riskPct: 2 };
 
@@ -49,4 +50,15 @@ test('realized: long win, short win, fees, ticks and R', () => {
   assert.equal(futuresRealized('short', 1, 5000, 4990, 0, 5, 0.25, 25).realized_pl, 50);
   assert.equal(futuresRealized('long', 1, 5000, 4995, 0, 5, 0.25, 25).realized_pl, -25);
   assert.equal(futuresRealized('long', 1, 5000, '', 0, 5, 0.25, 25).realized_pl, null);
+});
+
+test('contract presets: roots, month codes, and a changed point value falls back to custom', () => {
+  assert.equal(contractFor(FUTURES_CONTRACTS, 'MES Dec', 5)[0], 'MES');
+  assert.equal(contractFor(FUTURES_CONTRACTS, 'ES', 50)[0], 'ES');
+  assert.equal(contractFor(FUTURES_CONTRACTS, 'MESZ6', null)[0], 'MES');
+  assert.equal(contractFor(FUTURES_CONTRACTS, 'mnq', 2)[0], 'MNQ');
+  assert.equal(contractFor(FUTURES_CONTRACTS, 'MES', 50), null);
+  assert.equal(contractFor(FUTURES_CONTRACTS, 'ZZ', 5), null);
+  assert.equal(contractFor(FUTURES_CONTRACTS, '', null), null);
+  for (const [root, , pv, tick] of FUTURES_CONTRACTS) assert.ok(pv > 0 && tick > 0, root);
 });

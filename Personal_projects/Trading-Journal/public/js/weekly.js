@@ -50,9 +50,18 @@ export function tally2candle(rows) {
   return { ...counts, rate };
 }
 
+// settings may be a promise: it is awaited only when the trade-derived maths needs it, so the other
+// queries (trades, change log) start at once instead of waiting behind it.
 export async function weeklyReview(settings, ref = null) {
   const [monday, friday] = weekBounds(ref);
-  const rows = await listScalpTrades({ lo: monday, hi: friday });
+  const [rows, changes] = await Promise.all([
+    listScalpTrades({ lo: monday, hi: friday }),
+    supabase.from('strategy_change_log').select('*').gte('date', monday).lte('date', friday).order('id').then(({ data, error }) => { if (error) throw error; return data; }),
+  ]);
+  const setupCIds = rows.filter(r => r.setup === 'C').map(r => r.id);
+  const [cfg, scResults] = await Promise.all([settings, setupC.resultsFor(setupCIds)]);
+  settings = cfg;
+
   const known = rows.filter(r => r.net_pnl !== null);
   const wins = known.filter(r => win(r.net_pnl));
 
@@ -61,23 +70,18 @@ export async function weeklyReview(settings, ref = null) {
   const areas = scalpAreas(rows, settings, m);
   const actionItems = focus(areas, m, 3, 'scalp');
 
-  const setupCIds = rows.filter(r => r.setup === 'C').map(r => r.id);
   const scTally = { X: 0, C: 0, E: 0, 'not recorded': 0 };
   const scResult = {};
   for (const tid of setupCIds) {
-    const row = await setupC.get(tid);
-    const key = row && row.result ? row.result : 'not recorded';
-    scResult[tid] = row && row.result ? row.result : '';
+    const res = scResults.get(tid) || '';
+    scResult[tid] = res;
+    const key = res || 'not recorded';
     scTally[key] = (scTally[key] || 0) + 1;
   }
   // The tallies are judgement calls typed per trade, so the review lists the trades they cover.
   const tallyTrades = rows.filter(r => r.setup === 'A' || r.setup === 'B' || r.setup === 'C')
     .map(r => ({ id: r.id, trade_no: r.trade_no, ticker: r.ticker, date: r.date, setup: r.setup, net_pnl: r.net_pnl,
       tally_2candle: r.tally_2candle || '', sc_result: scResult[r.id] || '' }));
-
-  const { data: changes, error } = await supabase.from('strategy_change_log').select('*')
-    .gte('date', monday).lte('date', friday).order('id');
-  if (error) throw error;
 
   const categories = {};
   for (const r of rows) { const c = r.category || '-'; categories[c] = (categories[c] || 0) + 1; }
@@ -120,22 +124,27 @@ export async function setTally2Candle(tradeId, value) {
   if (error) throw error;
 }
 
-// Options / swing for a week (Monday to Sunday): plans closed in it, by exit date.
-export async function planWeek(kind, monday) {
+// Options / swing / futures for a week (Monday to Sunday): plans closed in it, by exit date. ONE query
+// for all three kinds; returns { options, swing, futures }.
+export async function planWeeks(monday) {
   const sunday = iso(new Date(new Date(monday + 'T00:00:00').getTime() + 6 * 86400000));
   const { data, error } = await supabase.from('plans')
-    .select('id,ticker,exit_date,plan_date,realized_pl,status,account').eq('kind', kind);
+    .select('id,kind,ticker,exit_date,plan_date,realized_pl,status,account').in('kind', ['options', 'swing', 'futures']);
   if (error) throw error;
-  const all = data || [];
-  const closed = all.filter(p => p.status === 'closed' && typeof p.realized_pl === 'number'
-    && (p.exit_date || p.plan_date) >= monday && (p.exit_date || p.plan_date) <= sunday)
-    .sort((a, b) => (a.exit_date || a.plan_date).localeCompare(b.exit_date || b.plan_date));
-  const wins = closed.filter(p => p.realized_pl > 0).length;
-  return {
-    n: closed.length, wins,
-    net: Math.round(closed.reduce((s, p) => s + p.realized_pl, 0) * 100) / 100,
-    win_pct: closed.length ? Math.round(1000 * wins / closed.length) / 10 : null,
-    open: all.filter(p => p.status === 'open').length,
-    trades: closed,
-  };
+  const out = {};
+  for (const kind of ['options', 'swing', 'futures']) {
+    const all = (data || []).filter(p => p.kind === kind);
+    const closed = all.filter(p => p.status === 'closed' && typeof p.realized_pl === 'number'
+      && (p.exit_date || p.plan_date) >= monday && (p.exit_date || p.plan_date) <= sunday)
+      .sort((a, b) => (a.exit_date || a.plan_date).localeCompare(b.exit_date || b.plan_date));
+    const wins = closed.filter(p => p.realized_pl > 0).length;
+    out[kind] = {
+      n: closed.length, wins,
+      net: Math.round(closed.reduce((s, p) => s + p.realized_pl, 0) * 100) / 100,
+      win_pct: closed.length ? Math.round(1000 * wins / closed.length) / 10 : null,
+      open: all.filter(p => p.status === 'open').length,
+      trades: closed,
+    };
+  }
+  return out;
 }

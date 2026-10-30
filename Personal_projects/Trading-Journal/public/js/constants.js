@@ -101,3 +101,14 @@ export const EXIT_SCENARIOS = [
 export const FUTURES_SESSIONS = ['Asia', 'London', 'NY open', 'RTH', 'Overnight'];
 export const FUTURES_VIOLATIONS = ['No stop set before entry', 'Moved or removed stop', 'Held past stop', 'Early exit',
   'Oversized (over risk budget)', 'Over daily loss limit', 'Chased / FOMO', 'Traded outside plan', 'Added to a loser'];
+
+// Futures contracts for the trade form's dropdown: [root symbol, name, $ per full point, tick size].
+// Standard CME specs; picking one only pre-fills the point value and tick size, both stay editable.
+export const FUTURES_CONTRACTS = [
+  ['MES', 'Micro E-mini S&P 500', 5, 0.25], ['ES', 'E-mini S&P 500', 50, 0.25],
+  ['MNQ', 'Micro E-mini Nasdaq-100', 2, 0.25], ['NQ', 'E-mini Nasdaq-100', 20, 0.25],
+  ['MYM', 'Micro E-mini Dow', 0.5, 1], ['YM', 'E-mini Dow', 5, 1],
+  ['M2K', 'Micro E-mini Russell 2000', 5, 0.1], ['RTY', 'E-mini Russell 2000', 50, 0.1],
+  ['MCL', 'Micro WTI crude oil', 100, 0.01], ['CL', 'WTI crude oil', 1000, 0.01],
+  ['MGC', 'Micro gold', 10, 0.1], ['GC', 'Gold', 100, 0.1],
+];

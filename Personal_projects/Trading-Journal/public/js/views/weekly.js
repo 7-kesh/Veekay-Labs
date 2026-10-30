@@ -1,7 +1,7 @@
 // Weekly review: a summary across the four areas, then one tab per area (Scalp / Options / Swing /
 // Futures) with that area's numbers, what went well / what to fix, and the commitments for the next
 // week. Commitments recorded here show on Today and above that area's trade form until closed.
-import { weekBounds, weeklyReview, planWeek, setTally2Candle, getWeeklyNotes, saveWeeklyNotes } from '../weekly.js';
+import { weekBounds, weeklyReview, planWeeks, setTally2Candle, getWeeklyNotes, saveWeeklyNotes } from '../weekly.js';
 import * as setupC from '../setup-c.js';
 import { getSettings, getWeekAreaNote, saveWeekAreaNote, listWeeklyActions, addWeeklyAction, setWeeklyActionStatus, deleteWeeklyAction } from '../db.js';
 import { AREAS, AREA_LABEL, areaOf, areaTabs } from '../areas.js';
@@ -75,12 +75,15 @@ function planDetail(p, area) {
 export async function render(params, el) {
   const area = areaOf(params);
   const [monday, friday] = weekBounds(params.week || null);
-  const settings = await getSettings();
-  const [scalp, options, swing, futures, weekActions, openActions, note, weekNote, saved] = await Promise.all([
-    weeklyReview(settings, monday), planWeek('options', monday), planWeek('swing', monday), planWeek('futures', monday),
-    listWeeklyActions({ weekStart: monday }), listWeeklyActions({ openOnly: true }),
-    getWeekAreaNote(monday, area), getWeeklyNotes(monday), getWeeklyNotes(monday),
+  // One batch: everything starts at once (settings is passed on as a promise), and weekly_actions and
+  // weekly_notes are each read once.
+  const [scalp, plans, allActions, note, saved] = await Promise.all([
+    weeklyReview(getSettings(), monday), planWeeks(monday), listWeeklyActions({}),
+    getWeekAreaNote(monday, area), getWeeklyNotes(monday),
   ]);
+  const { options, swing, futures } = plans;
+  const weekActions = allActions.filter(a => a.week_start === monday);
+  const openActions = allActions.filter(a => a.status === 'open');
   const stats = { scalp: { n: scalp.n, net: scalp.net, win: scalp.win_pct }, options: { n: options.n, net: options.net, win: options.win_pct },
     swing: { n: swing.n, net: swing.net, win: swing.win_pct }, futures: { n: futures.n, net: futures.net, win: futures.win_pct } };
   const totalNet = Math.round((scalp.net + options.net + swing.net + futures.net) * 100) / 100;

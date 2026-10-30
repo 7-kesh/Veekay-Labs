@@ -3,8 +3,8 @@
 // plan-then-actual shape as Options/Swing. Contract point value and tick size are typed per trade.
 import { getPlan, saveFuturesTrade, deletePlan, getSettings, getCapitalData } from '../db.js';
 import { capitalSummary, stripHtml } from '../capital.js';
-import { futuresPlan } from '../futures-calc.js';
-import { EMOTIONS, FUTURES_SESSIONS, FUTURES_VIOLATIONS } from '../constants.js';
+import { futuresPlan, contractFor } from '../futures-calc.js';
+import { EMOTIONS, FUTURES_SESSIONS, FUTURES_VIOLATIONS, FUTURES_CONTRACTS } from '../constants.js';
 import { money, px, num as fmtNum, esc } from '../format.js';
 import { navigate, dispatch } from '../router.js';
 import { fld, acctPick, chips } from '../fields.js';
@@ -25,6 +25,7 @@ export async function render(params, el) {
   const p = plan || { plan_date: new Date().toISOString().slice(0, 10), account: 'paper', direction: 'long',
     account_balance: availStr(capFor('paper')), risk_pct: settings.futures_risk_pct, qty: 1, status: 'planned' };
   const emo = p.emotions || [], vio = p.violations || [];
+  const preset = plan ? contractFor(FUTURES_CONTRACTS, plan.ticker, plan.point_value) : null;
 
   el.innerHTML = `
     <div class="head"><h1>${plan ? `${esc(plan.ticker)} · Futures` : 'New futures trade'}
@@ -39,6 +40,9 @@ export async function render(params, el) {
       <div class="rowline"><div class="rl"><i>1</i>Trade<br>and contract</div>
         <div class="cells">
           ${acctPick(p.account)}
+          <div class="fld f-lg"><label for="i_contract">Contract</label><select id="i_contract">
+            <option value="">Other / custom</option>${FUTURES_CONTRACTS.map(([r, n, pv, t]) =>
+              `<option value="${r}" ${preset && preset[0] === r ? 'selected' : ''}>${r} · ${esc(n)} ($${pv}/pt, ${t})</option>`).join('')}</select></div>
           ${fld('ticker', 'Symbol', p.ticker || '', 'f-sm', { extra: `class="upper" required ${plan ? '' : 'autofocus'}`, hint: 'e.g. MES Dec' })}
           <div class="fld"><span class="lab">Direction</span><div class="seg">${['long', 'short'].map(d =>
             `<label><input type="radio" name="direction" value="${d}" ${p.direction === d ? 'checked' : ''}><span>${d[0].toUpperCase() + d.slice(1)}</span></label>`).join('')}</div></div>
@@ -153,6 +157,14 @@ export async function render(params, el) {
     const s = capFor(ev.target.value);
     el.querySelector('#capStrip').innerHTML = stripHtml(s, 'Futures');
     if (!balTouched) { programmatic = true; form.elements.account_balance.value = availStr(s); programmatic = false; update(); }
+  });
+  // Picking a contract pre-fills the point value and tick size (still editable) and the symbol if it is empty.
+  el.querySelector('#i_contract').addEventListener('change', (ev) => {
+    const c = FUTURES_CONTRACTS.find(x => x[0] === ev.target.value);
+    if (!c) return;
+    form.elements.point_value.value = String(c[2]); form.elements.tick_size.value = String(c[3]);
+    if (!form.elements.ticker.value.trim()) form.elements.ticker.value = c[0];
+    form.elements.point_value.dispatchEvent(new Event('input', { bubbles: true }));
   });
   form.elements.ticker.addEventListener('input', () => { form.elements.ticker.value = form.elements.ticker.value.toUpperCase(); });
 
