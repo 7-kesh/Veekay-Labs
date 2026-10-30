@@ -3,7 +3,7 @@
 // week. Commitments recorded here show on Today and above that area's trade form until closed.
 import { weekBounds, weeklyReview, planWeek, setTally2Candle, getWeeklyNotes, saveWeeklyNotes } from '../weekly.js';
 import * as setupC from '../setup-c.js';
-import { getSettings, getWeekAreaNote, saveWeekAreaNote, listWeeklyActions, addWeeklyAction, setWeeklyActionStatus } from '../db.js';
+import { getSettings, getWeekAreaNote, saveWeekAreaNote, listWeeklyActions, addWeeklyAction, setWeeklyActionStatus, deleteWeeklyAction } from '../db.js';
 import { AREAS, AREA_LABEL, areaOf, areaTabs } from '../areas.js';
 import { money, signclass, esc } from '../format.js';
 
@@ -20,7 +20,8 @@ function actionRow(a, carried) {
     ${carried ? `<span class="muted">(from week of ${esc(a.week_start)})</span>` : ''}
     ${a.status === 'open' ? `<button class="btn sm" data-st="done" data-id="${a.id}" type="button">Done</button>
       <button class="btn sm" data-st="dropped" data-id="${a.id}" type="button">Drop</button>`
-      : `<button class="btn sm" data-st="open" data-id="${a.id}" type="button">Reopen</button>`}</li>`;
+      : `<button class="btn sm" data-st="open" data-id="${a.id}" type="button">Reopen</button>`}
+    <button class="btn sm" data-del="${a.id}" type="button" title="Delete permanently">Delete</button></li>`;
 }
 
 function scalpDetail(data) {
@@ -155,6 +156,15 @@ export async function render(params, el) {
   }));
   el.querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', async () => {
     await setWeeklyActionStatus(Number(b.dataset.id), b.dataset.st); await again();
+  }));
+  // Delete asks twice (first click arms it) since a deleted commitment cannot be brought back.
+  el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+    if (b.dataset.armed !== '1') {
+      b.dataset.armed = '1'; b.textContent = 'Sure?';
+      setTimeout(() => { if (document.body.contains(b)) { b.dataset.armed = ''; b.textContent = 'Delete'; } }, 3000);
+      return;
+    }
+    await deleteWeeklyAction(Number(b.dataset.del)); await again();
   }));
   el.querySelectorAll('select.tally2').forEach(s => s.addEventListener('change', async () => {
     await setTally2Candle(Number(s.dataset.id), s.value); await again();

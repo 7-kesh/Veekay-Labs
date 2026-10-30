@@ -574,3 +574,5 @@ export async function setEducationDone(id, done) {
   rethrow((await supabase.from('education_items').update({ done, done_on: done ? isoToday() : null }).eq('id', id)).error);
 }
 export async function deleteEducation(id) { rethrow((await supabase.from('education_items').delete().eq('id', id)).error); }
+
+export async function deleteWeeklyAction(id) { rethrow((await supabase.from('weekly_actions').delete().eq('id', id)).error); }

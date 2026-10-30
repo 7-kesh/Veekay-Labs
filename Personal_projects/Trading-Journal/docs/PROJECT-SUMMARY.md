@@ -492,5 +492,9 @@ Commits `106f8da` to `8c036af`; pushed to GitHub and deployed with `npx wrangler
 
 ### 2026-10-30 (later): live write test, commitment round trip
 - Added a test commitment through the live Weekly Review (Scalp tab): it listed under "Recorded this week", appeared in the Commitments card on Today and above the new scalp form, and ticking it done from the form removed the card. No console errors.
-- **Left behind:** one test row in `weekly_actions` ("TEST commitment (safe to delete)...", status done, week 2026-10-26). The app has no delete for commitments; remove it in Supabase Table Editor if wanted (or add a delete button).
+- **Left behind (since deleted, see evening entry):** one test row in `weekly_actions` ("TEST commitment (safe to delete)...", status done, week 2026-10-26). The app has no delete for commitments; remove it in Supabase Table Editor if wanted (or add a delete button).
 - **Still untested live:** journal entry save, and the 2-candle / Setup C tally dropdowns (they write real trade data, so Veekay should try one).
+
+### 2026-10-30 (evening): delete button for commitments (deployed `b16c7236`)
+- Weekly Review commitments (open, done, dropped, carried) have a two-click Delete (first click arms "Sure?" for 3s). `deleteWeeklyAction` in `db.js`. Verified live; it removed the leftover test row, so `weekly_actions` is clean.
+- Active area-tab fix confirmed readable live. Still untested live: journal entry save and the 2-candle / Setup C tally dropdowns.
