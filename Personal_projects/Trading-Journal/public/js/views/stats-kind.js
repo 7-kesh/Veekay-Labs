@@ -8,7 +8,7 @@ import { tradingScore, overviewHtml } from '../score.js';
 import { CATEGORIES } from '../constants.js';
 import { rankImprovements } from '../improvement-rank.js';
 
-const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
+const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing', futures: 'Futures' };
 
 // Top imported improvements (from Claude chat wrap-ups), ranked by what their target costs. They
 // are measured on scalp trades, so only the Scalp page lists them. Never breaks the page: if the
@@ -76,6 +76,24 @@ export async function render(kind, params, el) {
           <td class="barcell"><span class="bar ${net < 0 ? 'neg' : 'pos'}" style="width:${Math.round(100 * Math.abs(net) / (mx || 1))}%"></span></td></tr>`).join('');
       })()}</tbody></table>
     </section>`;
+  } else if (kind === 'futures') {
+    const s = d.plans.futures;
+    const cut = (rows) => rows.length ? `<table class="dense"><thead><tr><th></th><th>Trades</th><th>Wins</th><th>Net</th></tr></thead><tbody>${rows.map(([k, [c, w, net]]) =>
+      `<tr><td>${esc(k)}</td><td>${c}</td><td>${w}</td><td class="${signclass(net)}">${money(net)}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">No closed trades yet.</p>';
+    const list = (rows) => `<table class="dense"><tbody>${rows.length ? rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('') : '<tr><td class="muted">none tagged</td></tr>'}</tbody></table>`;
+    detail = `<section class="card"><h2>Futures detail</h2>
+      <div class="tiles">
+        <div class="tile"><span>Trades</span><b>${s.n}</b><small>${s.open} planned or open · ${s.closed} closed</small></div>
+        <div class="tile"><span>Planned vs realized R</span><b>${s.avg_plan_rr ?? '–'} → ${s.avg_r ?? '–'}</b></div>
+        <div class="tile"><span>Average ticks</span><b>${s.avg_ticks ?? '–'}</b><small>per closed trade</small></div>
+        <div class="tile"><span>Net P&amp;L</span><b class="${signclass(s.net)}">${money(s.net) || '$0.00'}</b></div>
+      </div>
+      <div class="cols">
+        <div><h3>By session</h3>${cut(s.by_session)}</div>
+        <div><h3>By setup</h3>${cut(s.by_setup)}</div>
+        <div><h3>Top violations</h3>${list(s.violations)}</div>
+        <div><h3>Emotions</h3>${list(s.emotions)}</div>
+      </div></section>`;
   } else {
     const s = d.plans[kind];
     detail = `<section class="card"><h2>${title} detail</h2>

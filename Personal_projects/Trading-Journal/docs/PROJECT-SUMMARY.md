@@ -506,3 +506,8 @@ Commits `106f8da` to `8c036af`; pushed to GitHub and deployed with `npx wrangler
 - Futures margin counts as money tied up (`capital.openCost` uses `margin_used`). `listOpenPositions` selects `margin_used`, so the migration must run before any deploy of this code. Sidebar Futures is now a link; Weekly Review Futures tab has real stats; export-day includes futures.
 - Verified live: form renders, forecast matches the tests, list and weekly tab load. NOT tested live: saving a futures trade, screenshots/export on one. Settings futures capital is still $0 (set it for a risk budget).
 - **Not built:** Futures stats page (Portfolio says so); strategy rules for futures are user-added.
+
+### 2026-10-30 (late night): Futures stats page (deployed `2c75ed23`, no migration)
+- `#/stats/futures` + sidebar link. `stats.js`: `KINDS` now includes futures; futures gets by-session / by-setup / violations / emotions / avg ticks. `improve.js` `planAreas` costs futures violation tags (net-negative tags become leaks with a "Stop: ..." directive; positive-net tags are not leaks). `views/stats-kind.js` has a Futures detail card. Test added in `improve.test.mjs` (18 JS tests pass).
+- Portfolio: the area sections stay Scalp/Options/Swing (`portfolio().kinds` is explicit); futures P&L is merged into the overall total and cumulative chart (calendar and levels already counted it); Futures card links to the new page.
+- Verified live: futures stats page renders empty with no console errors; Portfolio unchanged. Untested live with data until Veekay closes futures trades.

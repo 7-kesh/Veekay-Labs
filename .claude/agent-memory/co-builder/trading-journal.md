@@ -38,3 +38,5 @@ metadata:
 **Update 2026-10-30 (evening):** LIVE `b16c7236`: two-click Delete on weekly commitments; test row removed, table clean. Active tab fix confirmed. Still untested live: journal entry save, tally dropdowns.
 
 **Update 2026-10-30 (night):** futures trade form LIVE `8601c91e` (plan-then-actual in `plans` kind 'futures', `migrate-futures.sql` run, `futures-calc.js` tested). No contract built in: point value + tick size typed per trade (maybe a dropdown later). Margin counts as tied-up money. Untested live: saving a futures trade, screenshots/export. Not built: Futures stats page. Veekay still to set Futures starting capital in Settings. Migrations must run BEFORE deploy.
+
+**Update 2026-10-30 (late night):** Futures stats page LIVE `2c75ed23` (`#/stats/futures`: score, leaks incl. violation-tag costs, by session/setup, violations, emotions). Portfolio area sections stay 3; futures counts in the overall total. Untested with real futures data. Still open: Veekay sets Futures starting capital, enters a first futures trade, picks contracts (dropdown idea).

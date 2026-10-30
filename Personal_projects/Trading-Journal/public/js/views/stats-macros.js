@@ -2,7 +2,7 @@ import { periodSelectsHtml, readPeriod } from '../period.js';
 // Port of app/templates/_stats_macros.html - shared markup builders for the stats pages.
 import { money, signclass, num as fmtNum, esc } from '../format.js';
 
-const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
+const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing', futures: 'Futures' };
 const IMPACT_LABEL = { high: 'High', med: 'Medium', low: 'Low' };
 
 export function rate(r) {

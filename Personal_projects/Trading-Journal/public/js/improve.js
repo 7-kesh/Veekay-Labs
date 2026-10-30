@@ -217,8 +217,21 @@ export function planAreas(kind, plans, settings, m) {
   if (overbudget.length) {
     items.push(item('Plans over the risk budget',
       `${overbudget.length} of ${plans.length} plans risk more than the ${overbudget[0].risk_pct}% budget (largest planned loss ${usd(Math.max(...overbudget.map(p => p.planned_loss)))}).`,
-      `Use the Max ${kind === 'options' ? 'contracts' : 'shares'} figure in the forecast row, or move the stop, before you enter.`,
+      `Use the Max ${kind === 'swing' ? 'shares' : 'contracts'} figure in the forecast row, or move the stop, before you enter.`,
       { n: overbudget.length, kind: 'data', directive: 'Size every plan within the risk budget' }));
+  }
+
+  // Futures: the rule-violation chips ticked on a trade, costed by what those trades lost.
+  if (kind === 'futures') {
+    const byTag = new Map();
+    for (const p of closed) for (const t of (p.violations || [])) { if (!byTag.has(t)) byTag.set(t, []); byTag.get(t).push(p.realized_pl); }
+    for (const [t, vals] of byTag) {
+      const net = vals.reduce((a, v) => a + v, 0);
+      if (net >= 0) continue;
+      items.push(item(`Violation: ${t}`, `${vals.length} closed trade(s) tagged "${t}" netted ${usd(net)}.`,
+        'Make this a pre-trade check: if it applies, skip the trade or fix it before entering.',
+        { cost: -net, n: vals.length, directive: `Stop: ${t.toLowerCase()}` }));
+    }
   }
 
   if (m.avg_win_r !== null && m.avg_win_r !== undefined && closed.length) {

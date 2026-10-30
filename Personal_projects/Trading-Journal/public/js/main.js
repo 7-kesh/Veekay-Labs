@@ -48,6 +48,7 @@ register('stats/portfolio', statsPortfolio.render);
 register('stats/scalp', (p, el) => statsKind.render('scalp', p, el));
 register('stats/options', (p, el) => statsKind.render('options', p, el));
 register('stats/swing', (p, el) => statsKind.render('swing', p, el));
+register('stats/futures', (p, el) => statsKind.render('futures', p, el));
 
 mount(app);
 

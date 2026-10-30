@@ -6,8 +6,8 @@ import { scalpAreas, planAreas, focus } from './improve.js';
 import { EXIT_SCENARIOS } from './constants.js';
 import { periodBounds } from './period.js';
 
-export const KINDS = ['options', 'swing'];
-const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing' };
+export const KINDS = ['options', 'swing', 'futures'];
+const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing', futures: 'Futures' };
 
 export { periodBounds };
 
@@ -86,6 +86,19 @@ export async function statsData(period = 'all', account = 'all') {
       entry_ok: rate(prFiltered, 'entry_followed'), exit_ok: rate(prFiltered, 'exit_followed'),
       scenarios: counterTop(closed.map(p => p.exit_scenario).filter(Boolean), 100),
     };
+    if (kind === 'futures') {
+      const groups = (key) => {
+        const m = new Map();
+        for (const p of closed) { const k = key(p) || 'not recorded'; const g = m.get(k) || [0, 0, 0]; g[0] += 1; g[1] += win(p.realized_pl) ? 1 : 0; g[2] += p.realized_pl || 0; m.set(k, g); }
+        return [...m.entries()].sort((a, b) => b[1][0] - a[1][0]);
+      };
+      Object.assign(plans[kind], {
+        avg_ticks: avg(closed.map(p => p.realized_ticks)),
+        by_session: groups(p => p.session), by_setup: groups(p => p.setup),
+        violations: counterTop(closed.flatMap(p => p.violations || []), 8),
+        emotions: counterTop(closed.flatMap(p => p.emotions || []), 8),
+      });
+    }
   }
 
   const focusByKind = {};
@@ -106,8 +119,9 @@ function byDay(points) {
 }
 
 export function portfolio(d) {
-  const kinds = ['scalp', ...KINDS];
+  const kinds = ['scalp', 'options', 'swing']; // area sections on the Portfolio page; futures has its own stats page
   const merged = kinds.flatMap(k => d.charts[k].points.map(p => ({ label: `${KIND_LABEL[k]} ${p.label}`, date: p.date, pnl: p.pnl, r: null })));
+  merged.push(...d.charts.futures.points.map(p => ({ label: `Futures ${p.label}`, date: p.date, pnl: p.pnl, r: null }))); // futures counts in the overall total
   merged.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
   const total = analyse(merged);
 
