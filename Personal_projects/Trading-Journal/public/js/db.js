@@ -4,6 +4,7 @@ import { openCost } from './capital.js';
 import { supabase } from './supabase-client.js';
 import { cleanNumber, cleanDate } from './numeric.js';
 import { DEFAULT_SETTINGS } from './constants.js';
+import { futuresPlan, futuresRealized } from './futures-calc.js';
 import { scalpResult, optionsPlan, swingPlan, realized, estimateOptionPremiums, num as calcNum } from './calc.js';
 import * as setupC from './setup-c.js';
 import { OPTIONS_CHECKLIST, SWING_CHECKLIST, EXIT_SCENARIOS } from './constants.js';
@@ -89,7 +90,7 @@ export async function listCalendarEntries() {
 export async function listOpenPositions() {
   const [s, p] = await Promise.all([
     supabase.from('scalp_trades').select('id,account,entry_price,shares,exits_text,net_pnl').is('net_pnl', null),
-    supabase.from('plans').select('id,kind,account,status,entry_price,actual_entry,qty').eq('status', 'open'),
+    supabase.from('plans').select('id,kind,account,status,entry_price,actual_entry,qty,margin_used').eq('status', 'open'),
   ]);
   rethrow(s.error); rethrow(p.error);
   return [
@@ -576,3 +577,51 @@ export async function setEducationDone(id, done) {
 export async function deleteEducation(id) { rethrow((await supabase.from('education_items').delete().eq('id', id)).error); }
 
 export async function deleteWeeklyAction(id) { rethrow((await supabase.from('weekly_actions').delete().eq('id', id)).error); }
+
+// ---------- futures trades (plans table, kind 'futures') ----------
+// form: raw field values (strings); emotions / violations arrive as arrays. Returns the saved row's id.
+export async function saveFuturesTrade(id, form, settings) {
+  const old = id ? await getPlan(id) : null;
+  const v = {};
+  for (const k of ['plan_date', 'entry_date', 'exit_date']) {
+    const raw = form[k] || '';
+    if (!raw) { v[k] = null; continue; }
+    const fixed = cleanDate(raw);
+    if (!fixed) throw new Error(`Could not read "${raw}" as a date (${k.replace('_', ' ')}). Use YYYY-MM-DD.`);
+    v[k] = fixed;
+  }
+  for (const k of ['thesis', 'exit_reason', 'notes', 'session', 'entry_time', 'exit_time', 'setup']) v[k] = form[k] || '';
+  v.ticker = (form.ticker || '').toUpperCase();
+  v.direction = form.direction || 'long';
+  v.account = form.account === 'live' ? 'live' : 'paper';
+  for (const k of ['entry_price', 'stop_price', 'target_price', 'qty', 'account_balance', 'risk_pct', 'point_value', 'tick_size',
+    'margin_used', 'daily_loss_limit', 'max_contracts', 'actual_entry', 'actual_exit', 'fees']) v[k] = numOrNull(form[k]);
+  if (v.account_balance === null) v.account_balance = calcNum(settings.capital_futures);
+  if (v.risk_pct === null) v.risk_pct = calcNum(settings.futures_risk_pct);
+  v.emotions = form.emotions || [];
+  v.violations = form.violations || [];
+
+  const plan = futuresPlan({ entry: v.entry_price, stop: v.stop_price, target: v.target_price, contracts: v.qty, pointValue: v.point_value,
+    tickSize: v.tick_size, balance: v.account_balance, riskPct: v.risk_pct, direction: v.direction, margin: v.margin_used,
+    dailyLimit: v.daily_loss_limit, maxContracts: v.max_contracts });
+  v.planned_loss = plan.planned_loss; v.potential_profit = plan.potential_profit; v.rr = plan.rr;
+
+  if (v.actual_exit !== null && v.actual_entry === null) v.actual_entry = v.entry_price;
+  Object.assign(v, futuresRealized(v.direction, v.qty, v.actual_entry, v.actual_exit, v.fees, v.point_value, v.tick_size, plan.planned_loss));
+  v.roi = null;
+
+  const cancelled = form.cancel === '1' || (old && old.status === 'cancelled' && form.reopen !== '1');
+  if (cancelled) v.status = 'cancelled';
+  else if (v.actual_exit !== null) v.status = 'closed';
+  else if (v.actual_entry !== null) v.status = 'open';
+  else v.status = 'planned';
+
+  const today = new Date().toISOString().slice(0, 10);
+  if (!v.plan_date) v.plan_date = today;
+  if (v.status === 'closed' && !v.exit_date) v.exit_date = today;
+
+  if (old) { rethrow((await supabase.from('plans').update(v).eq('id', id)).error); return id; }
+  const { data, error } = await supabase.from('plans').insert({ kind: 'futures', ...v }).select('id').single();
+  rethrow(error);
+  return data.id;
+}

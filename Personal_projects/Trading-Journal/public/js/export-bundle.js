@@ -44,7 +44,7 @@ export async function exportTrade(kind, id) {
 // Everything logged on a date, as picker rows: { key, kind, id, label }.
 export async function listDayItems(date) {
   const scalp = await listScalpTrades({ date });
-  const plans = [...await listPlans('options'), ...await listPlans('swing')].filter(p => p.plan_date === date);
+  const plans = [...await listPlans('options'), ...await listPlans('swing'), ...await listPlans('futures')].filter(p => p.plan_date === date);
   return [
     ...scalp.map(t => ({ key: `scalp:${t.id}`, kind: 'scalp', id: t.id, row: t, label: `${t.trade_no || '#' + t.id} ${t.ticker || ''} ${t.entry_time || ''}`.trim(), pnl: t.net_pnl })),
     ...plans.map(p => ({ key: `${p.kind}:${p.id}`, kind: p.kind, id: p.id, row: p, label: `${p.kind} ${p.ticker || ''}`.trim(), pnl: null })),

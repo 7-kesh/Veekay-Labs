@@ -85,7 +85,7 @@ export async function render(params, el) {
             : `<p class="muted">No closed ${KIND_LABEL[k].toLowerCase()} trades with a P&amp;L in this period yet.</p>`}
         </section>`;
       }).join('')}
-      <section class="card sumcard ar-futures"><div class="sumhead"><h2>Futures</h2></div><p class="muted">Coming soon.</p></section>
+      <section class="card sumcard ar-futures"><div class="sumhead"><h2>Futures</h2></div><p class="muted">Futures stats page is not built yet. Closed futures trades already count in the calendar and levels.</p></section>
     </div>
 
     <section class="card"><h2>Areas side by side <small class="muted">each trade type on its own</small></h2>
@@ -93,7 +93,7 @@ export async function render(params, el) {
         <th>Area</th><th>Trades</th><th>Win %</th><th>Loss %</th><th>Net P&amp;L</th><th>Avg win</th><th>Avg loss</th><th>Win ÷ loss</th><th>Profit factor</th><th>Expectancy</th><th>Best</th><th>Worst</th><th></th></tr></thead><tbody>
       ${p.kinds.map(k => `<tr class="arow ar-${k}"><td><span class="areatag at-${k}">${KIND_LABEL[k]}</span></td>${row(d.charts[k].m)}
         <td><a href="#/stats/${k}?${qs}">open</a></td></tr>`).join('')}
-      <tr class="arow"><td><span class="areatag at-futures">Futures</span></td><td colspan="12" class="muted">Coming soon</td></tr>
+      <tr class="arow"><td><span class="areatag at-futures">Futures</span></td><td colspan="12" class="muted">Stats page not built yet</td></tr>
       <tr class="total"><td><b>All areas</b></td>${row(t)}<td></td></tr>
       </tbody></table></div>
     </section>

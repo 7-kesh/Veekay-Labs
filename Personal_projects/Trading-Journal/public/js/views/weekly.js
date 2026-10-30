@@ -76,14 +76,14 @@ export async function render(params, el) {
   const area = areaOf(params);
   const [monday, friday] = weekBounds(params.week || null);
   const settings = await getSettings();
-  const [scalp, options, swing, weekActions, openActions, note, weekNote, saved] = await Promise.all([
-    weeklyReview(settings, monday), planWeek('options', monday), planWeek('swing', monday),
+  const [scalp, options, swing, futures, weekActions, openActions, note, weekNote, saved] = await Promise.all([
+    weeklyReview(settings, monday), planWeek('options', monday), planWeek('swing', monday), planWeek('futures', monday),
     listWeeklyActions({ weekStart: monday }), listWeeklyActions({ openOnly: true }),
     getWeekAreaNote(monday, area), getWeeklyNotes(monday), getWeeklyNotes(monday),
   ]);
   const stats = { scalp: { n: scalp.n, net: scalp.net, win: scalp.win_pct }, options: { n: options.n, net: options.net, win: options.win_pct },
-    swing: { n: swing.n, net: swing.net, win: swing.win_pct }, futures: { n: 0, net: 0, win: null } };
-  const totalNet = Math.round((scalp.net + options.net + swing.net) * 100) / 100;
+    swing: { n: swing.n, net: swing.net, win: swing.win_pct }, futures: { n: futures.n, net: futures.net, win: futures.win_pct } };
+  const totalNet = Math.round((scalp.net + options.net + swing.net + futures.net) * 100) / 100;
   const mine = weekActions.filter(a => a.area === area);
   const carried = openActions.filter(a => a.area === area && a.week_start < monday);
 
@@ -98,10 +98,10 @@ export async function render(params, el) {
     <section class="card"><h2>Summary <small class="muted">all areas</small></h2>
       <table class="dense"><thead><tr><th>Area</th><th>Trades</th><th>Net</th><th>Win rate</th><th>Commitments</th></tr></thead><tbody>
       ${AREAS.map(([a, l]) => { const s = stats[a]; const acts = weekActions.filter(x => x.area === a);
-        return `<tr><td><a href="#/weekly?week=${monday}&area=${a}">${l}</a></td><td>${a === 'futures' ? '–' : s.n}</td>
-        <td class="${signclass(s.net)}">${a === 'futures' ? '–' : money(s.net)}</td><td>${pct(s.win)}</td>
+        return `<tr><td><a href="#/weekly?week=${monday}&area=${a}">${l}</a></td><td>${s.n}</td>
+        <td class="${signclass(s.net)}">${money(s.net)}</td><td>${pct(s.win)}</td>
         <td>${acts.length ? `${acts.filter(x => x.status === 'done').length} done · ${acts.filter(x => x.status === 'open').length} open of ${acts.length}` : '–'}</td></tr>`; }).join('')}
-      <tr><td><b>Total</b></td><td><b>${scalp.n + options.n + swing.n}</b></td><td class="${signclass(totalNet)}"><b>${money(totalNet)}</b></td><td></td><td></td></tr>
+      <tr><td><b>Total</b></td><td><b>${scalp.n + options.n + swing.n + futures.n}</b></td><td class="${signclass(totalNet)}"><b>${money(totalNet)}</b></td><td></td><td></td></tr>
       </tbody></table>
       <form id="weekForm" style="margin-top:12px">
         <label>Weekend prep <textarea name="weekend_prep" rows="2">${esc(saved ? saved.weekend_prep : '')}</textarea></label>
@@ -114,8 +114,7 @@ export async function render(params, el) {
 
     <section class="card"><h2>${AREA_LABEL[area]}</h2>
       ${area === 'scalp' ? scalpDetail(scalp)
-        : area === 'futures' ? '<p class="muted">Futures trading is coming soon. You can still record notes and commitments for it below.</p>'
-        : planDetail(area === 'options' ? options : swing, area)}
+        : planDetail(area === 'options' ? options : area === 'swing' ? swing : futures, area)}
     </section>
 
     <section class="card" style="margin-top:16px"><h2>${AREA_LABEL[area]}: what went well and what to fix</h2>

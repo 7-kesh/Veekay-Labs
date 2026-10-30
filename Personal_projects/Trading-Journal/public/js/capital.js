@@ -21,6 +21,7 @@ export function openCost(kind, row) {
     return n(row.entry_price) > 0 && n(row.shares) > 0 ? r2(n(row.entry_price) * n(row.shares)) : null;
   }
   if (row.status !== 'open') return null;
+  if (kind === 'futures') return n(row.margin_used) > 0 ? r2(n(row.margin_used)) : null; // futures ties up margin, not price x size
   const px = n(row.actual_entry) > 0 ? n(row.actual_entry) : n(row.entry_price);
   return px > 0 && n(row.qty) > 0 ? r2(px * MULT[kind] * n(row.qty)) : null;
 }

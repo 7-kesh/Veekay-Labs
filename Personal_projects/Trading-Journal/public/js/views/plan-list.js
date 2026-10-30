@@ -7,7 +7,7 @@ import { pctOf } from '../calc.js';
 import { downloadCsv } from '../csv.js';
 import { dispatch } from '../router.js';
 
-const KIND_LABEL = { options: 'Options', swing: 'Swing' };
+const KIND_LABEL = { options: 'Options', swing: 'Swing', futures: 'Futures' };
 
 function ynv(v) {
   return v === 'Y' ? '<span class="yn-Y">Y</span>' : v === 'N' ? '<span class="yn-N">N</span>' : '';

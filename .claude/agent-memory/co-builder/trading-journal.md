@@ -36,3 +36,5 @@ metadata:
 **Update 2026-10-30 (later):** commitment round trip verified live (add in Weekly Review -> shows on Today + scalp form -> tick done closes it). One test row left in `weekly_actions` (status done); no delete UI exists. Still untested live: journal entry save and the tally dropdowns (Veekay to try; they write real data).
 
 **Update 2026-10-30 (evening):** LIVE `b16c7236`: two-click Delete on weekly commitments; test row removed, table clean. Active tab fix confirmed. Still untested live: journal entry save, tally dropdowns.
+
+**Update 2026-10-30 (night):** futures trade form LIVE `8601c91e` (plan-then-actual in `plans` kind 'futures', `migrate-futures.sql` run, `futures-calc.js` tested). No contract built in: point value + tick size typed per trade (maybe a dropdown later). Margin counts as tied-up money. Untested live: saving a futures trade, screenshots/export. Not built: Futures stats page. Veekay still to set Futures starting capital in Settings. Migrations must run BEFORE deploy.

@@ -96,3 +96,8 @@ export const EXIT_SCENARIOS = [
   ["held", "Held beyond the stop hoping it would recover", "N"],
   ["early", "Exited early because I felt I had made enough", "N"],
 ];
+
+// Futures: one-tap lists for the futures trade form.
+export const FUTURES_SESSIONS = ['Asia', 'London', 'NY open', 'RTH', 'Overnight'];
+export const FUTURES_VIOLATIONS = ['No stop set before entry', 'Moved or removed stop', 'Held past stop', 'Early exit',
+  'Oversized (over risk budget)', 'Over daily loss limit', 'Chased / FOMO', 'Traded outside plan', 'Added to a loser'];

@@ -498,3 +498,11 @@ Commits `106f8da` to `8c036af`; pushed to GitHub and deployed with `npx wrangler
 ### 2026-10-30 (evening): delete button for commitments (deployed `b16c7236`)
 - Weekly Review commitments (open, done, dropped, carried) have a two-click Delete (first click arms "Sure?" for 3s). `deleteWeeklyAction` in `db.js`. Verified live; it removed the leftover test row, so `weekly_actions` is clean.
 - Active area-tab fix confirmed readable live. Still untested live: journal entry save and the 2-candle / Setup C tally dropdowns.
+
+### 2026-10-30 (night): futures trade form (deployed `8601c91e`; `migrate-futures.sql` run)
+- Futures trades live in `plans` with `kind='futures'`. New columns: point_value, tick_size, session, entry_time, exit_time, margin_used, daily_loss_limit, max_contracts, setup, emotions, violations, realized_ticks.
+- `futures-calc.js` (+ `futures-calc.test.mjs`, 6 tests; 17 JS tests pass): `futuresPlan` (risk per contract, ticks, planned loss, profit, R:R, budget, max by risk, margin / daily-limit / max-contract checks) and `futuresRealized` (P/L, ticks, R). `saveFuturesTrade` in `db.js`. Form `views/futures-form.js` (plan-then-actual, 6 sections incl. session, margin and limits, setup, emotions, futures violation chips, screenshots after first save). List reuses `plan-list.js`.
+- Contracts: Veekay was unsure which to trade, so NO contract is built in; point value and tick size are typed per trade. Possible later: a contract dropdown that fills them.
+- Futures margin counts as money tied up (`capital.openCost` uses `margin_used`). `listOpenPositions` selects `margin_used`, so the migration must run before any deploy of this code. Sidebar Futures is now a link; Weekly Review Futures tab has real stats; export-day includes futures.
+- Verified live: form renders, forecast matches the tests, list and weekly tab load. NOT tested live: saving a futures trade, screenshots/export on one. Settings futures capital is still $0 (set it for a risk budget).
+- **Not built:** Futures stats page (Portfolio says so); strategy rules for futures are user-added.

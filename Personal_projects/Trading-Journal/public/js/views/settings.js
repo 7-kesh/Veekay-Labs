@@ -15,7 +15,7 @@ const SECTIONS = [
     ['capital_options', 'Starting capital ($)'], ['options_risk_pct', 'Risk per trade (% of available)']] },
   { kind: 'swing', title: 'Swing', fields: [
     ['capital_swing', 'Starting capital ($)'], ['swing_risk_pct', 'Risk per trade (% of available)'], ['swing_min_rr', 'Minimum reward:risk']] },
-  { kind: 'futures', title: 'Futures', note: 'Futures trading is coming soon. These are saved for when it opens.', fields: [
+  { kind: 'futures', title: 'Futures', note: 'Margin held in open futures trades counts as money tied up. Point value and tick size are typed on each trade.', fields: [
     ['capital_futures', 'Starting capital ($)'], ['futures_risk_pct', 'Risk per trade (% of available)']] },
 ];
 const KEYS = SECTIONS.flatMap(s => s.fields.map(f => f[0]));
@@ -32,7 +32,7 @@ export async function render(_params, el) {
       <div class="setgrid">
         ${SECTIONS.map(sec => `<section class="card setcard ${sec.kind === 'futures' ? 'sec-futures-card' : 'pnl-' + sec.kind}">
           <h2>${sec.title}</h2>
-          ${sec.kind === 'futures' ? '' : stripHtml(capitalSummary(s, sec.kind, cap.entries, cap.open, { account: 'live' }), sec.title)}
+          ${stripHtml(capitalSummary(s, sec.kind, cap.entries, cap.open, { account: 'live' }), sec.title)}
           ${sec.note ? `<p class="muted note">${esc(sec.note)}</p>` : ''}
           <div class="setfields">${sec.fields.map(input).join('')}</div>
         </section>`).join('')}
