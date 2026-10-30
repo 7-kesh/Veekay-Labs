@@ -495,3 +495,82 @@ function numOrNull(v, fallback = null) {
 }
 
 function round2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }
+
+// ---------- areas: improvements, manual daily journal, weekly commitments ----------
+const isoToday = () => new Date().toISOString().slice(0, 10);
+
+export async function listImprovementsFor(area) {
+  const { data, error } = await supabase.from('improvements').select('*').eq('area', area)
+    .order('date', { ascending: false }).order('id', { ascending: false });
+  rethrow(error);
+  return data || [];
+}
+
+export async function addImprovement(area, text) {
+  rethrow((await supabase.from('improvements').insert({
+    date: isoToday(), text, area, target_type: 'none', trade_nos: [], status: 'proposed',
+  })).error);
+}
+
+export async function getJournalNote(date, area) {
+  const { data, error } = await supabase.from('journal_notes').select('*').eq('date', date).eq('area', area).maybeSingle();
+  rethrow(error);
+  return data;
+}
+
+export async function saveJournalNote(date, area, f) {
+  rethrow((await supabase.from('journal_notes').upsert({
+    date, area, summary: f.summary, went_well: f.went_well, to_fix: f.to_fix, tomorrow: f.tomorrow,
+  }, { onConflict: 'date,area' })).error);
+}
+
+export async function listJournalNotes(area, { lo, hi } = {}) {
+  let q = supabase.from('journal_notes').select('*').eq('area', area).order('date', { ascending: false });
+  if (lo) q = q.gte('date', lo).lte('date', hi);
+  const { data, error } = await q;
+  rethrow(error);
+  return data || [];
+}
+
+export async function getWeekAreaNote(weekStart, area) {
+  const { data, error } = await supabase.from('weekly_area_notes').select('*').eq('week_start', weekStart).eq('area', area).maybeSingle();
+  rethrow(error);
+  return data;
+}
+
+export async function saveWeekAreaNote(weekStart, area, wentWell, toFix) {
+  rethrow((await supabase.from('weekly_area_notes').upsert({
+    week_start: weekStart, area, went_well: wentWell, to_fix: toFix,
+  }, { onConflict: 'week_start,area' })).error);
+}
+
+// Commitments: all of a week's, or every still-open one (optionally for one area).
+export async function listWeeklyActions({ weekStart, area, openOnly } = {}) {
+  let q = supabase.from('weekly_actions').select('*').order('id');
+  if (weekStart) q = q.eq('week_start', weekStart);
+  if (area) q = q.eq('area', area);
+  if (openOnly) q = q.eq('status', 'open');
+  const { data, error } = await q;
+  rethrow(error);
+  return data || [];
+}
+
+export async function addWeeklyAction(weekStart, area, text) {
+  rethrow((await supabase.from('weekly_actions').insert({ week_start: weekStart, area, text })).error);
+}
+
+export async function setWeeklyActionStatus(id, status) {
+  rethrow((await supabase.from('weekly_actions').update({ status, closed_on: status === 'open' ? null : isoToday() }).eq('id', id)).error);
+}
+
+// ---------- education backlog ----------
+export async function listEducation() {
+  const { data, error } = await supabase.from('education_items').select('*').order('done').order('id', { ascending: false });
+  rethrow(error);
+  return data || [];
+}
+export async function addEducation(text) { rethrow((await supabase.from('education_items').insert({ text })).error); }
+export async function setEducationDone(id, done) {
+  rethrow((await supabase.from('education_items').update({ done, done_on: done ? isoToday() : null }).eq('id', id)).error);
+}
+export async function deleteEducation(id) { rethrow((await supabase.from('education_items').delete().eq('id', id)).error); }

@@ -638,7 +638,12 @@ html[data-theme="dark"] .head .actions{background:none;border:0}
 .capstrip.over{border-color:var(--neg)}.capstrip.over i.av{color:var(--neg)}
 .capstrip.unset{color:var(--muted);border-style:dashed}
 .setgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.setcard .capstrip{margin:0 0 12px}.setfields{display:flex;flex-wrap:wrap;gap:0 14px}
+.setcard{display:flex;flex-direction:column}
+.setcard .capstrip{margin:0 0 12px}
+.setfields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;align-items:end;margin-top:auto}
+.setfields .fld{width:100%;margin:0 !important;justify-content:flex-end}
+.setfields .fld>label{min-height:2.6em;display:flex;align-items:flex-end;line-height:1.3}
+.setfields input{width:100%}
 .sec-futures-card{--sec:var(--c-futures);--sec2:#F4BC6C}
 @media (max-width:900px){.setgrid{grid-template-columns:1fr}}
 
@@ -675,3 +680,14 @@ html[data-theme="dark"] .head .actions{background:none;border:0}
 .card.watch{background:linear-gradient(90deg,var(--warn),#F2C46E) top/100% 3px no-repeat,linear-gradient(180deg,#fff,#FFFCF6);margin-bottom:14px}
 html[data-theme="dark"] .card.watch{background:linear-gradient(90deg,var(--warn),#FFD38C) top/100% 3px no-repeat,linear-gradient(165deg,#1B1A22 0%,#0E1A2E 100%)}
 .watchlist{margin:0;padding-left:20px}.watchlist li{margin:6px 0}.watchlist .muted{display:block;font-size:12.5px}
+
+/* Education backlog / weekly commitments lists */
+.edulist,.acts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.edulist li,.acts li{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.edulist li label{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;margin:0}
+.edulist input[type=checkbox]{width:18px;height:18px;flex:none}
+.edulist li .btn,.acts li .btn{margin-left:auto}.acts li span:first-child{flex:1}.acts li .btn+.btn{margin-left:0}
+.sugg li{margin-bottom:6px}
+
+/* Area tabs (Improvements / Journal / Weekly / Strategy): explicit active colours, they sit outside the stats pages' --g context */
+.areatabs a.on,html[data-theme="dark"] .areatabs a.on{background:linear-gradient(135deg,#8B93FF,#B47CFF);color:#06101F;border-color:transparent;box-shadow:none}

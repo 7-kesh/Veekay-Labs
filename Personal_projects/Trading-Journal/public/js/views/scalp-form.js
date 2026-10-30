@@ -16,6 +16,7 @@ import { mountShotsPanel } from '../shots-panel.js';
 import { fld, yn, chips, acctPick } from '../fields.js';
 import { trackNewButton } from '../dirty.js';
 import { mountWatchouts } from './watchouts.js';
+import { mountCommitments } from './commitments.js';
 
 export async function render(params, el) {
   const isNew = params.id === 'new';
@@ -39,6 +40,7 @@ export async function render(params, el) {
       <div class="actions"><a class="btn" href="#/scalp">All scalp trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New trade</button></div></div>
     <div id="capStrip">${stripHtml(capFor(t.account || 'paper'), 'Scalp')}</div>
+    <div id="commitMount"></div>
     <div id="watchMount"></div>
 
     <form id="scalpForm" data-risk="${esc(settings.scalp_risk_dollars)}" data-balance="${capFor(t.account || 'paper').level || ''}" data-available="${capFor(t.account || 'paper').set ? capFor(t.account || 'paper').available : ''}" autocomplete="off">
@@ -196,6 +198,7 @@ export async function render(params, el) {
 
   wireForm();
 
+  mountCommitments(el.querySelector('#commitMount'), 'scalp');
   mountWatchouts(el.querySelector('#watchMount'));
   const reviewMount = el.querySelector('#reviewMount');
   mountShotsPanel(reviewMount, {

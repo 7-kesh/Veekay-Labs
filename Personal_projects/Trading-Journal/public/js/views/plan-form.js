@@ -1,4 +1,5 @@
 // Port of app/templates/plan_form.html + app/static/plan.js.
+import { mountCommitments } from './commitments.js';
 import { getPlan, savePlan, deletePlan, getSettings, getCapitalData } from '../db.js';
 import { capitalSummary, stripHtml } from '../capital.js';
 import { optionsPlan, swingPlan, num as calcNum, liquidityVerdict, pctOf, premiumAt, stockAtPremium, premiumAtModel, stockAtPremiumModel, optionsSanity, LIQUIDITY } from '../calc.js';
@@ -64,6 +65,8 @@ export async function render(kind, params, el) {
       ${plan ? `<span class="pill ${esc(plan.status)}">${esc(plan.status)}</span>` : ''}</h1>
       <div class="actions"><a class="btn" href="#/${kind}">All ${kind} trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New ${kind} plan</button></div></div>
+    <div id="commitMount"></div>
+    <div id="commitMount"></div>
     <div id="capStrip">${stripHtml(capFor(p.account || 'paper'), KIND_LABEL[kind])}</div>
 
     <form id="planForm" data-kind="${kind}" data-min-rr="${esc(settings.swing_min_rr)}" autocomplete="off">
@@ -293,6 +296,7 @@ function wireForm(kind, el, settings, plan, { capFor, availStr }) {
   }
   form.addEventListener('input', update); form.addEventListener('change', update); update();
 
+  mountCommitments(el.querySelector('#commitMount'), kind);
   trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => !!plan, newRoute: `${kind}/new` });
 
   // The strip (and, until you type your own, the Available $ box) follows the paper / live pick.

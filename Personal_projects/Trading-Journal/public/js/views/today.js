@@ -2,6 +2,7 @@ import { listScalpTrades } from '../db.js';
 import { money, signclass, px, esc } from '../format.js';
 import { pickAndExportDay } from '../export-picker.js';
 import { mountWatchouts } from './watchouts.js';
+import { mountCommitments } from './commitments.js';
 
 export async function render(_params, el) {
   const d = new Date().toISOString().slice(0, 10);
@@ -16,6 +17,7 @@ export async function render(_params, el) {
       <div class="n"><span>Trades</span><b>${trades.length}</b></div>
       <div class="n"><span>Wins</span><b>${wins}</b></div></div>
     </section>
+    <div id="commitMount" style="margin-top:16px"></div>
     <div id="watchMount" style="margin-top:16px"></div>
     <section class="card" style="margin-top:16px">
       <h2>Scalp trades today <small class="muted">(paper + live)</small></h2>
@@ -30,6 +32,7 @@ export async function render(_params, el) {
       <button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button>
       <span class="muted" id="exportStatus"></span></div>
   `;
+  mountCommitments(el.querySelector('#commitMount'), null);
   mountWatchouts(el.querySelector('#watchMount'));
   el.querySelector('#exportDay').addEventListener('click', async function () {
     const st = el.querySelector('#exportStatus');

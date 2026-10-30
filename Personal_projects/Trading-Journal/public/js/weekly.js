@@ -63,11 +63,17 @@ export async function weeklyReview(settings, ref = null) {
 
   const setupCIds = rows.filter(r => r.setup === 'C').map(r => r.id);
   const scTally = { X: 0, C: 0, E: 0, 'not recorded': 0 };
+  const scResult = {};
   for (const tid of setupCIds) {
     const row = await setupC.get(tid);
     const key = row && row.result ? row.result : 'not recorded';
+    scResult[tid] = row && row.result ? row.result : '';
     scTally[key] = (scTally[key] || 0) + 1;
   }
+  // The tallies are judgement calls typed per trade, so the review lists the trades they cover.
+  const tallyTrades = rows.filter(r => r.setup === 'A' || r.setup === 'B' || r.setup === 'C')
+    .map(r => ({ id: r.id, trade_no: r.trade_no, ticker: r.ticker, date: r.date, setup: r.setup, net_pnl: r.net_pnl,
+      tally_2candle: r.tally_2candle || '', sc_result: scResult[r.id] || '' }));
 
   const { data: changes, error } = await supabase.from('strategy_change_log').select('*')
     .gte('date', monday).lte('date', friday).order('id');
@@ -89,6 +95,7 @@ export async function weeklyReview(settings, ref = null) {
     days: byDay(rows, monday),
     tally_2candle: tally2candle(rows),
     setup_c_tally: scTally,
+    tally_trades: tallyTrades,
     changes: changes || [],
     action_items: actionItems,
   };
@@ -105,4 +112,30 @@ export async function saveWeeklyNotes(monday, actionItems, weekendPrep, notes) {
     week_start: monday, action_items: actionItems, weekend_prep: weekendPrep, notes: notes,
   }, { onConflict: 'week_start' });
   if (error) throw error;
+}
+
+// Quick-record from the review: the 2-candle outcome for one Setup A/B trade.
+export async function setTally2Candle(tradeId, value) {
+  const { error } = await supabase.from('scalp_trades').update({ tally_2candle: value }).eq('id', tradeId);
+  if (error) throw error;
+}
+
+// Options / swing for a week (Monday to Sunday): plans closed in it, by exit date.
+export async function planWeek(kind, monday) {
+  const sunday = iso(new Date(new Date(monday + 'T00:00:00').getTime() + 6 * 86400000));
+  const { data, error } = await supabase.from('plans')
+    .select('id,ticker,exit_date,plan_date,realized_pl,status,account').eq('kind', kind);
+  if (error) throw error;
+  const all = data || [];
+  const closed = all.filter(p => p.status === 'closed' && typeof p.realized_pl === 'number'
+    && (p.exit_date || p.plan_date) >= monday && (p.exit_date || p.plan_date) <= sunday)
+    .sort((a, b) => (a.exit_date || a.plan_date).localeCompare(b.exit_date || b.plan_date));
+  const wins = closed.filter(p => p.realized_pl > 0).length;
+  return {
+    n: closed.length, wins,
+    net: Math.round(closed.reduce((s, p) => s + p.realized_pl, 0) * 100) / 100,
+    win_pct: closed.length ? Math.round(1000 * wins / closed.length) / 10 : null,
+    open: all.filter(p => p.status === 'open').length,
+    trades: closed,
+  };
 }

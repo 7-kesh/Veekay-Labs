@@ -2,7 +2,9 @@
 
 > Read this first at the start of a session, then `docs/1_PRD.md`. Update the Snapshot and add a Session Log entry at the end of each session.
 
-## Current Snapshot (as of 2026-10-27, end of day)
+## Current Snapshot (as of 2026-10-30)
+
+- **2026-10-30 (built locally, NOT yet deployed, awaiting Veekay's "deploy" and one SQL migration):** Improvements, Daily journal, Weekly review and Strategy are now split into Scalp / Options / Swing / Futures tabs (`?area=`, `areas.js`). Weekly review = all-area summary + per-area tab (numbers, what went well / what to fix, commitments for next week). Commitments recorded there show as a card on Today and above that area's trade form until ticked done (`views/commitments.js`). Daily journal is a manual entry per day per area (`journal_notes`; scalp still also shows the Claude wrap-up). New **Education backlog** page (to-do list with check-off). Scalp weekly review: the 2-candle and Setup C tallies were empty because no trade ever had them recorded; they can now be set per trade in the review. Settings fields realigned (CSS grid). Local Flask app retired to `archive/local-flask-app/`. **Run `supabase/migrate-areas.sql` first.** Veekay confirmed: upload freeze gone, TTM Red = negative, Futures still open, options estimates good.
 
 - **2026-10-27 end of day:** latest Worker version `af6ad17e`, all code pushed. Portfolio is the opening page (area sections, levels graph, P&L calendar); per-area capital and risk in Settings; manual strategy rule check on scalp trades; no Claude calls anywhere in the app (the Worker only serves static files). Cloudflare secrets `ANTHROPIC_API_KEY` and `ALLOWED_EMAIL` were deleted; access is gated by Supabase auth plus the `allowed_emails` row-level-security table. The 2026-10-26 notes below are history where they mention Claude review or those secrets. Open: HPE options trade still open, confirm TTM sign (Red = negative), futures fields, estimate-accuracy panel after ~10 closed options trades.
 

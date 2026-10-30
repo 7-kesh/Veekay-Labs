@@ -18,6 +18,7 @@ import * as wrapupImport from './views/wrapup-import.js';
 import * as journalView from './views/journal.js';
 import * as journalEntryView from './views/journal-entry.js';
 import * as improvementsView from './views/improvements.js';
+import * as educationView from './views/education.js';
 
 const app = document.getElementById('app');
 const loginScreen = document.getElementById('loginScreen');
@@ -34,6 +35,7 @@ register('import', wrapupImport.render);
 register('journal', journalView.render);
 register('journal/:date', journalEntryView.render);
 register('improvements', improvementsView.render);
+register('education', educationView.render);
 register('options', (p, el) => planList.render('options', p, el));
 register('options/:id', (p, el) => planForm.render('options', p, el));
 register('swing', (p, el) => planList.render('swing', p, el));

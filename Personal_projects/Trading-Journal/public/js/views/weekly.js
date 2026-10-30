@@ -1,76 +1,166 @@
-// Port of app/templates/weekly.html.
-import { weekBounds, weeklyReview, getWeeklyNotes, saveWeeklyNotes } from '../weekly.js';
-import { getSettings } from '../db.js';
+// Weekly review: a summary across the four areas, then one tab per area (Scalp / Options / Swing /
+// Futures) with that area's numbers, what went well / what to fix, and the commitments for the next
+// week. Commitments recorded here show on Today and above that area's trade form until closed.
+import { weekBounds, weeklyReview, planWeek, setTally2Candle, getWeeklyNotes, saveWeeklyNotes } from '../weekly.js';
+import * as setupC from '../setup-c.js';
+import { getSettings, getWeekAreaNote, saveWeekAreaNote, listWeeklyActions, addWeeklyAction, setWeeklyActionStatus } from '../db.js';
+import { AREAS, AREA_LABEL, areaOf, areaTabs } from '../areas.js';
 import { money, signclass, esc } from '../format.js';
-import { navigate, dispatch } from '../router.js';
 
-function addDays(iso, n) {
-  const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10);
+const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+const pct = v => (v === null || v === undefined ? '–' : v + '%');
+const RATE = (v) => (v === null || v === undefined ? '–' : v + '%');
+
+function kpis(items) {
+  return `<div class="live">${items.map(([l, v, c]) => `<div class="n"><span>${l}</span><b class="${c || ''}">${v}</b></div>`).join('')}</div>`;
+}
+
+function actionRow(a, carried) {
+  return `<li data-id="${a.id}"><span class="${a.status !== 'open' ? 'muted' : ''}">${a.status === 'done' ? '✓ ' : a.status === 'dropped' ? '✗ ' : ''}${esc(a.text)}</span>
+    ${carried ? `<span class="muted">(from week of ${esc(a.week_start)})</span>` : ''}
+    ${a.status === 'open' ? `<button class="btn sm" data-st="done" data-id="${a.id}" type="button">Done</button>
+      <button class="btn sm" data-st="dropped" data-id="${a.id}" type="button">Drop</button>`
+      : `<button class="btn sm" data-st="open" data-id="${a.id}" type="button">Reopen</button>`}</li>`;
+}
+
+function scalpDetail(data) {
+  const trs = data.tally_trades;
+  const ab = trs.filter(t => t.setup !== 'C'), c = trs.filter(t => t.setup === 'C');
+  const sel = (cls, id, cur, opts) => `<select class="${cls}" data-id="${id}">${opts.map(([v, l]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const t2 = data.tally_2candle, unscored = ab.filter(t => !t.tally_2candle).length;
+  return `
+    ${kpis([['Trades', data.n], ['Net', money(data.net), signclass(data.net)], ['Win rate', pct(data.win_pct)], ['Entry OK', pct(data.entry_ok)], ['Exit OK', pct(data.exit_ok)]])}
+    <h3 style="margin-top:16px">By day</h3>
+    <table class="dense"><thead><tr><th>Date</th><th>Trades</th><th>Net</th><th>Categories</th></tr></thead>
+    <tbody>${data.days.map(d => `<tr><td>${esc(d.date)}</td><td>${d.trades}</td><td class="${signclass(d.net)}">${money(d.net)}</td>
+      <td>${Object.entries(d.cats).map(([k, n]) => `${esc(k)}:${n}`).join(' ')}</td></tr>`).join('')}</tbody></table>
+
+    <h3 style="margin-top:16px">2-candle tally <small class="muted">Setup A/B · success = price reached the first known resistance after the trigger</small></h3>
+    <p>Success: ${t2.success} · Fail: ${t2.fail} · Contaminated: ${t2.contaminated} · Rate: ${RATE(t2.rate)}
+      ${ab.length ? `· <b>${unscored}</b> of ${ab.length} not yet recorded` : ''}</p>
+    ${ab.length ? `<table class="dense"><thead><tr><th>Trade</th><th>Ticker</th><th>Setup</th><th>Net</th><th>Outcome</th></tr></thead><tbody>
+      ${ab.map(t => `<tr><td><a href="#/scalp/${t.id}">${esc(t.trade_no)}</a></td><td>${esc(t.ticker)}</td><td>${esc(t.setup)}</td>
+        <td class="${signclass(t.net_pnl)}">${money(t.net_pnl)}</td>
+        <td>${sel('tally2', t.id, t.tally_2candle, [['', 'not recorded'], ['success', 'Success'], ['fail', 'Fail'], ['contaminated', 'Contaminated']])}</td></tr>`).join('')}
+      </tbody></table>` : '<p class="muted">No Setup A/B trades this week.</p>'}
+
+    <h3 style="margin-top:16px">Setup C tally <small class="muted">experimental, never mixed into A/B</small></h3>
+    <p>X (valid sample): ${data.setup_c_tally.X} · C (failed a gate): ${data.setup_c_tally.C} · E (under review): ${data.setup_c_tally.E}
+      · Not recorded: ${data.setup_c_tally['not recorded']}</p>
+    ${c.length ? `<table class="dense"><thead><tr><th>Trade</th><th>Ticker</th><th>Net</th><th>Result</th></tr></thead><tbody>
+      ${c.map(t => `<tr><td><a href="#/scalp/${t.id}">${esc(t.trade_no)}</a></td><td>${esc(t.ticker)}</td>
+        <td class="${signclass(t.net_pnl)}">${money(t.net_pnl)}</td>
+        <td>${sel('scres', t.id, t.sc_result, [['', 'not recorded'], ...Object.entries(setupC.RESULTS)])}</td></tr>`).join('')}
+      </tbody></table>` : '<p class="muted">No Setup C trades this week.</p>'}
+
+    ${data.changes.length ? `<h3 style="margin-top:16px">Strategy changes stated this week</h3>
+      <table class="dense"><tbody>${data.changes.map(x => `<tr><td>${esc(x.date)}</td><td>${esc(x.rule_key)}</td><td>${esc(x.effect || '')}</td></tr>`).join('')}</tbody></table>` : ''}
+
+    <h3 style="margin-top:16px">Suggested action items <small class="muted">from your leaks</small></h3>
+    ${data.action_items.length ? `<ol class="sugg">${data.action_items.map(f => `<li><b>${esc(f.directive)}</b> — ${f.n} trades, ${money(f.cost)} (${esc(f.impact)} impact)
+      <button class="btn sm addSugg" type="button" data-text="${esc(f.directive)}">Add as commitment</button></li>`).join('')}</ol>`
+      : '<p class="muted">Nothing specific this week.</p>'}`;
+}
+
+function planDetail(p, area) {
+  return `${kpis([['Closed trades', p.n], ['Net', money(p.net), signclass(p.net)], ['Win rate', pct(p.win_pct)], ['Still open', p.open]])}
+    <h3 style="margin-top:16px">Closed this week</h3>
+    ${p.trades.length ? `<table class="dense"><thead><tr><th>Exit</th><th>Ticker</th><th>P&amp;L</th></tr></thead><tbody>
+      ${p.trades.map(t => `<tr><td>${esc(t.exit_date || t.plan_date)}</td><td><a href="#/${area}/${t.id}">${esc(t.ticker)}</a></td>
+        <td class="${signclass(t.realized_pl)}">${money(t.realized_pl)}</td></tr>`).join('')}</tbody></table>`
+      : `<p class="muted">No ${AREA_LABEL[area].toLowerCase()} trades closed this week.</p>`}`;
 }
 
 export async function render(params, el) {
-  const [monday] = weekBounds(params.week || null);
+  const area = areaOf(params);
+  const [monday, friday] = weekBounds(params.week || null);
   const settings = await getSettings();
-  const data = await weeklyReview(settings, monday);
-  const saved = await getWeeklyNotes(monday);
-  const prevWeek = addDays(monday, -7), nextWeek = addDays(monday, 7);
+  const [scalp, options, swing, weekActions, openActions, note, weekNote, saved] = await Promise.all([
+    weeklyReview(settings, monday), planWeek('options', monday), planWeek('swing', monday),
+    listWeeklyActions({ weekStart: monday }), listWeeklyActions({ openOnly: true }),
+    getWeekAreaNote(monday, area), getWeeklyNotes(monday), getWeeklyNotes(monday),
+  ]);
+  const stats = { scalp: { n: scalp.n, net: scalp.net, win: scalp.win_pct }, options: { n: options.n, net: options.net, win: options.win_pct },
+    swing: { n: swing.n, net: swing.net, win: swing.win_pct }, futures: { n: 0, net: 0, win: null } };
+  const totalNet = Math.round((scalp.net + options.net + swing.net) * 100) / 100;
+  const mine = weekActions.filter(a => a.area === area);
+  const carried = openActions.filter(a => a.area === area && a.week_start < monday);
 
   el.innerHTML = `
     <div class="head"><h1>Weekly review</h1>
       <div class="actions">
-        <a class="btn" href="#/weekly?week=${prevWeek}">← Prior week</a>
-        <a class="btn" href="#/weekly?week=${nextWeek}">Next week →</a>
+        <a class="btn" href="#/weekly?week=${addDays(monday, -7)}&area=${area}">← Prior week</a>
+        <a class="btn" href="#/weekly?week=${addDays(monday, 7)}&area=${area}">Next week →</a>
       </div></div>
-    <p class="muted">${esc(data.monday)} – ${esc(data.friday)}</p>
+    <p class="muted">${esc(monday)} – ${esc(friday)}</p>
 
-    <section class="card">
-      <div class="live">
-        <div class="n"><span>Trades</span><b>${data.n}</b></div>
-        <div class="n"><span>Net</span><b class="${signclass(data.net)}">${money(data.net)}</b></div>
-        <div class="n"><span>Win rate</span><b>${data.win_pct === null ? '–' : data.win_pct + '%'}</b></div>
-        <div class="n"><span>Entry OK</span><b>${data.entry_ok === null ? '–' : data.entry_ok + '%'}</b></div>
-        <div class="n"><span>Exit OK</span><b>${data.exit_ok === null ? '–' : data.exit_ok + '%'}</b></div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:16px"><h2>By day</h2>
-      <table class="dense"><thead><tr><th>Date</th><th>Trades</th><th>Net</th><th>Categories</th></tr></thead>
-      <tbody>${data.days.map(d => `<tr><td>${esc(d.date)}</td><td>${d.trades}</td>
-        <td class="${signclass(d.net)}">${money(d.net)}</td>
-        <td>${Object.entries(d.cats).map(([c, n]) => `${esc(c)}:${n}`).join(' ')}</td></tr>`).join('')}</tbody></table>
-    </section>
-
-    <section class="card" style="margin-top:16px"><h2>2-candle tally (Setup A/B)</h2>
-      <p>Success: ${data.tally_2candle.success} &middot; Fail: ${data.tally_2candle.fail} &middot; Contaminated: ${data.tally_2candle.contaminated}
-      &middot; Rate: ${data.tally_2candle.rate === null ? '–' : data.tally_2candle.rate + '%'}</p>
-      <h3 style="margin-top:10px">Setup C tally</h3>
-      <p>${Object.entries(data.setup_c_tally).map(([k, n]) => `${esc(k)}: ${n}`).join(' · ')}</p>
-    </section>
-
-    ${data.changes.length ? `<section class="card" style="margin-top:16px"><h2>Strategy changes stated this week</h2>
-      <table class="dense"><tbody>${data.changes.map(c => `<tr><td>${esc(c.date)}</td><td>${esc(c.rule_key)}</td><td>${esc(c.effect || '')}</td></tr>`).join('')}</tbody></table>
-    </section>` : ''}
-
-    <section class="card" style="margin-top:16px"><h2>Suggested action items</h2>
-      ${data.action_items.length ? `<ol>${data.action_items.map(f => `<li><b>${esc(f.directive)}</b> — ${f.n} trades, ${money(f.cost)} (${esc(f.impact)} impact)</li>`).join('')}</ol>`
-        : '<p class="muted">Nothing specific this week.</p>'}
-    </section>
-
-    <section class="card" style="margin-top:16px"><h2>Your notes</h2>
-      <form id="weeklyForm">
-        <label>Action items you're committing to<textarea name="action_items" rows="3">${esc(saved ? saved.action_items : '')}</textarea></label>
-        <label>Weekend prep<textarea name="weekend_prep" rows="3">${esc(saved ? saved.weekend_prep : '')}</textarea></label>
-        <label>Notes<textarea name="notes" rows="3">${esc(saved ? saved.notes : '')}</textarea></label>
-        <div class="actions" style="margin-top:8px"><button type="submit" class="btn primary">Save</button></div>
+    <section class="card"><h2>Summary <small class="muted">all areas</small></h2>
+      <table class="dense"><thead><tr><th>Area</th><th>Trades</th><th>Net</th><th>Win rate</th><th>Commitments</th></tr></thead><tbody>
+      ${AREAS.map(([a, l]) => { const s = stats[a]; const acts = weekActions.filter(x => x.area === a);
+        return `<tr><td><a href="#/weekly?week=${monday}&area=${a}">${l}</a></td><td>${a === 'futures' ? '–' : s.n}</td>
+        <td class="${signclass(s.net)}">${a === 'futures' ? '–' : money(s.net)}</td><td>${pct(s.win)}</td>
+        <td>${acts.length ? `${acts.filter(x => x.status === 'done').length} done · ${acts.filter(x => x.status === 'open').length} open of ${acts.length}` : '–'}</td></tr>`; }).join('')}
+      <tr><td><b>Total</b></td><td><b>${scalp.n + options.n + swing.n}</b></td><td class="${signclass(totalNet)}"><b>${money(totalNet)}</b></td><td></td><td></td></tr>
+      </tbody></table>
+      <form id="weekForm" style="margin-top:12px">
+        <label>Weekend prep <textarea name="weekend_prep" rows="2">${esc(saved ? saved.weekend_prep : '')}</textarea></label>
+        <label>Notes for the week <textarea name="notes" rows="2">${esc(saved ? saved.notes : '')}</textarea></label>
+        <div class="actions" style="margin-top:8px"><button type="submit" class="btn">Save week notes</button><span class="muted" id="weekMsg"></span></div>
       </form>
     </section>
-  `;
 
-  el.querySelector('#weeklyForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const f = e.target;
-    await saveWeeklyNotes(monday, f.action_items.value, f.weekend_prep.value, f.notes.value);
-    navigate(`weekly?week=${monday}`);
-    await dispatch();
+    ${areaTabs('weekly', area, { week: monday })}
+
+    <section class="card"><h2>${AREA_LABEL[area]}</h2>
+      ${area === 'scalp' ? scalpDetail(scalp)
+        : area === 'futures' ? '<p class="muted">Futures trading is coming soon. You can still record notes and commitments for it below.</p>'
+        : planDetail(area === 'options' ? options : swing, area)}
+    </section>
+
+    <section class="card" style="margin-top:16px"><h2>${AREA_LABEL[area]}: what went well and what to fix</h2>
+      <form id="noteForm">
+        <label>What went well<textarea name="went_well" rows="3">${esc(note ? note.went_well : '')}</textarea></label>
+        <label>What to fix<textarea name="to_fix" rows="3">${esc(note ? note.to_fix : '')}</textarea></label>
+        <div class="actions" style="margin-top:8px"><button type="submit" class="btn primary">Save</button><span class="muted" id="noteMsg"></span></div>
+      </form>
+    </section>
+
+    <section class="card" style="margin-top:16px"><h2>${AREA_LABEL[area]}: commitments for next week</h2>
+      <p class="muted note">Recorded here, they appear on Today and above the ${AREA_LABEL[area].toLowerCase()} trade form until you mark them done or drop them.</p>
+      ${carried.length ? `<h3>Still open from earlier weeks</h3><ul class="acts">${carried.map(a => actionRow(a, true)).join('')}</ul>` : ''}
+      <h3 style="margin-top:8px">Recorded this week</h3>
+      ${mine.length ? `<ul class="acts">${mine.map(a => actionRow(a, false)).join('')}</ul>` : '<p class="muted">None yet.</p>'}
+      <form id="actForm" style="display:flex;gap:8px;margin-top:8px"><input name="text" placeholder="e.g. Wait for the 5-minute reset before re-entering" required style="flex:1">
+        <button class="btn primary" type="submit">Add</button></form>
+    </section>`;
+
+  const again = () => render(params, el);
+  el.querySelector('#weekForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    await saveWeeklyNotes(monday, saved ? saved.action_items : '', f.weekend_prep.value, f.notes.value);
+    el.querySelector('#weekMsg').textContent = 'Saved.';
   });
+  el.querySelector('#noteForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    await saveWeekAreaNote(monday, area, f.went_well.value, f.to_fix.value);
+    el.querySelector('#noteMsg').textContent = 'Saved.';
+  });
+  el.querySelector('#actForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = e.target.text.value.trim();
+    if (text) { await addWeeklyAction(monday, area, text); await again(); }
+  });
+  el.querySelectorAll('.addSugg').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true; await addWeeklyAction(monday, area, b.dataset.text); await again();
+  }));
+  el.querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', async () => {
+    await setWeeklyActionStatus(Number(b.dataset.id), b.dataset.st); await again();
+  }));
+  el.querySelectorAll('select.tally2').forEach(s => s.addEventListener('change', async () => {
+    await setTally2Candle(Number(s.dataset.id), s.value); await again();
+  }));
+  el.querySelectorAll('select.scres').forEach(s => s.addEventListener('change', async () => {
+    const t = scalp.tally_trades.find(x => x.id === Number(s.dataset.id));
+    await setupC.setResult(t.id, t.date, s.value); await again();
+  }));
 }

@@ -49,3 +49,10 @@ export async function tally() {
   for (const r of data || []) out[r.result || 'not recorded'] = (out[r.result || 'not recorded'] || 0) + 1;
   return out;
 }
+
+// Quick-record from the weekly review: set only the result on a Setup C trade's evidence row.
+export async function setResult(tradeId, tradeDate, result) {
+  const existing = await get(tradeId);
+  if (existing) rethrow((await supabase.from('setup_c_log').update({ result: result || null }).eq('trade_id', tradeId)).error);
+  else rethrow((await supabase.from('setup_c_log').insert({ trade_id: tradeId, version: await ruleEffectiveFrom('setup_c', tradeDate), result: result || null })).error);
+}

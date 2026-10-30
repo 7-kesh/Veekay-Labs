@@ -1,6 +1,7 @@
 // Improvements page: active items ranked by what their target costs in real trades, with
 // before/after once adopted. Statuses: proposed -> adopted -> resolved (or dropped).
-import { listImprovements, setImprovementStatus, listScalpTrades } from '../db.js';
+import { listImprovementsFor, addImprovement, setImprovementStatus, listScalpTrades } from '../db.js';
+import { AREA_LABEL, areaOf, areaTabs } from '../areas.js';
 import { rankImprovements, beforeAfter, MIN_AFTER_TRADES } from '../improvement-rank.js';
 import { money, esc } from '../format.js';
 
@@ -19,9 +20,10 @@ function baHtml(i, ba) {
   return `<table class="dense"><thead><tr><th>Since ${esc(i.adopted_on)}</th>${head}</tr></thead><tbody>${row('Before', ba.before)}${row('After', ba.after)}</tbody></table>`;
 }
 
-export async function render(_params, el) {
+export async function render(params, el) {
+  const area = areaOf(params);
   let items = [], trades = [], err = '';
-  try { [items, trades] = await Promise.all([listImprovements(), listScalpTrades({})]); }
+  try { [items, trades] = await Promise.all([listImprovementsFor(area), area === 'scalp' ? listScalpTrades({}) : []]); }
   catch (e) { err = e.message || String(e); }
   const ranked = rankImprovements(items, trades);
   const done = items.filter(i => i.status === 'resolved' || i.status === 'dropped');
@@ -38,15 +40,22 @@ export async function render(_params, el) {
     </div></section>`;
 
   el.innerHTML = `
-    <div class="head"><h1>Improvements <small>ranked by what they cost you</small></h1><div class="actions"><a class="btn" href="#/import">Import wrap-up</a></div></div>
+    <div class="head"><h1>Improvements <small>${area === 'scalp' ? 'ranked by what they cost you' : esc(AREA_LABEL[area])}</small></h1><div class="actions">${area === 'scalp' ? '<a class="btn" href="#/import">Import wrap-up</a>' : ''}</div></div>
+    ${areaTabs('improvements', area)}
+    <form id="addImp" class="card" style="display:flex;gap:8px;margin-bottom:12px"><input name="text" placeholder="Add a ${esc(AREA_LABEL[area].toLowerCase())} improvement" required style="flex:1"><button class="btn primary" type="submit">Add</button></form>
     ${err ? `<p class="neg">${esc(err)} - if this is the first time, run <code>supabase/migrate-wrapup.sql</code> in the Supabase SQL editor.</p>` : ''}
-    ${ranked.length ? ranked.map((i, k) => card(i, k + 1)).join('') : (err ? '' : '<section class="card"><p class="muted">No active improvements. Import a wrap-up to add some.</p></section>')}
+    ${ranked.length ? ranked.map((i, k) => card(i, k + 1)).join('') : (err ? '' : '<section class="card"><p class="muted">No active improvements for this area yet.</p></section>')}
     <p class="muted note">Violation targets are ranked by the net P&amp;L lost on trades carrying that tag. Metric and no-target items sit below them, newest first. Costs for different items overlap, so don't add them up.</p>
     ${done.length ? `<details><summary>${done.length} resolved or dropped</summary>${done.map(i => `<p><b>${esc(i.status)}</b> - ${esc(i.text)} <span class="muted">(${esc(targetText(i))})</span> <a href="#" data-act="proposed" data-id="${i.id}">reopen</a></p>`).join('')}</details>` : ''}
   `;
   el.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async (e) => {
     e.preventDefault();
     await setImprovementStatus(Number(b.dataset.id), b.dataset.act);
-    await render({}, el);
+    await render(params, el);
   }));
+  el.querySelector('#addImp').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const t = e.target.text.value.trim();
+    if (t) { await addImprovement(area, t); await render(params, el); }
+  });
 }

@@ -4,20 +4,31 @@
 import { STRATEGY_ORDER, STRATEGY_LABELS, SEED_DATE, currentRules, changeLog, applyChange, ruleEffectiveFrom, CHANGE_EFFECTS } from '../strategy.js';
 import { esc } from '../format.js';
 import { dispatch } from '../router.js';
+import { AREA_LABEL, areaOf, areaTabs } from '../areas.js';
 import { buildPlaybookPdf, downloadPdf } from '../playbook-pdf.js';
 
-export async function render(_params, el) {
-  const rules = await currentRules('scalp');
-  const log = await changeLog('scalp');
+export async function render(params, el) {
+  const area = areaOf(params);
+  const rules = await currentRules(area);
+  const log = await changeLog(area);
+  // Scalp has the seeded, ordered playbook; the other areas hold rules you add yourself (the rule's
+  // title is its key).
+  const order = area === 'scalp' ? STRATEGY_ORDER : Object.keys(rules);
+  const label = k => (area === 'scalp' ? STRATEGY_LABELS[k] : k) || k;
   const today = new Date().toISOString().slice(0, 10);
 
   el.innerHTML = `
     <div class="head"><h1>Strategy</h1>
-      <button class="btn" id="downloadPdf" type="button">Download playbook PDF</button></div>
-    <section class="card muted">Frozen strategy. Any wording change is a red flag by standing rule - propose it, see how Claude classifies it, then decide.</section>
-    ${STRATEGY_ORDER.map(k => `
+      ${area === 'scalp' ? '<button class="btn" id="downloadPdf" type="button">Download playbook PDF</button>' : ''}</div>
+    ${areaTabs('strategy', area)}
+    ${area === 'scalp' ? '' : `<section class="card"><h2>Add a ${esc(AREA_LABEL[area].toLowerCase())} rule</h2>
+      <form id="newRule"><label>Rule title<input name="title" required placeholder="e.g. Entry: IV rank below 50"></label>
+      <label>Rule wording<textarea name="body" rows="3" required></textarea></label>
+      <div class="actions" style="margin-top:8px"><button class="btn primary" type="submit">Add rule</button></div></form></section>`}
+    <section class="card muted">Frozen strategy. Any wording change is a red flag by standing rule - propose it, pick its effect, then confirm.</section>
+    ${order.map(k => `
       <section class="card" style="margin-top:12px">
-        <h2>${esc(STRATEGY_LABELS[k])}</h2>
+        <h2>${esc(label(k))}</h2>
         <p>${esc(rules[k] || '(not set)')}</p>
         <details><summary>Propose a change</summary>
           <form class="proposeForm" data-rule="${esc(k)}" style="margin-top:10px">
@@ -34,17 +45,24 @@ export async function render(_params, el) {
             </div>
           </form>
         </details>
-      </section>`).join('')}
+      </section>`).join('') || (area === 'scalp' ? '' : `<section class="card" style="margin-top:12px"><p class="muted">No ${esc(AREA_LABEL[area].toLowerCase())} rules yet. Add the first one above.</p></section>`)}
 
     <section class="card" style="margin-top:16px"><h2>Change log</h2>
       <table class="dense"><thead><tr><th>Date</th><th>Rule</th><th>Effect</th><th>New wording</th></tr></thead>
-      <tbody>${(log || []).map(r => `<tr><td>${esc(r.date)}</td><td>${esc(STRATEGY_LABELS[r.rule_key] || r.rule_key)}</td>
+      <tbody>${(log || []).map(r => `<tr><td>${esc(r.date)}</td><td>${esc(label(r.rule_key))}</td>
         <td>${esc(r.effect || '')}</td><td>${esc((r.new_text || '').slice(0, 200))}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">No changes logged yet.</td></tr>'}
       </tbody></table>
     </section>
   `;
 
-  el.querySelector('#downloadPdf').addEventListener('click', async function () {
+  const nr = el.querySelector('#newRule');
+  if (nr) nr.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await applyChange(area, nr.title.value.trim(), nr.body.value.trim(), today, 'addition', false, 'added in app');
+    await dispatch();
+  });
+  const dl = el.querySelector('#downloadPdf');
+  if (dl) dl.addEventListener('click', async function () {
     this.disabled = true; this.textContent = 'Building…';
     try {
       const orderedRules = STRATEGY_ORDER.map(k => [k, STRATEGY_LABELS[k], rules[k] || '']);
@@ -88,7 +106,7 @@ export async function render(_params, el) {
       const applyBtn = form.querySelector('.applyBtn');
       applyBtn.disabled = true;
       try {
-        await applyChange('scalp', ruleKey, newText, form.effective_from.value || today,
+        await applyChange(area, ruleKey, newText, form.effective_from.value || today,
           lastClassification.effect, form.applies_same_day.checked, 'stated by Veekay');
         await dispatch(); // re-render with fresh data
       } catch (err) {
