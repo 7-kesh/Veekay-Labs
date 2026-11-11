@@ -1,6 +1,6 @@
 # KeshavTrades
 
-A private trading journal for Indian equities and derivatives, built from the existing Trading Journal application. Supports Scalp/Intraday, Options, Swing and Futures journaling, portfolio analytics, weekly reviews and AI-assisted broker-statement imports.
+A private trading journal for Indian equities and derivatives, built from the existing Trading Journal application. Organises trading and investing into Intraday, Swing, Investing and MF / ETFs, with portfolio analytics, weekly reviews and AI-assisted broker-statement imports. Existing Scalp, Options, Swing and Futures records are retained; Futures records remain in the database but the new Investing area starts as a separate long-term equity ledger.
 
 ## Architecture
 - Frontend: static JavaScript application in `public/`; host it on a static hosting provider of your choice.
@@ -29,3 +29,10 @@ The app requires Supabase authentication and an email allow-list. The Edge Funct
 - Backend: Supabase Edge Function in `supabase/functions/ai-import/`
 - Database and row-level security: `supabase/`
 - Tests: `npm test`
+
+
+## Investing and MF / ETFs
+- Investing records equity buy/sell transactions and calculates open units and average cost.
+- MF / ETFs records mutual fund and ETF purchases/redemptions, including SIP-style recurring buys.
+- Latest market prices or NAVs are entered manually; there is no live market-data feed or automatic broker sync.
+- New investment and fund data is owner-scoped by Supabase Row Level Security.
