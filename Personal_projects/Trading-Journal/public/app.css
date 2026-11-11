@@ -14,8 +14,8 @@
 }
 /* Dark mode removed on purpose (Veekay's call, 2026-10-23) - always light, regardless of
    system theme preference. */
-body.sec-scalp{--sec:var(--c-scalp)}body.sec-options{--sec:var(--c-options)}
-body.sec-swing{--sec:var(--c-swing)}body.sec-futures{--sec:var(--c-futures)}
+body.sec-scalp,body.sec-options,body.sec-intraday{--sec:var(--c-scalp)}
+body.sec-swing{--sec:var(--c-swing)}body.sec-investing{--sec:var(--c-futures)}body.sec-funds{--sec:var(--violet)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 a{color:var(--sec);text-decoration:none}a:hover{text-decoration:underline}
@@ -33,7 +33,7 @@ a{color:var(--sec);text-decoration:none}a:hover{text-decoration:underline}
 .sn.sub{margin-left:14px;font-size:14px;font-weight:500;padding:7px 12px}
 .sn:hover{text-decoration:none;background:color-mix(in srgb,var(--tc) 14%,var(--card))}
 .sn.on{background:var(--tc);color:var(--on-sec)}.sn.on::before{background:var(--on-sec)}
-.s-home{--tc:var(--c-home)}.s-scalp{--tc:var(--c-scalp)}.s-options{--tc:var(--c-options)}.s-swing{--tc:var(--c-swing)}.s-futures{--tc:var(--c-futures)}
+.s-home{--tc:var(--c-home)}.s-intraday{--tc:var(--c-scalp)}.s-swing{--tc:var(--c-swing)}.s-investing{--tc:var(--c-futures)}.s-funds{--tc:var(--violet)}
 .soon{background:rgba(0,0,0,.12);border-radius:8px;padding:0 6px;font-size:11px;font-weight:600}
 .grow{flex:1}
 @media (max-width:820px){
@@ -535,8 +535,8 @@ html[data-theme="dark"]{color-scheme:dark;
   --pos:#2FD9B6;--neg:#FF6F86;--warn:#F2B25C;--pos-bg:rgba(47,217,182,.14);--neg-bg:rgba(255,111,134,.14);--warn-bg:rgba(242,178,92,.14);
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);--ring:0 0 0 3px rgba(142,162,255,.28);
   --sec2:#B38CF5}
-html[data-theme="dark"] body.sec-scalp{--sec2:#A8B8FF}html[data-theme="dark"] body.sec-options{--sec2:#E0B4FF}
-html[data-theme="dark"] body.sec-swing{--sec2:#7CF0D3}html[data-theme="dark"] body.sec-futures{--sec2:#FFD38C}
+html[data-theme="dark"] body.sec-scalp,html[data-theme="dark"] body.sec-options,html[data-theme="dark"] body.sec-intraday{--sec2:#A8B8FF}
+html[data-theme="dark"] body.sec-swing{--sec2:#7CF0D3}html[data-theme="dark"] body.sec-investing{--sec2:#FFD38C}html[data-theme="dark"] body.sec-funds{--sec2:#D0B5FF}
 html[data-theme="dark"] .pnl-scalp{--sec2:#A8B8FF}html[data-theme="dark"] .pnl-options{--sec2:#E0B4FF}html[data-theme="dark"] .pnl-swing{--sec2:#7CF0D3}
 html[data-theme="dark"] body{background:
   radial-gradient(900px 560px at 100% -10%,rgba(128,100,200,.30),transparent 70%),
