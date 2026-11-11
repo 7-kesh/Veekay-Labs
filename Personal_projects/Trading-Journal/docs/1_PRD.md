@@ -1,131 +1,37 @@
-# Trading Journal: Product Requirements Document
+# KeshavTrades — Product Requirements
 
-> Status: v1 built and in use, 2026-10-22. Owner: Venkat Krishnan Chellappa (Veekay). Part of Veekay Labs, linked to the `TradeVenture/` folder.
-> Wireframe review is pending (Veekay is reviewing the UI); open items are in section 11.
+## Product overview
+KeshavTrades is a private, single-user trading and investment journal for Indian markets. The product is organised around four clear workspaces: **Intraday**, **Swing**, **Investing**, and **MF / ETFs**.
 
-## 1. Problem
+## Core workspaces
 
-Veekay logs trades in a Google Sheet (tabs: Paper Live Journal, Options, Swing, plus reference tabs) and in `TradeVenture/Trade_Log.csv` plus weekly Markdown journals. Pain points:
-- Entry is slow and zig-zags across wide sheets; the scalp sheet puts each trade in a column.
-- Options and swing trades are planned first and closed later, but the sheet has no clear plan-vs-actual comparison. Its Swing tab also has `#REF!`/`#DIV/0!` errors and stale copied values.
-- No view of where money is lost (which rule, which emotion, which time of day) or whether wins are big enough to pay for losses.
-- Reviewing a trade with Claude means manually assembling screenshots, order details and rules each time.
+### Intraday
+Capture intraday trades, entry and exit details, position sizing, risk, setups, execution quality, screenshots, and post-trade reviews. Trade planning and advanced instrument metrics are available within this workspace.
 
-## 2. Goals
+### Swing
+Plan and track multi-day trades, record intended entry, stop and target, then compare the plan with actual execution and realised results.
 
-1. Log a scalp trade in about 20 seconds after the trade.
-2. For options and swing: capture the plan before entry, come back for actuals, and see plan vs actual.
-3. Show profit/loss, win %, loss % and winning-vs-losing margins per trade type, and rank the key areas to improve.
-4. Review any trade with Claude from inside the app, graded against Veekay's own written rules.
-5. Keep all data local, available on both laptop and desktop through the synced GitHub folder.
+### Investing
+Maintain a long-term equity portfolio with buy/sell transactions, quantity, purchase price, fees, average cost, latest manually entered market price, current value and unrealised profit/loss.
 
-## 3. Non-goals (v1)
+### MF / ETFs
+Maintain separate mutual-fund and ETF holdings. Record SIP-style or lump-sum purchases and redemptions, units, NAV or price, fees, cost basis, latest manually entered valuation and returns.
 
-- No live market data, charts or broker integration.
-- No Futures (placeholder tab only: "Coming soon").
-- Not multi-user, not hosted, no accounts or login.
-- Not a replacement for the weekly strategy journal in `TradeVenture/` (strategy changes are still logged there).
+## Shared capabilities
+- Private authentication and owner-scoped Supabase Row Level Security.
+- Dashboard, portfolio analytics, calendar, weekly reviews and learning journal.
+- CSV/file import with AI-assisted extraction staged for user review before saving.
+- Export and audit-friendly transaction history.
 
-## 4. User and context
+## Data and pricing principles
+- Existing journal records are preserved during the workspace redesign.
+- Investment and fund transactions use dedicated tables and are not mixed with trade-plan records.
+- Latest market prices and NAVs are manually maintained until a verified market-data provider is integrated.
+- No automatic broker sync or live market feed is implied.
 
-Single user, a hands-on AI PM who paper-trades small-cap scalps (1-minute charts, 1R = $20, standard 50 shares) and is starting options and swing journals. Works on a laptop and a desktop; the GitHub folder syncs to the cloud. Currently all scalp trades are paper.
-
-## 5. Scope: four sections
-
-| Section | When entered | Flow |
-|---|---|---|
-| Scalp | After the trade | One-shot entry with setup, validity flags, violations, emotions |
-| Options | Plan before entry | Plan, then actuals, then plan-vs-actual |
-| Swing | Plan before entry | Same as options |
-| Futures | n/a | "Coming soon" placeholder |
-
-Navigation is a left sidebar: Today (what is waiting for actuals); Journal (Scalp, Options, Swing, Futures); Stats (Portfolio plus one page per trade type); Settings.
-
-## 6. Functional requirements
-
-**Entry (all sections)**
-- F0. Sidebar navigation with a colour per area; collapses to a top bar on narrow screens.
-- F1. Rows laid out left to right, numbered, with a label rail; Tab moves along a row; Cmd/Ctrl+Enter saves; sticky save bar; sticky in-page jump tabs.
-- F2. Every entry has an Account field: Paper or Live (default Paper).
-- F3. Section colours: Scalp blue, Options violet, Swing teal, Futures amber.
-
-**Scalp**
-- F4. Fields: ticker, date, in/out time, entry, shares (default 50), stop, commission, exits, setup A/B/C, setup/entry/exit valid, violations, emotions, category, entry/exit order type, notes, broker order text.
-- F5. Exits accept one price (sells everything) or `shares@price; shares@price`. Planned risk, gross and net P&L, R and an automatic category (A clean, B execution issue, C invalid entry, X Setup C) are computed live and again on save.
-- F6. Trade numbers continue the ledger (T104 onward). The 103 trades in `Trade_Log.csv` are imported (idempotent), with free-text cells kept verbatim.
-
-**Options and Swing**
-- F7. Plan: ticker, direction, entry/stop/target (premium or price), quantity, account balance, risk %, plus options-specific strike, expiry, delta, stock levels and liquidity (bid/ask, volume, open interest).
-- F8. Live forecast: investment, risk budget, planned loss, potential profit, reward:risk, max contracts/shares in budget, and verdicts (affordable, within budget, meets the swing minimum 2:1, QUALIFIED).
-- F9. Entry checklist from the sheet; actuals for entry and exit; exit scenario (target, stop, invalidated, panic, held past stop, early) suggests "exit followed".
-- F10. Status derives from the data: planned, open, closed (or cancelled). A plan-vs-actual table shows entry slippage, where the exit landed against stop/target, realized P/L, ROI and R, and flags losses beyond the plan.
-
-**Stats** (Portfolio and one page per trade type, each its own URL)
-- F11. Per-type page: tiles (net, win %, loss %, average win/loss, win-to-loss size, profit factor, expectancy); cumulative P&L; P&L per trade; win/loss split; win rate vs break-even rate; winning-vs-losing margins; size distribution; written analysis; table view.
-- F12. Filters: period (week, month, 30 days, all) and account (paper, live, both); both carry across stats pages.
-- F13. **Focus now** at the top of each page: up to three narrow, specific habits to stop or start (for example "Avoid extended entries"), each with impact (High/Medium/Low) judged from the data: trades affected, dollars lost, share of all losses, and net if those trades had been skipped. Umbrella items, items touching more than 35% of trades, and items repeating another item's trades are excluded.
-- F13b. **Key areas to improve** below it: the broader ranked list (up to six), with evidence and an action drawn from the rules; costs overlap and are labelled as not additive.
-- F13c. **Portfolio page**: combined result, biggest leaks across all areas, a table with every area side by side plus an all-areas total, cumulative P&L by area, net P&L and trade count by area, and a summary card per area.
-
-**Claude review**
-- F14. Per trade: paste screenshots (paste, drop or pick; shrunk in the browser), paste broker order text, then "Review with Claude" (API) or "Copy review packet" (no key). The review uses `rules/*.md` as the rubric and is saved with the trade.
-
-## 7. Data and platform requirements
-
-- N1. SQLite in rollback-journal mode (not WAL) in `data/journal.db`, because the folder syncs to the cloud. Screenshots in `data/screenshots/`. Neither is committed to git.
-- N2. One writer at a time: a heartbeat lock file blocks a second machine; `--force` overrides after a crash. Daily backups, 14 kept.
-- N3. The Python environment is per machine in `~/.venvs/trading-journal`, outside the synced folder. The API key is per machine in `~/.trading-journal.env`.
-- N4. Server binds to 127.0.0.1 only. Stack: Python, Flask, SQLite, server-rendered templates, plain JavaScript and inline SVG (works offline, no CDN).
-- N5. Calculations reproduce the sheet's numbers (options example: $109.96 P/L, 21.56% ROI, 3.27 R:R).
-
-## 8. Success measures
-
-- A scalp trade is logged in about 20 seconds.
-- Every options/swing trade has a plan before entry and actuals after exit.
-- Veekay uses the "Key areas to improve" list to choose one rule to work on each week.
-- Reviews are run on the trades that break a rule.
-
-## 9. Risks and mitigations
-
-| Risk | Mitigation |
-|---|---|
-| Cloud sync copies the database mid-write or from two machines | Rollback mode, single-writer lock, daily backups; wait for sync to finish before switching machines |
-| Review rubric drifts from the strategy actually in force | `rules/*.md` seeded from the journal and `Strategy_Change_Log.md`; edit when strategy changes |
-| Free-text legacy data cannot be parsed | Kept verbatim; manual net P&L field for rows whose exits cannot be parsed |
-| Small samples mislead (options/swing start empty) | Insights say so when fewer than 5 trades |
-
-## 10. Decisions made
-
-SQLite rollback mode; Python/Flask; `Trade_Log.csv` is the scalp source of truth; project lives in the Veekay Labs repo under `Personal_projects/`; Futures deferred; Paper/Live is a field, not a separate database.
-
-## 11. Open items
-
-1. Wireframe/UI review by Veekay (pending).
-2. API key not set up on either machine yet.
-3. Options risk budget: the sheet calculator uses 5% of $1,500 ($75) but its checklist text says $30. Confirm and set in Settings.
-4. Options and Swing entries default to Paper; confirm that is right.
-5. Rules files need Veekay's confirmation against the strategy in force; categories D and E in the ledger have no definition.
-6. Futures field list.
-7. Not yet run on the second machine (committed to git 2026-10-22).
-8. Claude-chat workflow: steps 2-3 built (not yet deployed or tried); step 4 (skill update) awaits Veekay's sign-off on `docs/skill-changes.md`.
-9. Possible later: nightly CSV export, premium estimator (greeks), weekly report page, strategy-change log inside the app.
-
-## 12. Claude-chat workflow (decided 2026-10-26)
-
-**Why:** in-app API reviews were unreliable (screenshots shrunk to 1200px, thin rules copy, low-effort single pass, no conversation). Claude chat with the `trade-journal` skill gives much better assessments. The app's role changes from reviewer to capture, export and import.
-
-**Roles**
-- App: capture Veekay's fields; keep original-resolution screenshots; export bundles; import the wrap-up; rank improvements from the data.
-- Claude chat + skill: unbiased assessment, asks questions, and on "wrap up for today" produces the journal entry, learnings and improvements.
-
-**Build order** (status in `PROJECT-SUMMARY.md`)
-1. **Capture + export** - full-resolution screenshots; "Export for Claude" zip per trade and per day (`tj-export/1`: `trade.json`/`day.json`, README, screenshots). API review button switched off (code kept behind `API_REVIEW_ENABLED`). DONE 2026-10-26, pending deploy.
-2. **Import + improvement items** - BUILT 2026-10-26 (needs `supabase/migrate-wrapup.sql` run, then deploy). Strict, versioned JSON schema for the wrap-up (`journal_entry`, `learnings`, `improvements`); paste/upload in the app with validation and a preview-then-confirm step; new tables for the three outputs. Improvements carry a `target` (a violation tag or a metric).
-3. **Target-based ranking + before/after** - BUILT 2026-10-26. The app ranks active improvements by the dollar cost of their target from real trades, and shows target frequency/cost before vs after the adoption date (status: proposed / adopted / resolved). Plain arithmetic, no AI.
-4. **Skill update** - see `docs/skill-changes.md` (includes a drop-folder flow: zips saved to `TradeVenture/App_Exports/`, read directly by the skill; unverified until tested with a real zip). Needs Veekay's sign-off on the export and wrap-up formats first.
-
-**Journal pages (added 2026-10-26):** the app's journal is the final record. `#/journal` lists days (year/month filters) with download of everything shown as Markdown or JSON; `#/journal/<date>` shows one day (summary, per-trade verdicts next to the app's P&L, learnings, improvements) with its own downloads; `#/import` loads a Claude wrap-up block or a previously downloaded JSON (one day or a batch, statuses preserved). Year/month filters also exist on the Scalp list, Stats pages and Options/Swing lists.
-
-**Retention:** screenshots auto-delete after 7 days; consumed export zips in `TradeVenture/App_Exports/` are deleted by the skill by end of day (docs/skill-changes.md).
-
-**Rules:** the import never edits strategy rules (a strategy change is a red flag and goes through Veekay's confirm-and-log path). The skill's frozen-strategy text is the single source of truth for grading; the app's `rules/*.md` copy is no longer used for assessment. Screenshots auto-purge after 7 days, so export promptly.
+## Product navigation
+1. Intraday
+2. Swing
+3. Investing
+4. MF / ETFs
+5. Portfolio, Reviews, Journal, Education and Settings
