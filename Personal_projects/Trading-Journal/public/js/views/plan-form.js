@@ -12,6 +12,7 @@ import { trackNewButton } from '../dirty.js';
 import { mountShotsPanel } from '../shots-panel.js';
 
 const KIND_LABEL = { options: 'Intraday', swing: 'Swing' };
+const KIND_ROUTE = { options: 'intraday/plans', swing: 'swing' };
 
 function planVsActual(p) {
   if (p.actual_entry === null || p.actual_entry === undefined) return [];
@@ -63,7 +64,7 @@ export async function render(kind, params, el) {
   el.innerHTML = `
     <div class="head"><h1>${plan ? `${esc(plan.ticker)} · ${KIND_LABEL[kind]}` : `New ${KIND_LABEL[kind]} plan`}
       ${plan ? `<span class="pill ${esc(plan.status)}">${esc(plan.status)}</span>` : ''}</h1>
-      <div class="actions"><a class="btn" href="#/${kind}">All ${KIND_LABEL[kind]} trades</a>
+      <div class="actions"><a class="btn" href="#/${KIND_ROUTE[kind]}">All ${KIND_LABEL[kind]} trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New ${KIND_LABEL[kind]} plan</button></div></div>
     <div id="commitMount"></div>
     <div id="commitMount"></div>
@@ -297,7 +298,7 @@ function wireForm(kind, el, settings, plan, { capFor, availStr }) {
   form.addEventListener('input', update); form.addEventListener('change', update); update();
 
   mountCommitments(el.querySelector('#commitMount'), kind);
-  trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => !!plan, newRoute: `${kind}/new` });
+  trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => !!plan, newRoute: `${KIND_ROUTE[kind]}/new` });
 
   // The strip (and, until you type your own, the Available $ box) follows the paper / live pick.
   const balInput = form.elements.account_balance;
@@ -338,7 +339,7 @@ function wireForm(kind, el, settings, plan, { capFor, availStr }) {
     try {
       const id = await savePlan(kind, plan ? plan.id : null, formObj, settings);
       const before = window.location.hash;
-      navigate(`${kind}/${id}`);
+      navigate(`${KIND_ROUTE[kind]}/${id}`);
       if (window.location.hash === before) await dispatch();
     } catch (err) {
       alert('Could not save: ' + (err.message || err));
@@ -359,7 +360,7 @@ function wireForm(kind, el, settings, plan, { capFor, availStr }) {
     deleteBtn.addEventListener('click', async () => {
       if (!confirm('Delete this plan and its screenshots?')) return;
       await deletePlan(kind, plan.id);
-      navigate(kind);
+      navigate(KIND_ROUTE[kind]);
       await dispatch();
     });
   }
