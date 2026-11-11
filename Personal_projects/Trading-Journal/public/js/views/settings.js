@@ -8,15 +8,14 @@ import { esc } from '../format.js';
 import { capitalSummary, stripHtml } from '../capital.js';
 
 const SECTIONS = [
-  { kind: 'scalp', title: 'Scalp', fields: [
+  { kind: 'scalp', title: 'Intraday', fields: [
     ['capital_scalp', 'Starting capital ($)'], ['scalp_risk_dollars', 'Risk per trade, 1R ($)'],
-    ['default_shares', 'Default shares'], ['default_commission', 'Default commission ($)']] },
-  { kind: 'options', title: 'Options', fields: [
-    ['capital_options', 'Starting capital ($)'], ['options_risk_pct', 'Risk per trade (% of available)']] },
+    ['default_shares', 'Default shares'], ['default_commission', 'Default commission ($)'],
+    ['capital_options', 'Plan capital ($)'], ['options_risk_pct', 'Plan risk (% of available)']] },
   { kind: 'swing', title: 'Swing', fields: [
     ['capital_swing', 'Starting capital ($)'], ['swing_risk_pct', 'Risk per trade (% of available)'], ['swing_min_rr', 'Minimum reward:risk']] },
-  { kind: 'futures', title: 'Futures', note: 'Margin held in open futures trades counts as money tied up. Point value and tick size are typed on each trade.', fields: [
-    ['capital_futures', 'Starting capital ($)'], ['futures_risk_pct', 'Risk per trade (% of available)']] },
+  { kind: 'investing', title: 'Investing', note: 'Long-term equity holdings are tracked through transactions and manually updated market prices. No separate trading-risk settings are needed.' , fields: [] },
+  { kind: 'funds', title: 'MF / ETFs', note: 'Mutual fund and ETF holdings are tracked through transactions and manually updated NAV / market prices. No separate trading-risk settings are needed.', fields: [] },
 ];
 const KEYS = SECTIONS.flatMap(s => s.fields.map(f => f[0]));
 
