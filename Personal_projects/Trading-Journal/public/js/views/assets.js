@@ -32,6 +32,7 @@ function computeHoldings(rows, prices) {
 
 export async function renderAssetClass(kind, params, el) {
   const c = CONFIG[kind];
+  const fundTabs = kind === 'mutual_fund' || kind === 'etf' ? `<nav class="subtabs"><a class="${kind === 'mutual_fund' ? 'on' : ''}" href="#/funds">Mutual Funds</a><a class="${kind === 'etf' ? 'on' : ''}" href="#/etfs">ETFs</a></nav>` : '';
   const [{ data:userData, error:userError }, { data:rows, error:rowsError }, { data:prices, error:pricesError }] = await Promise.all([
     supabase.auth.getUser(),
     supabase.from('asset_transactions').select('*').eq('asset_class', c.assetClass).order('trade_date', { ascending:false }).order('id', { ascending:false }),
@@ -45,7 +46,7 @@ export async function renderAssetClass(kind, params, el) {
   const value = holdings.reduce((s,h)=>s+(h.value ?? h.cost),0);
   const pnl = holdings.reduce((s,h)=>s+(h.pnl ?? 0),0);
   el.innerHTML = `
-    <div class="head"><div><h1>${c.title}</h1><p class="muted">${c.subtitle}. Prices are manually updated; no broker or market feed is connected.</p></div></div>
+    ${fundTabs}<div class="head"><div><h1>${c.title}</h1><p class="muted">${c.subtitle}. Prices are manually updated; no broker or market feed is connected.</p></div></div>
     <div class="tiles">
       <div class="tile"><span>Invested cost</span><b>${money(invested)}</b></div>
       <div class="tile"><span>Current value*</span><b>${money(value)}</b></div>
