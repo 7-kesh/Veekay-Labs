@@ -1,6 +1,6 @@
 import { supabase } from '../supabase-client.js';
 import { esc } from '../format.js';
-const money = value => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 }).format(Number(value || 0);
+const money = value => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 }).format(Number(value || 0));
 
 const CONFIG = {
   equity: { title: 'Investing', subtitle: 'Long-term equity portfolio', route: 'investing', assetClass: 'equity', unit: 'Shares' },
