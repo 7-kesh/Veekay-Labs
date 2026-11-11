@@ -3,66 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trading Journal</title>
+<meta name="theme-color" content="#10151f">
+<title>KeshavTrades — Trading Journal</title>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('tj-theme')||'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
 <link rel="stylesheet" href="app.css">
 <style>
-  #loginScreen { display: flex; align-items: center; justify-content: center; height: 100vh; }
-  #loginScreen .card { width: 320px; }
-  #loginScreen .card h1 { margin-top: 0; font-size: 18px; }
-  #loginScreen input { width: 100%; margin-bottom: 10px; }
-  #loginScreen .neg { font-size: 13px; }
+  #loginScreen { display:flex;align-items:center;justify-content:center;height:100vh }
+  #loginScreen .card { width:320px } #loginScreen .card h1 { margin-top:0;font-size:18px }
+  #loginScreen input { width:100%;margin-bottom:10px } #loginScreen .neg { font-size:13px }
+  .brand { letter-spacing:.02em } .tablewrap { overflow-x:auto;max-width:100% }
+  #aiPreview table { width:100%;border-collapse:collapse;font-size:12px }
+  #aiPreview th,#aiPreview td { padding:8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap }
+  #aiPreview th { color:var(--muted);text-transform:capitalize }
 </style>
 </head>
 <body>
-
 <div id="loginScreen" hidden>
-  <form id="loginForm" class="card">
-    <h1>Trading Journal</h1>
+  <form id="loginForm" class="card"><h1>KeshavTrades</h1>
     <input type="email" name="email" placeholder="Email" required autocomplete="username">
     <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
-    <button class="btn primary" type="submit" style="width:100%">Log in</button>
-    <p id="loginError" class="neg"></p>
+    <button class="btn primary" type="submit" style="width:100%">Log in</button><p id="loginError" class="neg"></p>
   </form>
 </div>
-
 <div class="shell" id="shell" hidden>
   <aside class="side" aria-label="Main navigation">
-    <a class="brand" href="#/stats/portfolio">Trading Journal</a>
-    <a class="sn s-home" href="#/stats/portfolio">Portfolio</a>
-    <a class="sn s-home" href="#/today">Today</a>
-
+    <a class="brand" href="#/stats/portfolio">KeshavTrades</a>
+    <a class="sn s-home" href="#/stats/portfolio">Portfolio</a><a class="sn s-home" href="#/today">Today</a>
     <div class="sg">Journal</div>
-    <a class="sn s-scalp" href="#/scalp">Scalp</a>
-    <a class="sn s-options" href="#/options">Options</a>
-    <a class="sn s-swing" href="#/swing">Swing</a>
-    <a class="sn s-futures" href="#/futures">Futures</a>
-
+    <a class="sn s-scalp" href="#/scalp">Scalp</a><a class="sn s-options" href="#/options">Options</a>
+    <a class="sn s-swing" href="#/swing">Swing</a><a class="sn s-futures" href="#/futures">Futures</a>
     <div class="sg">Area stats</div>
-    <a class="sn s-scalp" href="#/stats/scalp">Scalp stats</a>
-    <a class="sn s-options" href="#/stats/options">Options stats</a>
-    <a class="sn s-swing" href="#/stats/swing">Swing stats</a>
-    <a class="sn s-futures" href="#/stats/futures">Futures stats</a>
-
+    <a class="sn s-scalp" href="#/stats/scalp">Scalp stats</a><a class="sn s-options" href="#/stats/options">Options stats</a>
+    <a class="sn s-swing" href="#/stats/swing">Swing stats</a><a class="sn s-futures" href="#/stats/futures">Futures stats</a>
+    <div class="sg">AI &amp; review</div><a class="sn s-home" href="#/ai-import">AI Import</a>
     <span class="grow"></span>
-    <a class="sn s-home" href="#/improvements">Improvements</a>
-    <a class="sn s-home" href="#/journal">Daily journal</a>
-    <a class="sn s-home" href="#/weekly">Weekly review</a>
-    <a class="sn s-home" href="#/strategy">Strategy</a>
-    <a class="sn s-home" href="#/education">Education backlog</a>
-    <a class="sn s-home" href="#/settings">Settings</a>
-
+    <a class="sn s-home" href="#/improvements">Improvements</a><a class="sn s-home" href="#/journal">Daily journal</a>
+    <a class="sn s-home" href="#/weekly">Weekly review</a><a class="sn s-home" href="#/strategy">Strategy</a>
+    <a class="sn s-home" href="#/education">Education backlog</a><a class="sn s-home" href="#/settings">Settings</a>
     <div style="padding:0 16px 12px;min-width:0">
       <p id="userEmail" style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 0 6px"></p>
       <button class="btn sm themebtn" id="themeBtn" type="button" style="margin-bottom:6px"></button>
       <button class="btn sm" id="logoutBtn" style="width:100%">Log out</button>
     </div>
-    <p style="text-align:center;font-size:11px;color:var(--muted);padding:0 12px 10px">Property of VeekayLabs</p>
+    <p style="text-align:center;font-size:11px;color:var(--muted);padding:0 12px 10px">KeshavTrades · Private workspace</p>
   </aside>
   <main id="app"></main>
 </div>
-
-<script src="config.js"></script>
-<script type="module" src="js/main.js"></script>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script><script type="module" src="js/main.js"></script>
+</body></html>
