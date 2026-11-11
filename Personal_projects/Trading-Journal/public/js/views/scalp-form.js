@@ -36,10 +36,10 @@ export async function render(params, el) {
   const setupCRow = trade ? await setupC.get(trade.id) : null;
 
   el.innerHTML = `
-    <div class="head"><h1>${trade ? `Edit ${esc(trade.trade_no)} &middot; ${esc(trade.ticker)}` : 'New scalp trade'}</h1>
-      <div class="actions"><a class="btn" href="#/scalp">All scalp trades</a>
+    <div class="head"><h1>${trade ? `Edit ${esc(trade.trade_no)} &middot; ${esc(trade.ticker)}` : 'New intraday trade'}</h1>
+      <div class="actions"><a class="btn" href="#/scalp">All intraday trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New trade</button></div></div>
-    <div id="capStrip">${stripHtml(capFor(t.account || 'paper'), 'Scalp')}</div>
+    <div id="capStrip">${stripHtml(capFor(t.account || 'paper'), 'Intraday')}</div>
     <div id="commitMount"></div>
     <div id="watchMount"></div>
 
@@ -248,7 +248,7 @@ export async function render(params, el) {
     form.addEventListener('change', (ev) => {
       if (ev.target.name !== 'account') return;
       const s = capFor(ev.target.value);
-      el.querySelector('#capStrip').innerHTML = stripHtml(s, 'Scalp');
+      el.querySelector('#capStrip').innerHTML = stripHtml(s, 'Intraday');
       form.dataset.balance = s.level || '';
       form.dataset.available = s.set ? s.available : '';
       update();
