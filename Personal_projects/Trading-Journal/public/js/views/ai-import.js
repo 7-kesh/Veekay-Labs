@@ -35,7 +35,7 @@ export async function render(_params, el) {
     '</div><p class="muted note">Maximum file size: 12 MB. Excel workbooks are read in your browser; PDF and image contents are sent to the secured AI endpoint.</p>' +
     '<div class="actions"><button class="btn primary" id="analyzeBtn" type="submit">Analyse upload with AI</button><span class="muted" id="status" role="status"></span></div></form></section>' +
     '<section class="card" id="aiPreview" hidden><div class="head"><h2>Extraction preview</h2><div class="actions"><button class="btn" id="downloadJson" type="button">Download JSON</button><button class="btn primary" id="saveBatch" type="button">Save import batch</button></div></div>' +
-    '<div id="aiSummary"></div><div id="aiWarnings"></div><div id="aiTrades"></div>' +
+    '<div id="aiSummary"></div><div id="aiInsights"></div><div id="aiWarnings"></div><div id="aiTrades"></div>' +
     '<p class="muted note">AI extraction can misread quantities, prices, fees or trade direction. Verify the original broker statement before using these records for performance or tax decisions.</p><span class="muted" id="saveStatus"></span></section>';
 
   const form = el.querySelector('#aiImportForm'), fileInput = el.querySelector('#tradeFile');
@@ -70,6 +70,7 @@ export async function render(_params, el) {
       latest = body.result; latestFile = file;
       if (!latest || !Array.isArray(latest.trades)) throw new Error('The AI response did not contain a valid trades array.');
       el.querySelector('#aiSummary').innerHTML = '<h3>Summary</h3><p>' + esc(latest.summary || 'No summary supplied.') + '</p>';
+      el.querySelector('#aiInsights').innerHTML = (latest.insights || []).length ? '<h3>AI observations</h3><ul>' + latest.insights.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
       el.querySelector('#aiWarnings').innerHTML = (latest.warnings || []).length ? '<h3>Warnings</h3><ul class="neg">' + latest.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
       el.querySelector('#aiTrades').innerHTML = '<h3>Extracted trades (' + latest.trades.length + ')</h3>' + renderTrades(latest.trades);
       preview.hidden = false; status.textContent = 'Extraction complete. Review the records below.';
