@@ -57,7 +57,7 @@ Do not deploy until the Supabase schema, allow-list, frontend config and Worker 
 ## AI upload flow
 The AI Import page accepts CSV, TSV, TXT, JSON, XLSX, XLS, PDF and PNG/JPG/WEBP files up to 12 MB. Excel workbooks are converted to sheet text in the browser. PDF and image contents are sent to the secured Worker endpoint. The Worker validates the signed-in Supabase user and allow-list before calling the OpenAI Responses API.
 
-The user receives a structured preview, confidence labels, warnings and evidence-based observations. The result can be downloaded as JSON and saved to the private `ai_import_batches` staging table after explicit confirmation. The source file is not retained by the endpoint. Staging batches do not silently modify canonical trade rows.
+The user receives a structured preview, confidence labels, warnings and evidence-based observations. The result can be downloaded as JSON and saved to the private `ai_import_batches` staging table after explicit confirmation. The Worker does not persist the original upload or store the OpenAI Response object (`store: false`). The file is still transmitted to OpenAI for processing and remains subject to the API account's applicable data controls and abuse-monitoring retention; do not treat this as a zero-retention guarantee. Staging batches do not silently modify canonical trade rows.
 
 ## Scope and safety
 - Zerodha, Groww and generic broker support currently means broker-export file imports.
