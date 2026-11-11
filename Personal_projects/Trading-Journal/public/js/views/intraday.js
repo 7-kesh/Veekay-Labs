@@ -6,9 +6,9 @@ export async function render(params, el) {
         <p>Record entries, exits, risk, setups, execution quality, screenshots and post-trade reviews.</p>
         <a class="btn primary" href="#/scalp">Open intraday trades</a>
       </section>
-      <section class="card"><h2>Options intraday plans</h2>
-        <p>Keep option-specific trade planning and Greeks in the same Intraday workspace.</p>
-        <a class="btn primary" href="#/options">Open options journal</a>
+      <section class="card"><h2>Intraday trade plans</h2>
+        <p>Keep advanced instrument planning, risk metrics and trade Greeks in the same Intraday workspace.</p>
+        <a class="btn primary" href="#/options">Open trade plans</a>
       </section>
     </div>
   `;
