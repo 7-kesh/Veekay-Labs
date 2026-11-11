@@ -1,6 +1,6 @@
 # Trading Journal
 
-Local web app for Veekay's trade logging (Scalp, Options, Swing; Futures coming soon). Part of Veekay Labs, but separate from the Phase 1-5 gates in the repo root.
+Private web app for trading and investment journaling across Intraday, Swing, Investing and MF / ETFs. Part of Veekay Labs, but separate from the Phase 1-5 gates in the repo root.
 
 ## Session protocol
 At the start of a session read `docs/PROJECT-SUMMARY.md` (Snapshot, Gotchas) and `docs/1_PRD.md`. At the end, update the Snapshot and add a Session Log entry, and tick off or add items in the PRD's open list.
