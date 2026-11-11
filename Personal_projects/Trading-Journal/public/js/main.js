@@ -47,6 +47,7 @@ register('options/:id', (p, el) => planForm.render('options', p, el));
 register('swing', (p, el) => planList.render('swing', p, el));
 register('investing', (p, el) => assetsView.renderAssetClass('equity', p, el));
 register('funds', (p, el) => assetsView.renderAssetClass('mutual_fund', p, el));
+register('etfs', (p, el) => assetsView.renderAssetClass('etf', p, el));
 register('futures', async (p, el) => { navigate('investing'); await dispatch(); });
 register('futures/:id', async (p, el) => { navigate('investing'); await dispatch(); });
 register('swing/:id', (p, el) => planForm.render('swing', p, el));
