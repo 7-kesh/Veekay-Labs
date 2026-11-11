@@ -2,10 +2,11 @@
 const JSON_HEADERS = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' };
 const response = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: JSON_HEADERS });
 const schema = {
-  type: 'object', additionalProperties: false, required: ['summary','trades','warnings'],
+  type: 'object', additionalProperties: false, required: ['summary','trades','warnings','insights'],
   properties: {
     summary: { type: 'string' },
     warnings: { type: 'array', items: { type: 'string' } },
+    insights: { type: 'array', items: { type: 'string' } },
     trades: { type: 'array', items: {
       type: 'object', additionalProperties: false,
       required: ['date','symbol','trade_type','side','quantity','entry_price','exit_price','net_pnl','fees','confidence','notes'],
@@ -53,7 +54,7 @@ export default {
         const broker = String(body.broker || 'Auto-detect').slice(0, 40);
         const account = body.account === 'paper' ? 'paper' : 'live';
         const content = [];
-        const instructions = 'You are a careful Indian equity and derivatives trade-statement extraction assistant for KeshavTrades. Extract only trade facts visible in the supplied source. Do not infer missing prices, quantities, dates, fees or P&L. Use null when absent. Treat buy/sell as transaction side, not position direction. Keep each trade/fill as a distinct row if the source does so; do not combine partial fills unless the source explicitly groups them. Use ISO YYYY-MM-DD dates when clear. Convert numeric values to numbers. Identify Indian formats and INR values; do not convert currencies. Mark confidence low when ambiguous. Put ambiguity and source caveats in notes and warnings. This is data extraction only, not investment advice. Broker selected: ' + broker + '. Account type: ' + account + '. File: ' + body.filename;
+        const instructions = 'You are a careful Indian equity and derivatives trade-statement extraction assistant for KeshavTrades. Extract only trade facts visible in the supplied source. Do not infer missing prices, quantities, dates, fees or P&L. Use null when absent. Treat buy/sell as transaction side, not position direction. Keep each trade/fill as a distinct row if the source does so; do not combine partial fills unless the source explicitly groups them. Use ISO YYYY-MM-DD dates when clear. Convert numeric values to numbers. Identify Indian formats and INR values; do not convert currencies. Mark confidence low when ambiguous. Put ambiguity and source caveats in notes and warnings. Add concise insights only when supported by the uploaded records; explicitly mention sample size and avoid extrapolating. This is data extraction and journaling analysis only, not investment advice. Broker selected: ' + broker + '. Account type: ' + account + '. File: ' + body.filename;
         if (body.contentType === 'text') {
           if (typeof body.text !== 'string' || body.text.length > 180000) return response({ error:'Text input is missing or too large.' }, 400);
           content.push({ type:'input_text', text:'Extract trades from this broker export:\n' + body.text });
