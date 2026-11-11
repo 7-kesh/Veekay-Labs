@@ -20,15 +20,15 @@ export async function render(_params, el) {
     <div id="commitMount" style="margin-top:16px"></div>
     <div id="watchMount" style="margin-top:16px"></div>
     <section class="card" style="margin-top:16px">
-      <h2>Scalp trades today <small class="muted">(paper + live)</small></h2>
+      <h2>Intraday trades today <small class="muted">(paper + live)</small></h2>
       <table class="dense"><thead><tr><th>Trade</th><th>Acct</th><th>Ticker</th><th>Entry</th><th>Net</th><th>Cat</th><th></th></tr></thead>
       <tbody>${trades.map(t => `<tr>
         <td>${esc(t.trade_no)}</td><td><span class="acct acct-${t.account || 'paper'}">${t.account === 'live' ? 'Live' : 'Paper'}</span></td><td><b>${esc(t.ticker)}</b></td><td>${px(t.entry_price)}</td>
         <td class="${signclass(t.net_pnl)}">${money(t.net_pnl)}</td><td>${esc(t.category || '')}</td>
-        <td><a href="#/scalp/${t.id}">edit</a></td></tr>`).join('') || '<tr><td colspan="7" class="muted">No trades yet today.</td></tr>'}
+        <td><a href="#/intraday/trades/${t.id}">edit</a></td></tr>`).join('') || '<tr><td colspan="7" class="muted">No trades yet today.</td></tr>'}
       </tbody></table>
     </section>
-    <div class="actions" style="margin-top:16px"><a class="btn primary" href="#/scalp/new">+ New scalp trade</a>
+    <div class="actions" style="margin-top:16px"><a class="btn primary" href="#/intraday/trades/new">+ New intraday trade</a>
       <button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button>
       <span class="muted" id="exportStatus"></span></div>
   `;
