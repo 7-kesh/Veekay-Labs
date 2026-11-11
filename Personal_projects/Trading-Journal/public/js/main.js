@@ -18,7 +18,6 @@ import * as wrapupImport from './views/wrapup-import.js';
 import * as journalView from './views/journal.js';
 import * as journalEntryView from './views/journal-entry.js';
 import * as improvementsView from './views/improvements.js';
-import * as futuresForm from './views/futures-form.js';
 import * as educationView from './views/education.js';
 import * as aiImportView from './views/ai-import.js';
 import * as intradayView from './views/intraday.js';
@@ -31,8 +30,8 @@ const userEmailEl = document.getElementById('userEmail');
 
 register('today', today.render);
 register('intraday', intradayView.render);
-register('scalp', scalpList.render);
-register('scalp/:id', scalpForm.render);
+register('intraday/trades', scalpList.render);
+register('intraday/trades/:id', scalpForm.render);
 register('strategy', strategyView.render);
 register('weekly', weeklyView.render);
 register('settings', settingsView.render);
@@ -42,30 +41,26 @@ register('journal/:date', journalEntryView.render);
 register('improvements', improvementsView.render);
 register('education', educationView.render);
 register('ai-import', aiImportView.render);
-register('options', (p, el) => planList.render('options', p, el));
-register('options/:id', (p, el) => planForm.render('options', p, el));
+register('intraday/plans', (p, el) => planList.render('options', p, el));
+register('intraday/plans/:id', (p, el) => planForm.render('options', p, el));
 register('swing', (p, el) => planList.render('swing', p, el));
 register('investing', (p, el) => assetsView.renderAssetClass('equity', p, el));
 register('funds', (p, el) => assetsView.renderAssetClass('mutual_fund', p, el));
 register('etfs', (p, el) => assetsView.renderAssetClass('etf', p, el));
-register('futures', async (p, el) => { navigate('investing'); await dispatch(); });
-register('futures/:id', async (p, el) => { navigate('investing'); await dispatch(); });
 register('swing/:id', (p, el) => planForm.render('swing', p, el));
 register('stats', async (p, el) => { navigate('stats/portfolio'); await dispatch(); });
 register('stats/portfolio', statsPortfolio.render);
-register('stats/scalp', (p, el) => statsKind.render('scalp', p, el));
-register('stats/options', (p, el) => statsKind.render('options', p, el));
+register('stats/intraday', (p, el) => statsKind.render('scalp', p, el));
 register('stats/swing', (p, el) => statsKind.render('swing', p, el));
-register('stats/futures', (p, el) => statsKind.render('futures', p, el));
 
 mount(app);
 
-// The sidebar's active item and the page's section color (scalp / options / swing / home) follow the route.
+// The sidebar's active item and section color follow the current workspace.
 function updateChrome() {
   const path = (window.location.hash || '#/stats/portfolio').slice(2).split('?')[0];
   const first = path.split('/')[0];
   const sec = path.startsWith('stats/') ? path.split('/')[1] : first;
-  document.body.className = ['scalp','options','intraday'].includes(sec) ? 'sec-intraday' : sec === 'swing' ? 'sec-swing' : sec === 'investing' ? 'sec-investing' : (sec === 'funds' || sec === 'etfs') ? 'sec-funds' : '';
+  document.body.className = ['intraday'].includes(sec) ? 'sec-intraday' : sec === 'swing' ? 'sec-swing' : sec === 'investing' ? 'sec-investing' : (sec === 'funds' || sec === 'etfs') ? 'sec-funds' : '';
   document.querySelectorAll('.side .sn[href]').forEach(a => {
     const target = a.getAttribute('href').slice(2);
     a.classList.toggle('on', path === target || path.startsWith(target + '/') || (target === 'funds' && path === 'etfs'));
