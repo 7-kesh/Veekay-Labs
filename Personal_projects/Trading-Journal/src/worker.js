@@ -79,6 +79,7 @@ export default {
           headers:{ Authorization:'Bearer ' + env.OPENAI_API_KEY, 'Content-Type':'application/json' },
           body:JSON.stringify({
             model: env.OPENAI_MODEL || 'gpt-4.1',
+            store: false,
             instructions,
             input:[{ role:'user', content }],
             text:{ format:{ type:'json_schema', name:'keshavtrades_import', strict:true, schema } },
