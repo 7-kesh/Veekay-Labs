@@ -5,9 +5,9 @@
   "type": "module",
   "description": "Private KeshavTrades journal with authenticated OpenAI import analysis.",
   "scripts": {
-    "deploy": "wrangler deploy",
     "test": "node --test public/js/*.test.mjs",
-    "check": "node --check src/worker.js && find public/js -name '*.js' -print0 | xargs -0 -n1 node --check"
+    "check": "node --check src/worker.js && find public/js -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "deploy:edge": "supabase functions deploy ai-import"
   },
   "devDependencies": {
     "wrangler": "^4.152.0"
