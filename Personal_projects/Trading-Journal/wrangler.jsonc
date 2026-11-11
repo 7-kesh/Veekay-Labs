@@ -3,7 +3,7 @@
   // Must match the Worker name Cloudflare already created for this Git-connected project -
   // inferred from the deployed URL (veekay-labs-trade-journal.<subdomain>.workers.dev).
   // If this doesn't match what the dashboard shows under Settings, update it to match exactly.
-  "name": "veekay-labs-trade-journal",
+  "name": "keshavtrades",
   "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
