@@ -1,6 +1,7 @@
-// Configure with YOUR private Supabase project before running or deploying.
-// Never place the OpenAI API key here; it belongs in a Cloudflare Worker secret.
+// KeshavTrades public client configuration.
+// Supabase publishable keys are designed for browser use; RLS is the security boundary.
+// Never place the OpenAI API key or a Supabase service-role key in this file.
 window.TJ_CONFIG = {
-  supabaseUrl: 'https://YOUR_PROJECT.supabase.co',
-  supabaseAnonKey: 'YOUR_SUPABASE_ANON_KEY'
+  supabaseUrl: 'https://vfykhtwnfdsehznenrmg.supabase.co',
+  supabaseAnonKey: 'sb_publishable_amHTUvJGTPlu1mbF2RL7hw_kQOttAIy'
 };
