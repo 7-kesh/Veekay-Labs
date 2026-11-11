@@ -20,6 +20,7 @@ import * as journalEntryView from './views/journal-entry.js';
 import * as improvementsView from './views/improvements.js';
 import * as futuresForm from './views/futures-form.js';
 import * as educationView from './views/education.js';
+import * as aiImportView from './views/ai-import.js';
 
 const app = document.getElementById('app');
 const loginScreen = document.getElementById('loginScreen');
@@ -37,6 +38,7 @@ register('journal', journalView.render);
 register('journal/:date', journalEntryView.render);
 register('improvements', improvementsView.render);
 register('education', educationView.render);
+register('ai-import', aiImportView.render);
 register('options', (p, el) => planList.render('options', p, el));
 register('options/:id', (p, el) => planForm.render('options', p, el));
 register('swing', (p, el) => planList.render('swing', p, el));
