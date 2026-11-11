@@ -1,5 +1,6 @@
 import { supabase } from '../supabase-client.js';
-import { money, esc } from '../format.js';
+import { esc } from '../format.js';
+const money = value => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 }).format(Number(value || 0);
 
 const CONFIG = {
   equity: { title: 'Investing', subtitle: 'Long-term equity portfolio', route: 'investing', assetClass: 'equity', unit: 'Shares' },
@@ -77,6 +78,7 @@ export async function renderAssetClass(kind, params, el) {
   const userId = userData.user.id;
   el.querySelector('#assetForm').addEventListener('submit', async e => {
     e.preventDefault(); const f = e.currentTarget; const d = Object.fromEntries(new FormData(f));
+    if (d.transaction_type === 'sell') { const h = holdings.find(x => x.symbol === d.symbol.trim().toUpperCase()); if (!h || Number(d.units) > h.units + 1e-8) return alert('Sell quantity exceeds the units currently held.'); }
     const { error } = await supabase.from('asset_transactions').insert({ user_id:userId, asset_class:c.assetClass,
       transaction_type:d.transaction_type, symbol:d.symbol.trim().toUpperCase(), name:d.name.trim(), trade_date:d.trade_date,
       units:Number(d.units), price:Number(d.price), fees:Number(d.fees||0), notes:d.notes.trim() });
