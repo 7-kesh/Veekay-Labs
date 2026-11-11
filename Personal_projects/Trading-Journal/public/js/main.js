@@ -21,6 +21,8 @@ import * as improvementsView from './views/improvements.js';
 import * as futuresForm from './views/futures-form.js';
 import * as educationView from './views/education.js';
 import * as aiImportView from './views/ai-import.js';
+import * as intradayView from './views/intraday.js';
+import * as assetsView from './views/assets.js';
 
 const app = document.getElementById('app');
 const loginScreen = document.getElementById('loginScreen');
@@ -28,6 +30,7 @@ const shell = document.getElementById('shell');
 const userEmailEl = document.getElementById('userEmail');
 
 register('today', today.render);
+register('intraday', intradayView.render);
 register('scalp', scalpList.render);
 register('scalp/:id', scalpForm.render);
 register('strategy', strategyView.render);
@@ -42,8 +45,10 @@ register('ai-import', aiImportView.render);
 register('options', (p, el) => planList.render('options', p, el));
 register('options/:id', (p, el) => planForm.render('options', p, el));
 register('swing', (p, el) => planList.render('swing', p, el));
-register('futures', (p, el) => planList.render('futures', p, el));
-register('futures/:id', (p, el) => futuresForm.render(p, el));
+register('investing', (p, el) => assetsView.renderAssetClass('equity', p, el));
+register('funds', (p, el) => assetsView.renderAssetClass('mutual_fund', p, el));
+register('futures', async (p, el) => { navigate('investing'); await dispatch(); });
+register('futures/:id', async (p, el) => { navigate('investing'); await dispatch(); });
 register('swing/:id', (p, el) => planForm.render('swing', p, el));
 register('stats', async (p, el) => { navigate('stats/portfolio'); await dispatch(); });
 register('stats/portfolio', statsPortfolio.render);
@@ -59,7 +64,7 @@ function updateChrome() {
   const path = (window.location.hash || '#/stats/portfolio').slice(2).split('?')[0];
   const first = path.split('/')[0];
   const sec = path.startsWith('stats/') ? path.split('/')[1] : first;
-  document.body.className = ['scalp', 'options', 'swing', 'futures'].includes(sec) ? 'sec-' + sec : '';
+  document.body.className = ['scalp','options','intraday'].includes(sec) ? 'sec-intraday' : sec === 'swing' ? 'sec-swing' : sec === 'investing' ? 'sec-investing' : sec === 'funds' ? 'sec-funds' : '';
   document.querySelectorAll('.side .sn[href]').forEach(a => {
     const target = a.getAttribute('href').slice(2);
     a.classList.toggle('on', path === target || path.startsWith(target + '/'));
