@@ -1,6 +1,6 @@
 # KeshavTrades
 
-A private trading journal for Indian equities and derivatives, built from the existing Trading Journal application. Organises trading and investing into Intraday, Swing, Investing and MF / ETFs, with portfolio analytics, weekly reviews and AI-assisted broker-statement imports. Existing Scalp, Options, Swing and Futures records are retained; Futures records remain in the database but the new Investing area starts as a separate long-term equity ledger.
+A private trading and investment journal for Indian markets. The workspace is organised into four areas: Intraday, Swing, Investing and MF / ETFs. It includes trade planning and review, portfolio analytics, weekly reviews, and AI-assisted broker-statement imports. The Investing area tracks long-term equity holdings, while MF / ETFs provides dedicated mutual-fund and ETF transaction and portfolio tracking.
 
 ## Architecture
 - Frontend: static JavaScript application in `public/`; host it on a static hosting provider of your choice.
