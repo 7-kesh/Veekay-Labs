@@ -44,7 +44,7 @@ export async function render(params, el) {
   const opt = (val, cur, label) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${label}</option>`;
   el.innerHTML = `
     <div class="head"><h1>Intraday trades</h1>
-      <div class="actions"><input type="date" id="dayPick" value="${new Date().toISOString().slice(0, 10)}"><button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/scalp/new">+ New</a></div></div>
+      <div class="actions"><input type="date" id="dayPick" value="${new Date().toISOString().slice(0, 10)}"><button class="btn" id="exportDay" type="button">Export for AI-Assist-Review</button><button class="btn" id="exportCsv" type="button">Export CSV</button><a class="btn primary" href="#/intraday/trades/new">+ New</a></div></div>
     ${stripHtml(sum, 'Intraday')}
     <form class="filters" id="filters" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <select name="period" ${year ? 'disabled' : ''}>${opt('week', period, 'This week')}${opt('month', period, 'This month')}${opt('30d', period, 'Last 30 days')}${opt('all', period, 'All time')}</select>
@@ -56,7 +56,7 @@ export async function render(params, el) {
     </form>
     <table class="dense"><thead><tr><th></th><th>Trade</th><th>Date</th><th>Acct</th><th>Ticker</th><th>Entry</th><th>Net</th><th>% acct</th><th>R</th><th>Cat</th><th>Status</th></tr></thead>
     <tbody>${rows.map(r => `<tr>
-      <td class="rowact"><a href="#/scalp/${r.id}">edit</a> · <a href="#" class="deleteRow neg" data-id="${r.id}" data-label="${esc(r.trade_no)}">delete</a></td>
+      <td class="rowact"><a href="#/intraday/trades/${r.id}">edit</a> · <a href="#" class="deleteRow neg" data-id="${r.id}" data-label="${esc(r.trade_no)}">delete</a></td>
       <td>${esc(r.trade_no)}</td><td>${esc(r.date)}</td><td><span class="acct acct-${r.account || 'paper'}">${r.account === 'live' ? 'Live' : 'Paper'}</span></td><td><b>${esc(r.ticker)}</b></td><td>${px(r.entry_price)}</td>
       <td class="${signclass(r.net_pnl)}">${money(r.net_pnl)}</td><td class="${signclass(r.net_pnl)}">${pct(pctOf(r.net_pnl, bal))}</td><td>${r.r_multiple ?? ''}</td><td>${esc(r.category || '')}</td>
       <td><span class="pill ${r.review_status === 'complete' ? 'closed' : 'open'}">${r.review_status === 'complete' ? 'complete' : 'draft'}</span></td>
@@ -68,7 +68,7 @@ export async function render(params, el) {
     if (!form.year.value) form.month.value = '';
     const p = new URLSearchParams(new FormData(form)); // disabled fields are omitted
     if (!form.year.value) { p.delete('year'); p.delete('month'); }
-    window.location.hash = '#/scalp?' + p.toString();
+    window.location.hash = '#/intraday/trades?' + p.toString();
   });
   form.q.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); form.dispatchEvent(new Event('change')); } });
   el.querySelector('#exportDay').addEventListener('click', async function () {
