@@ -65,10 +65,10 @@ function updateChrome() {
   const path = (window.location.hash || '#/stats/portfolio').slice(2).split('?')[0];
   const first = path.split('/')[0];
   const sec = path.startsWith('stats/') ? path.split('/')[1] : first;
-  document.body.className = ['scalp','options','intraday'].includes(sec) ? 'sec-intraday' : sec === 'swing' ? 'sec-swing' : sec === 'investing' ? 'sec-investing' : sec === 'funds' ? 'sec-funds' : '';
+  document.body.className = ['scalp','options','intraday'].includes(sec) ? 'sec-intraday' : sec === 'swing' ? 'sec-swing' : sec === 'investing' ? 'sec-investing' : (sec === 'funds' || sec === 'etfs') ? 'sec-funds' : '';
   document.querySelectorAll('.side .sn[href]').forEach(a => {
     const target = a.getAttribute('href').slice(2);
-    a.classList.toggle('on', path === target || path.startsWith(target + '/'));
+    a.classList.toggle('on', path === target || path.startsWith(target + '/') || (target === 'funds' && path === 'etfs'));
   });
 }
 window.addEventListener('hashchange', updateChrome);
