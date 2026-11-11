@@ -7,7 +7,7 @@ export async function render(params, el) {
         <a class="btn primary" href="#/scalp">Open intraday trades</a>
       </section>
       <section class="card"><h2>Intraday trade plans</h2>
-        <p>Keep advanced instrument planning, risk metrics and trade Greeks in the same Intraday workspace.</p>
+        <p>Keep trade planning, risk metrics and instrument details in the same Intraday workspace.</p>
         <a class="btn primary" href="#/options">Open trade plans</a>
       </section>
     </div>
