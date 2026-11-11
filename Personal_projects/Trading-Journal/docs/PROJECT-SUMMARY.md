@@ -1,3 +1,9 @@
+# Current product state — November 2026
+
+KeshavTrades is now organised into **Intraday, Swing, Investing and MF / ETFs**. The web app navigation and product documentation should use these names consistently. Investing is a dedicated long-term equity ledger; MF / ETFs has separate mutual-fund and ETF holdings and transaction views. Latest prices/NAVs are manually entered. Existing journal data is retained. The older entries below are a historical engineering log and may describe retired implementation details; they are not the current product specification.
+
+---
+
 # Trading Journal: Project Build Summary
 
 > Read this first at the start of a session, then `docs/1_PRD.md`. Update the Snapshot and add a Session Log entry at the end of each session.
