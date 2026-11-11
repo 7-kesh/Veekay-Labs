@@ -11,7 +11,7 @@ import { cleanDate, formatUsd } from '../numeric.js';
 import { trackNewButton } from '../dirty.js';
 import { mountShotsPanel } from '../shots-panel.js';
 
-const KIND_LABEL = { options: 'Options', swing: 'Swing' };
+const KIND_LABEL = { options: 'Intraday', swing: 'Swing' };
 
 function planVsActual(p) {
   if (p.actual_entry === null || p.actual_entry === undefined) return [];
@@ -61,10 +61,10 @@ export async function render(kind, params, el) {
   const result = plan ? planVsActual(plan) : [];
 
   el.innerHTML = `
-    <div class="head"><h1>${plan ? `${esc(plan.ticker)} · ${KIND_LABEL[kind]}` : `New ${kind} plan`}
+    <div class="head"><h1>${plan ? `${esc(plan.ticker)} · ${KIND_LABEL[kind]}` : `New ${KIND_LABEL[kind]} plan`}
       ${plan ? `<span class="pill ${esc(plan.status)}">${esc(plan.status)}</span>` : ''}</h1>
-      <div class="actions"><a class="btn" href="#/${kind}">All ${kind} trades</a>
-        <button class="btn" type="button" id="newBtn" disabled>+ New ${kind} plan</button></div></div>
+      <div class="actions"><a class="btn" href="#/${kind}">All ${KIND_LABEL[kind]} trades</a>
+        <button class="btn" type="button" id="newBtn" disabled>+ New ${KIND_LABEL[kind]} plan</button></div></div>
     <div id="commitMount"></div>
     <div id="commitMount"></div>
     <div id="capStrip">${stripHtml(capFor(p.account || 'paper'), KIND_LABEL[kind])}</div>
