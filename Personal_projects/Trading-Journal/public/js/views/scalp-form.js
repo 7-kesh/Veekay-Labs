@@ -37,7 +37,7 @@ export async function render(params, el) {
 
   el.innerHTML = `
     <div class="head"><h1>${trade ? `Edit ${esc(trade.trade_no)} &middot; ${esc(trade.ticker)}` : 'New intraday trade'}</h1>
-      <div class="actions"><a class="btn" href="#/scalp">All intraday trades</a>
+      <div class="actions"><a class="btn" href="#/intraday/trades">All intraday trades</a>
         <button class="btn" type="button" id="newBtn" disabled>+ New trade</button></div></div>
     <div id="capStrip">${stripHtml(capFor(t.account || 'paper'), 'Intraday')}</div>
     <div id="commitMount"></div>
@@ -186,7 +186,7 @@ export async function render(params, el) {
     ${recent.length ? `<section class="card" style="margin-top:16px"><h2>Earlier today</h2><table class="dense"><tbody>
       ${recent.map(r => `<tr><td>${esc(r.trade_no)}</td><td><b>${esc(r.ticker)}</b></td><td>${px(r.entry_price)}</td>
         <td class="${signclass(r.net_pnl)}">${money(r.net_pnl)}</td><td>${esc(r.category || '')}</td>
-        <td><a href="#/scalp/${r.id}">edit</a></td></tr>`).join('')}</tbody></table></section>` : ''}
+        <td><a href="#/intraday/trades/${r.id}">edit</a></td></tr>`).join('')}</tbody></table></section>` : ''}
 
     ${trade && history.length ? `<section class="card" style="margin-top:16px"><h2>History</h2>
       <table class="dense"><thead><tr><th>When</th><th>Field</th><th>Old</th><th>New</th><th>Source</th></tr></thead><tbody>
@@ -208,7 +208,7 @@ export async function render(params, el) {
       trade = await getScalpTrade(id);
       dirty && dirty.markClean(); // the draft just saved the current form
       history.length = 0; // stale now; next natural re-render (e.g. after Save) will refresh it
-      if (!window.location.hash.endsWith('/scalp/' + id)) window.history.replaceState(null, '', '#/scalp/' + id);
+      if (!window.location.hash.endsWith('/intraday/trades/' + id)) window.history.replaceState(null, '', '#/intraday/trades/' + id);
       return { id, tradeData: trade };
     },
   });
@@ -243,7 +243,7 @@ export async function render(params, el) {
     const form = el.querySelector('#scalpForm');
     const $ = n => form.elements[n];
 
-    dirty = trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => savedId !== null, newRoute: 'scalp/new' });
+    dirty = trackNewButton(form, el.querySelector('#newBtn'), { isSaved: () => savedId !== null, newRoute: 'intraday/trades/new' });
     // Portfolio strip, % base and the affordability check follow the paper / live pick.
     form.addEventListener('change', (ev) => {
       if (ev.target.name !== 'account') return;
@@ -412,11 +412,11 @@ export async function render(params, el) {
         const id = await persist(formObj);
         const before = window.location.hash;
         if (then === 'new') {
-          navigate(`scalp/new?ticker=${encodeURIComponent(formObj.ticker || '')}`);
+          navigate(`intraday/trades/new?ticker=${encodeURIComponent(formObj.ticker || '')}`);
         } else if (then === 'complete') {
-          navigate('scalp');
+          navigate('intraday/trades');
         } else {
-          navigate(`scalp/${id}`);
+          navigate(`intraday/trades/${id}`);
         }
         if (window.location.hash === before) await dispatch();
       } catch (err) {
@@ -438,7 +438,7 @@ export async function render(params, el) {
       deleteBtn.addEventListener('click', async () => {
         if (!confirm('Delete this trade and its screenshots?')) return;
         await deleteScalpTrade(trade.id);
-        navigate('scalp');
+        navigate('intraday/trades');
         await dispatch();
       });
     }
