@@ -53,8 +53,7 @@ export async function render(_params, el) {
     try {
       const sessionResult = await supabase.auth.getSession();
       if (sessionResult.error) throw sessionResult.error;
-      const token = sessionResult.data.session && sessionResult.data.session.access_token;
-      if (!token) throw new Error('Your session expired. Please sign in again.');
+      if (!sessionResult.data.session) throw new Error('Your session expired. Please sign in again.');
       const payload = { filename:file.name, mimeType:file.type || 'application/octet-stream', broker:el.querySelector('#broker').value, account:el.querySelector('#account').value };
       if (ext === '.xlsx' || ext === '.xls') {
         payload.contentType = 'text'; payload.text = await extractWorkbook(file);
@@ -64,10 +63,16 @@ export async function render(_params, el) {
         payload.contentType = ext === '.pdf' ? 'pdf' : 'image'; payload.dataUrl = await asDataUrl(file);
       }
       status.textContent = 'Analysing with OpenAI…';
-      const response = await fetch('/api/ai/import', { method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}, body:JSON.stringify(payload) });
-      const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.error || 'AI extraction failed (' + response.status + ').');
-      latest = body.result; latestFile = file;
+      const { data, error } = await supabase.functions.invoke('ai-import', { body: payload });
+      if (error) {
+        let message = error.message || 'AI extraction failed.';
+        if (error.context instanceof Response) {
+          const detail = await error.context.json().catch(() => ({}));
+          if (detail.error) message = detail.error;
+        }
+        throw new Error(message);
+      }
+      latest = data && data.result; latestFile = file;
       if (!latest || !Array.isArray(latest.trades)) throw new Error('The AI response did not contain a valid trades array.');
       el.querySelector('#aiSummary').innerHTML = '<h3>Summary</h3><p>' + esc(latest.summary || 'No summary supplied.') + '</p>';
       el.querySelector('#aiInsights').innerHTML = (latest.insights || []).length ? '<h3>AI observations</h3><ul>' + latest.insights.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
