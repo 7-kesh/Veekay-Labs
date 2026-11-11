@@ -1,0 +1,34 @@
+name: KeshavTrades CI
+
+on:
+  push:
+    paths:
+      - "Personal_projects/Trading-Journal/**"
+      - ".github/workflows/keshavtrades-ci.yml"
+  pull_request:
+    paths:
+      - "Personal_projects/Trading-Journal/**"
+      - ".github/workflows/keshavtrades-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Personal_projects/Trading-Journal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Personal_projects/Trading-Journal/package-lock.json
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Run unit tests
+        run: npm test
