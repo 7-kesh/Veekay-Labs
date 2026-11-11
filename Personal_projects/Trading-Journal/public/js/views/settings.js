@@ -31,7 +31,7 @@ export async function render(_params, el) {
       <div class="setgrid">
         ${SECTIONS.map(sec => `<section class="card setcard ${sec.kind === 'futures' ? 'sec-futures-card' : 'pnl-' + sec.kind}">
           <h2>${sec.title}</h2>
-          ${stripHtml(capitalSummary(s, sec.kind, cap.entries, cap.open, { account: 'live' }), sec.title)}
+          ${sec.fields.length ? stripHtml(capitalSummary(s, sec.kind, cap.entries, cap.open, { account: 'live' }), sec.title) : ''}
           ${sec.note ? `<p class="muted note">${esc(sec.note)}</p>` : ''}
           <div class="setfields">${sec.fields.map(input).join('')}</div>
         </section>`).join('')}
