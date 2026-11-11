@@ -8,7 +8,7 @@ import { tradingScore, overviewHtml } from '../score.js';
 import { CATEGORIES } from '../constants.js';
 import { rankImprovements } from '../improvement-rank.js';
 
-const KIND_LABEL = { scalp: 'Scalp', options: 'Options', swing: 'Swing', futures: 'Futures' };
+const KIND_LABEL = { scalp: 'Intraday', options: 'Intraday plans', swing: 'Swing', futures: 'Investing' };
 
 // Top imported improvements (from Claude chat wrap-ups), ranked by what their target costs. They
 // are measured on scalp trades, so only the Scalp page lists them. Never breaks the page: if the
@@ -17,7 +17,7 @@ async function improvementsCard(kind, title) {
   const more = '<p class="muted note"><a href="#/improvements">All improvements</a></p>';
   if (kind !== 'scalp') {
     return `<section class="card imps"><h2>Improvements <small class="muted">from your Claude wrap-ups</small></h2>
-      <p class="muted">Wrap-up improvements are measured on scalp trades, so none apply to ${esc(title.toLowerCase())} yet.</p>${more}</section>`;
+      <p class="muted">Wrap-up improvements are measured on intraday trades, so none apply to ${esc(title.toLowerCase())} yet.</p>${more}</section>`;
   }
   try {
     const [items, trades] = await Promise.all([listImprovements(), listScalpTrades({})]);
@@ -38,7 +38,7 @@ function problemRatesHtml(s) {
   const rows = (items, label) => items.map(([k, c]) => `<div class="prow"><span class="pname">${esc(label(k))}</span>
       <span class="pbar"><i style="width:${Math.min(100, pc(c))}%"></i></span><span class="pnum"><b>${pc(c)}%</b> <small>${c} of ${n}</small></span></div>`).join('');
   const cats = s.categories.filter(([k]) => k && k !== '-').sort((a, b) => b[1] - a[1]);
-  return `<section class="card probs"><h2>Where the problems are <small class="muted">share of ${n} scalp trades</small></h2>
+  return `<section class="card probs"><h2>Where the problems are <small class="muted">share of ${n} intraday trades</small></h2>
     <div class="cols"><div><h3>By category</h3>${rows(cats, k => CATEGORIES[k] || k)}</div>
       <div><h3>Most common violations</h3>${s.violations.length ? rows(s.violations, k => k) : '<p class="muted">None tagged.</p>'}</div></div></section>`;
 }
@@ -54,7 +54,7 @@ export async function render(kind, params, el) {
   let detail = '';
   if (kind === 'scalp') {
     const s = d.scalp;
-    detail = `<section class="card"><h2>Scalp detail</h2>
+    detail = `<section class="card"><h2>Intraday detail</h2>
       <div class="tiles">
         <div class="tile"><span>Entries valid</span><b>${rate(s.entry_ok)}</b></div>
         <div class="tile"><span>Exits valid</span><b>${rate(s.exit_ok)}</b></div>
@@ -81,7 +81,7 @@ export async function render(kind, params, el) {
     const cut = (rows) => rows.length ? `<table class="dense"><thead><tr><th></th><th>Trades</th><th>Wins</th><th>Net</th></tr></thead><tbody>${rows.map(([k, [c, w, net]]) =>
       `<tr><td>${esc(k)}</td><td>${c}</td><td>${w}</td><td class="${signclass(net)}">${money(net)}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">No closed trades yet.</p>';
     const list = (rows) => `<table class="dense"><tbody>${rows.length ? rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('') : '<tr><td class="muted">none tagged</td></tr>'}</tbody></table>`;
-    detail = `<section class="card"><h2>Futures detail</h2>
+    detail = `<section class="card"><h2>Investing detail</h2>
       <div class="tiles">
         <div class="tile"><span>Trades</span><b>${s.n}</b><small>${s.open} planned or open · ${s.closed} closed</small></div>
         <div class="tile"><span>Planned vs realized R</span><b>${s.avg_plan_rr ?? '–'} → ${s.avg_r ?? '–'}</b></div>
