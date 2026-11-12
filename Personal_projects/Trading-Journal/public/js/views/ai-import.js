@@ -18,6 +18,12 @@ async function extractWorkbook(file) {
   const workbook = window.XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true });
   return workbook.SheetNames.map(name => 'SHEET: ' + name + '\n' + window.XLSX.utils.sheet_to_csv(workbook.Sheets[name])).join('\n\n').slice(0, 180000);
 }
+function renderTransactions(rows) {
+  if (!rows.length) return '<p class="muted">No investment transactions extracted.</p>';
+  const cols = ['date','asset_class','transaction_type','symbol','name','quantity','price','fees','confidence'];
+  return '<div class="tablewrap"><table><thead><tr>' + cols.map(c => '<th>' + c.replaceAll('_',' ') + '</th>').join('') +
+    '</tr></thead><tbody>' + rows.map(t => '<tr>' + cols.map(c => '<td>' + esc(t[c] ?? '—') + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+}
 function renderTrades(trades) {
   if (!trades.length) return '<p class="muted">No trade rows were confidently extracted. Try a broker tradebook or contract note with clearer headers.</p>';
   const cols = ['date','symbol','trade_type','side','quantity','entry_price','exit_price','net_pnl','fees','confidence'];
@@ -35,7 +41,7 @@ export async function render(_params, el) {
     '</div><p class="muted note">Maximum file size: 12 MB. Excel workbooks are read in your browser; PDF and image contents are sent to the secured AI endpoint.</p>' +
     '<div class="actions"><button class="btn primary" id="analyzeBtn" type="submit">Analyse upload with AI</button><span class="muted" id="status" role="status"></span></div></form></section>' +
     '<section class="card" id="aiPreview" hidden><div class="head"><h2>Extraction preview</h2><div class="actions"><button class="btn" id="downloadJson" type="button">Download JSON</button><button class="btn primary" id="saveBatch" type="button">Save import batch</button></div></div>' +
-    '<div id="aiSummary"></div><div id="aiInsights"></div><div id="aiWarnings"></div><div id="aiTrades"></div>' +
+    '<div id="aiSummary"></div><div id="aiInsights"></div><div id="aiWarnings"></div><div id="aiTrades"></div><div id="aiTransactions"></div>' +
     '<p class="muted note">AI extraction can misread quantities, prices, fees or trade direction. Verify the original broker statement before using these records for performance or tax decisions.</p><span class="muted" id="saveStatus"></span></section>';
 
   const form = el.querySelector('#aiImportForm'), fileInput = el.querySelector('#tradeFile');
@@ -73,11 +79,11 @@ export async function render(_params, el) {
         throw new Error(message);
       }
       latest = data && data.result; latestFile = file;
-      if (!latest || !Array.isArray(latest.trades)) throw new Error('The AI response did not contain a valid trades array.');
+      if (!latest || !Array.isArray(latest.trades) || !Array.isArray(latest.transactions)) throw new Error('The AI response did not contain valid trade and investment arrays.');
       el.querySelector('#aiSummary').innerHTML = '<h3>Summary</h3><p>' + esc(latest.summary || 'No summary supplied.') + '</p>';
       el.querySelector('#aiInsights').innerHTML = (latest.insights || []).length ? '<h3>AI observations</h3><ul>' + latest.insights.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
       el.querySelector('#aiWarnings').innerHTML = (latest.warnings || []).length ? '<h3>Warnings</h3><ul class="neg">' + latest.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
-      el.querySelector('#aiTrades').innerHTML = '<h3>Extracted trades (' + latest.trades.length + ')</h3>' + renderTrades(latest.trades);
+      el.querySelector('#aiTrades').innerHTML = '<h3>Extracted trades (' + latest.trades.length + ')</h3>' + renderTrades(latest.trades);\n      el.querySelector('#aiTransactions').innerHTML = '<h3>Investment transactions (' + latest.transactions.length + ')</h3>' + renderTransactions(latest.transactions);
       preview.hidden = false; status.textContent = 'Extraction complete. Review the records below.';
     } catch (err) { status.textContent = err.message || String(err); }
     finally { btn.disabled = false; }
