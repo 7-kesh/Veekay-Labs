@@ -51,6 +51,7 @@ register('etfs', (p, el) => assetsView.renderAssetClass('etf', p, el));
 register('swing/:id', (p, el) => planForm.render('swing', p, el));
 register('stats', async (p, el) => { navigate('stats/portfolio'); await dispatch(); });
 register('stats/portfolio', analyticsView.render);
+register('graphs', analyticsView.render);
 register('stats/intraday', (p, el) => statsKind.render('scalp', p, el));
 register('stats/swing', (p, el) => statsKind.render('swing', p, el));
 
