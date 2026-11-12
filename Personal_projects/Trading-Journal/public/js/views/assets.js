@@ -49,7 +49,7 @@ export async function renderAssetClass(kind, params, el) {
   const graphRows = [...holdings].sort((a,b)=>(b.value ?? b.cost)-(a.value ?? a.cost));
   const graphMax = Math.max(1, ...graphRows.map(h=>Math.max(h.cost, h.value ?? h.cost)));
   const chartHtml = graphRows.length ? `
-    <section class="card"><h2>Portfolio visualisation <small class="muted">cost basis vs latest value</small></h2>
+    <section class="card"><style>.asset-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;margin:8px 0 16px}.asset-legend span{display:flex;align-items:center;gap:6px}.asset-dot{width:9px;height:9px;border-radius:50%;display:inline-block}.asset-dot.cost,.asset-bar.cost{background:#8b98a9}.asset-dot.value,.asset-bar.value{background:#27866a}.asset-bar-row{margin:12px 0}.asset-bar-label{display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:5px}.asset-bar-track{height:9px;background:var(--line, #e5e7eb);border-radius:8px;overflow:hidden;margin:4px 0}.asset-bar{height:100%;border-radius:8px;min-width:0}</style><h2>Portfolio visualisation <small class="muted">cost basis vs latest value</small></h2>
       <div class="asset-legend"><span><i class="asset-dot cost"></i> Invested cost</span><span><i class="asset-dot value"></i> Current value / cost estimate</span></div>
       <div class="asset-bars">${graphRows.map(h=>`<div class="asset-bar-row">
         <div class="asset-bar-label"><b>${esc(h.symbol)}</b><span>${money(h.value ?? h.cost)}</span></div>
