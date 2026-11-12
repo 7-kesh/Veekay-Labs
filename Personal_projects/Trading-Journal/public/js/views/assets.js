@@ -46,8 +46,21 @@ export async function renderAssetClass(kind, params, el) {
   const invested = holdings.reduce((s,h)=>s+h.cost,0);
   const value = holdings.reduce((s,h)=>s+(h.value ?? h.cost),0);
   const pnl = holdings.reduce((s,h)=>s+(h.pnl ?? 0),0);
+  const graphRows = [...holdings].sort((a,b)=>(b.value ?? b.cost)-(a.value ?? a.cost));
+  const graphMax = Math.max(1, ...graphRows.map(h=>Math.max(h.cost, h.value ?? h.cost)));
+  const chartHtml = graphRows.length ? `
+    <section class="card"><h2>Portfolio visualisation <small class="muted">cost basis vs latest value</small></h2>
+      <div class="asset-legend"><span><i class="asset-dot cost"></i> Invested cost</span><span><i class="asset-dot value"></i> Current value / cost estimate</span></div>
+      <div class="asset-bars">${graphRows.map(h=>`<div class="asset-bar-row">
+        <div class="asset-bar-label"><b>${esc(h.symbol)}</b><span>${money(h.value ?? h.cost)}</span></div>
+        <div class="asset-bar-track"><div class="asset-bar cost" style="width:${Math.max(0,h.cost/graphMax*100)}%"></div></div>
+        <div class="asset-bar-track"><div class="asset-bar value" style="width:${Math.max(0,(h.value ?? h.cost)/graphMax*100)}%"></div></div>
+      </div>`).join('')}</div>
+      <p class="muted note">Bars compare each holding's invested cost with its latest value. Where no latest price is entered, cost is shown as an estimate.</p>
+    </section>` : '';
   el.innerHTML = `
     ${fundTabs}<div class="head"><div><h1>${c.title}</h1><p class="muted">${c.subtitle}. Prices are manually updated; no broker or market feed is connected.</p></div></div>
+    ${chartHtml}
     <div class="tiles">
       <div class="tile"><span>Invested cost</span><b>${money(invested)}</b></div>
       <div class="tile"><span>Current value*</span><b>${money(value)}</b></div>
