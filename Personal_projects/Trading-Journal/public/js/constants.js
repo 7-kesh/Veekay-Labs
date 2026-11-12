@@ -77,7 +77,7 @@ export const OPTIONS_CHECKLIST = [
   ["trend", "Trend: bullish or bearish setup identified on TradingView"],
   ["levels", "Support/resistance: valid entry area and price target identified"],
   ["confirm", "Confirmation: waited for the planned entry trigger"],
-  ["contract", "Option selection: checked delta, expiration and liquidity"],
+  ["contract", "Instrument selection: checked suitability, expiry and liquidity"],
   ["risk", "Risk: stop-loss and profit target set before entry, planned risk within budget"],
 ];
 
