@@ -40,7 +40,7 @@ export async function render(params, el) {
     </div></section>`;
 
   el.innerHTML = `
-    <div class="head"><h1>Improvements <small>${area === 'scalp' ? 'ranked by what they cost you' : esc(AREA_LABEL[area])}</small></h1><div class="actions">${area === 'scalp' ? '<a class="btn" href="#/import">Import wrap-up</a>' : ''}</div></div>
+    <div class="head"><h1>Improvements <small>${area === 'scalp' ? 'Intraday · ranked by what they cost you' : esc(AREA_LABEL[area])}</small></h1><div class="actions">${area === 'scalp' ? '<a class="btn" href="#/import">Import wrap-up</a>' : ''}</div></div>
     ${areaTabs('improvements', area)}
     <form id="addImp" class="card" style="display:flex;gap:8px;margin-bottom:12px"><input name="text" placeholder="Add a ${esc(AREA_LABEL[area].toLowerCase())} improvement" required style="flex:1"><button class="btn primary" type="submit">Add</button></form>
     ${err ? `<p class="neg">${esc(err)} - if this is the first time, run <code>supabase/migrate-wrapup.sql</code> in the Supabase SQL editor.</p>` : ''}
