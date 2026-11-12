@@ -38,7 +38,7 @@ export async function render(params, el) {
     ${rows.length ? `<section class="card" style="margin-top:16px"><h2>Trades assessed</h2>
       <table class="dense"><thead><tr><th>Trade</th><th>Ticker</th><th>Net</th><th>Cat</th><th>Verdict</th><th>Violations</th><th>Lesson</th></tr></thead><tbody>
       ${rows.map(t => { const a = byNo.get(t.trade_no); return `<tr>
-        <td>${a ? `<a href="#/scalp/${a.id}">${esc(t.trade_no)}</a>` : esc(t.trade_no)}</td><td>${a ? esc(a.ticker) : ''}</td>
+        <td>${a ? `<a href="#/intraday/trades/${a.id}">${esc(t.trade_no)}</a>` : esc(t.trade_no)}</td><td>${a ? esc(a.ticker) : ''}</td>
         <td class="${signclass(a && a.net_pnl)}">${a ? money(a.net_pnl) : ''}</td><td>${esc(t.category || '')}</td>
         <td>${esc(t.verdict)}</td><td>${esc((t.violations || []).join('; '))}</td><td>${esc(t.lesson || '')}</td></tr>`; }).join('')}
       </tbody></table></section>` : ''}
