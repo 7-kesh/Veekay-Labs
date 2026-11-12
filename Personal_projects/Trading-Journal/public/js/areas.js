@@ -2,7 +2,7 @@
 // tab bar they share. The active area travels in the URL as ?area=.
 import { esc } from './format.js';
 
-export const AREAS = [['scalp', 'Scalp'], ['options', 'Options'], ['swing', 'Swing'], ['futures', 'Futures']];
+export const AREAS = [['scalp', 'Intraday'], ['options', 'Intraday plans'], ['swing', 'Swing'], ['futures', 'Investing']];
 export const AREA_LABEL = Object.fromEntries(AREAS);
 
 export function areaOf(params) {
