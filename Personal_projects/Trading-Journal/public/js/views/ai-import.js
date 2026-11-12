@@ -83,7 +83,8 @@ export async function render(_params, el) {
       el.querySelector('#aiSummary').innerHTML = '<h3>Summary</h3><p>' + esc(latest.summary || 'No summary supplied.') + '</p>';
       el.querySelector('#aiInsights').innerHTML = (latest.insights || []).length ? '<h3>AI observations</h3><ul>' + latest.insights.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
       el.querySelector('#aiWarnings').innerHTML = (latest.warnings || []).length ? '<h3>Warnings</h3><ul class="neg">' + latest.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' : '';
-      el.querySelector('#aiTrades').innerHTML = '<h3>Extracted trades (' + latest.trades.length + ')</h3>' + renderTrades(latest.trades);\n      el.querySelector('#aiTransactions').innerHTML = '<h3>Investment transactions (' + latest.transactions.length + ')</h3>' + renderTransactions(latest.transactions);
+      el.querySelector('#aiTrades').innerHTML = '<h3>Extracted trades (' + latest.trades.length + ')</h3>' + renderTrades(latest.trades);
+      el.querySelector('#aiTransactions').innerHTML = '<h3>Investment transactions (' + latest.transactions.length + ')</h3>' + renderTransactions(latest.transactions);
       preview.hidden = false; status.textContent = 'Extraction complete. Review the records below.';
     } catch (err) { status.textContent = err.message || String(err); }
     finally { btn.disabled = false; }
