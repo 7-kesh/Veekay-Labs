@@ -12,8 +12,9 @@ function holdingRows(transactions, prices) {
   const map=new Map();
   for(const r of [...transactions].sort((a,b)=>(a.trade_date||'').localeCompare(b.trade_date||'')||a.id-b.id)){
     const symbol=String(r.symbol||'').toUpperCase();
-    if(!map.has(symbol)) map.set(symbol,{symbol,name:r.name||symbol,units:0,cost:0,asset_class:r.asset_class});
-    const h=map.get(symbol), qty=safe(r.units), gross=qty*safe(r.price)+safe(r.fees);
+    const key=String(r.asset_class||'')+':'+symbol;
+    if(!map.has(key)) map.set(key,{symbol,name:r.name||symbol,units:0,cost:0,asset_class:r.asset_class});
+    const h=map.get(key), qty=safe(r.units), gross=qty*safe(r.price)+safe(r.fees);
     if(r.transaction_type==='buy'){h.units+=qty;h.cost+=gross;}
     else if(h.units>0){const avg=h.cost/h.units;h.cost=Math.max(0,h.cost-avg*qty);h.units=Math.max(0,h.units-qty);}
     if(r.name)h.name=r.name;
