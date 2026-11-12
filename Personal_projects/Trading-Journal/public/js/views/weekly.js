@@ -40,7 +40,7 @@ function scalpDetail(data) {
     <p>Success: ${t2.success} · Fail: ${t2.fail} · Contaminated: ${t2.contaminated} · Rate: ${RATE(t2.rate)}
       ${ab.length ? `· <b>${unscored}</b> of ${ab.length} not yet recorded` : ''}</p>
     ${ab.length ? `<table class="dense"><thead><tr><th>Trade</th><th>Ticker</th><th>Setup</th><th>Net</th><th>Outcome</th></tr></thead><tbody>
-      ${ab.map(t => `<tr><td><a href="#/scalp/${t.id}">${esc(t.trade_no)}</a></td><td>${esc(t.ticker)}</td><td>${esc(t.setup)}</td>
+      ${ab.map(t => `<tr><td><a href="#/intraday/trades/${t.id}">${esc(t.trade_no)}</a></td><td>${esc(t.ticker)}</td><td>${esc(t.setup)}</td>
         <td class="${signclass(t.net_pnl)}">${money(t.net_pnl)}</td>
         <td>${sel('tally2', t.id, t.tally_2candle, [['', 'not recorded'], ['success', 'Success'], ['fail', 'Fail'], ['contaminated', 'Contaminated']])}</td></tr>`).join('')}
       </tbody></table>` : '<p class="muted">No Setup A/B trades this week.</p>'}
@@ -67,7 +67,7 @@ function planDetail(p, area) {
   return `${kpis([['Closed trades', p.n], ['Net', money(p.net), signclass(p.net)], ['Win rate', pct(p.win_pct)], ['Still open', p.open]])}
     <h3 style="margin-top:16px">Closed this week</h3>
     ${p.trades.length ? `<table class="dense"><thead><tr><th>Exit</th><th>Ticker</th><th>P&amp;L</th></tr></thead><tbody>
-      ${p.trades.map(t => `<tr><td>${esc(t.exit_date || t.plan_date)}</td><td><a href="#/${area}/${t.id}">${esc(t.ticker)}</a></td>
+      ${p.trades.map(t => `<tr><td>${esc(t.exit_date || t.plan_date)}</td><td><a href="${area === 'scalp' ? '#/intraday/trades/' : area === 'options' ? '#/intraday/plans/' : '#/' + area + '/'}${t.id}">${esc(t.ticker)}</a></td>
         <td class="${signclass(t.realized_pl)}">${money(t.realized_pl)}</td></tr>`).join('')}</tbody></table>`
       : `<p class="muted">No ${AREA_LABEL[area].toLowerCase()} trades closed this week.</p>`}`;
 }
