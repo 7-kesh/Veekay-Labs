@@ -14,6 +14,7 @@ import * as planList from './views/plan-list.js';
 import * as planForm from './views/plan-form.js';
 import * as statsKind from './views/stats-kind.js';
 import * as statsPortfolio from './views/stats-portfolio.js';
+import * as analyticsView from './views/analytics.js';
 import * as wrapupImport from './views/wrapup-import.js';
 import * as journalView from './views/journal.js';
 import * as journalEntryView from './views/journal-entry.js';
@@ -49,7 +50,7 @@ register('funds', (p, el) => assetsView.renderAssetClass('mutual_fund', p, el));
 register('etfs', (p, el) => assetsView.renderAssetClass('etf', p, el));
 register('swing/:id', (p, el) => planForm.render('swing', p, el));
 register('stats', async (p, el) => { navigate('stats/portfolio'); await dispatch(); });
-register('stats/portfolio', statsPortfolio.render);
+register('stats/portfolio', analyticsView.render);
 register('stats/intraday', (p, el) => statsKind.render('scalp', p, el));
 register('stats/swing', (p, el) => statsKind.render('swing', p, el));
 
