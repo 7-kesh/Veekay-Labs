@@ -8,6 +8,11 @@ const CONFIG = {
   etf: { title: 'ETFs', subtitle: 'Exchange-traded fund portfolio', route: 'funds', assetClass: 'etf', unit: 'Units' },
 };
 
+function snapshotHoldings(rows){
+ const groups=new Map();
+ for(const r of rows||[]){const key=r.asset_class+':'+(r.isin||r.symbol).toUpperCase();if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r);}
+ return [...groups.values()].map(g=>{const r=[...g].sort((x,y)=>Number(y.units)-Number(x.units))[0],units=Number(r.units||0),cost=Number(r.invested_value??units*Number(r.avg_price||0)),value=Number(r.current_value??units*Number(r.close_price||0));return {symbol:r.symbol,name:r.name,isin:r.isin,units,cost,avg:units?cost/units:0,market:r.close_price===null?null:Number(r.close_price),value,pnl:r.unrealized_pnl===null?value-cost:Number(r.unrealized_pnl),asset_class:r.asset_class,brokers:[...new Set(g.map(x=>x.broker))],snapshot:true};});
+}
 function computeHoldings(rows, prices) {
   const map = new Map();
   for (const r of [...rows].sort((a,b) => a.trade_date.localeCompare(b.trade_date) || a.id-b.id)) {
@@ -34,15 +39,17 @@ function computeHoldings(rows, prices) {
 export async function renderAssetClass(kind, params, el) {
   const c = CONFIG[kind];
   const fundTabs = kind === 'mutual_fund' || kind === 'etf' ? `<nav class="subtabs"><a class="${kind === 'mutual_fund' ? 'on' : ''}" href="#/funds">Mutual Funds</a><a class="${kind === 'etf' ? 'on' : ''}" href="#/etfs">ETFs</a></nav>` : '';
-  const [{ data:userData, error:userError }, { data:rows, error:rowsError }, { data:prices, error:pricesError }] = await Promise.all([
+  const [{ data:userData, error:userError }, { data:rows, error:rowsError }, { data:prices, error:pricesError }, { data:snapshots, error:snapshotError }] = await Promise.all([
     supabase.auth.getUser(),
     supabase.from('asset_transactions').select('*').eq('asset_class', c.assetClass).order('trade_date', { ascending:false }).order('id', { ascending:false }),
     supabase.from('asset_market_prices').select('*').eq('asset_class', c.assetClass),
+    supabase.from('asset_holding_snapshots').select('*').eq('asset_class', c.assetClass).order('as_of_date',{ascending:false}),
   ]);
   if (userError) throw userError;
   if (rowsError) throw rowsError;
   if (pricesError) throw pricesError;
-  const holdings = computeHoldings(rows || [], prices || []);
+  if (snapshotError) throw snapshotError;
+  const holdings = snapshots?.length ? snapshotHoldings(snapshots) : computeHoldings(rows || [], prices || []);
   const invested = holdings.reduce((s,h)=>s+h.cost,0);
   const value = holdings.reduce((s,h)=>s+(h.value ?? h.cost),0);
   const pnl = holdings.reduce((s,h)=>s+(h.pnl ?? 0),0);
@@ -68,9 +75,9 @@ export async function renderAssetClass(kind, params, el) {
       <div class="tile"><span>Holdings</span><b>${holdings.length}</b></div>
     </div>
     <section class="card"><h2>Holdings</h2>
-      <div class="tablewrap"><table class="dense"><thead><tr><th>Symbol</th><th>Name</th><th>Units</th><th>Avg cost</th><th>Latest price</th><th>Market value</th><th>P&amp;L</th><th>Update price</th></tr></thead><tbody>
-      ${holdings.map(h=>`<tr><td><b>${esc(h.symbol)}</b></td><td>${esc(h.name)}</td><td>${h.units.toFixed(4)}</td><td>${money(h.avg)}</td><td>${h.market === null ? '—' : money(h.market)}</td><td>${h.value === null ? '—' : money(h.value)}</td><td class="${(h.pnl ?? 0)>=0?'pos':'neg'}">${h.pnl === null ? '—' : money(h.pnl)}</td><td><form class="priceForm" data-symbol="${esc(h.symbol)}" style="display:flex;gap:4px"><input name="price" type="number" min="0" step="0.0001" placeholder="Price" required style="width:95px"><button class="btn sm">Save</button></form></td></tr>`).join('') || '<tr><td colspan="8" class="muted">No holdings yet. Add your first buy transaction below.</td></tr>'}
-      </tbody></table></div><p class="muted" style="font-size:12px">*Current value and unrealised P&amp;L use your manually entered latest prices. Missing prices are temporarily valued at cost.</p>
+      <div class="tablewrap"><table class="dense"><thead><tr><th>Symbol / ISIN</th><th>Name</th><th>Source</th><th>Units</th><th>Avg cost</th><th>Latest price</th><th>Market value</th><th>P&amp;L</th><th>Update price</th></tr></thead><tbody>
+      ${holdings.map(h=>`<tr><td><b>${esc(h.symbol)}</b><br><small class="muted">${esc(h.isin||'')}</small></td><td>${esc(h.name)}</td><td>${h.snapshot?esc(h.brokers.join(' + ')):'Manual'}</td><td>${h.units.toFixed(4)}</td><td>${money(h.avg)}</td><td>${h.market === null ? '—' : money(h.market)}</td><td>${h.value === null ? '—' : money(h.value)}</td><td class="${(h.pnl ?? 0)>=0?'pos':'neg'}">${h.pnl === null ? '—' : money(h.pnl)}</td><td><form class="priceForm" data-symbol="${esc(h.symbol)}" style="display:flex;gap:4px"><input name="price" type="number" min="0" step="0.0001" placeholder="Price" required style="width:95px"><button class="btn sm">Save</button></form></td></tr>`).join('') || '<tr><td colspan="9" class="muted">No holdings yet. Add your first buy transaction below.</td></tr>'}
+      </tbody></table></div><p class="muted" style="font-size:12px">Imported broker holdings use statement snapshots and reported closing prices/NAVs. Overlapping ISINs are consolidated conservatively using the largest reported quantity, not added together.</p>
     </section>
     <section class="card"><h2>Add transaction</h2>
       <form id="assetForm" class="filters" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end">
