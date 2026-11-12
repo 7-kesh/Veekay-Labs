@@ -102,6 +102,27 @@ export async function render(_params, el) {
       }).select('id').single();
       if (result.error) throw result.error;
       const account = el.querySelector('#account').value;
+      const auth = await supabase.auth.getUser();
+      if (auth.error || !auth.data.user) throw auth.error || new Error('Please sign in again.');
+      let assetImported = 0, assetSkipped = 0;
+      const assetRows = (latest.transactions || []).filter(t => t.date && t.symbol &&
+        ['equity','mutual_fund','etf'].includes(t.asset_class) && ['buy','sell'].includes(t.transaction_type) &&
+        Number(t.quantity) > 0 && Number.isFinite(Number(t.price)) && ['high','medium'].includes(t.confidence));
+      assetSkipped = (latest.transactions || []).length - assetRows.length;
+      for (const t of assetRows) {
+        const row = { user_id:auth.data.user.id, asset_class:t.asset_class, transaction_type:t.transaction_type,
+          symbol:String(t.symbol).trim().toUpperCase(), name:String(t.name || '').slice(0,120),
+          trade_date:String(t.date).slice(0,10), units:Number(t.quantity), price:Number(t.price), fees:Number(t.fees || 0),
+          notes:'Imported from ' + latestFile.name + (t.notes ? ' — ' + t.notes : '') };
+        const dup = await supabase.from('asset_transactions').select('id').eq('user_id',row.user_id)
+          .eq('asset_class',row.asset_class).eq('transaction_type',row.transaction_type).eq('symbol',row.symbol)
+          .eq('trade_date',row.trade_date).eq('units',row.units).eq('price',row.price).eq('fees',row.fees).limit(1);
+        if (dup.error) throw dup.error;
+        if (dup.data.length) { assetSkipped++; continue; }
+        const ins = await supabase.from('asset_transactions').insert(row);
+        if (ins.error) throw ins.error;
+        assetImported++;
+      }
       const valid = latest.trades.filter(t => t.date && t.symbol && Number(t.quantity) > 0 &&
         Number.isFinite(Number(t.entry_price)) && Number.isFinite(Number(t.exit_price)) &&
         ['high','medium'].includes(t.confidence) && ['intraday','scalp','options','swing'].includes(t.trade_type));
@@ -142,7 +163,7 @@ export async function render(_params, el) {
         imported++;
       }
       msg.textContent = 'Import batch #' + result.data.id + ' saved. Added ' + imported +
-        ' trade(s) to your journal; skipped ' + skipped + ' duplicate, uncertain or incomplete row(s). Check Intraday / Swing and Graphs.';
+        ' trade(s) and ' + assetImported + ' investment transaction(s) imported; skipped ' + skipped + ' trade row(s) and ' + assetSkipped + ' investment row(s). Check Portfolio and Graphs.';
     } catch (err) {
       msg.textContent = 'Could not save: ' + (err.message || String(err)) + '. Check that the ai_import_batches migration has been run.';
       btn.disabled = false;
