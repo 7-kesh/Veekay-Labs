@@ -95,7 +95,48 @@ export async function render(_params, el) {
         file_type:extOf(latestFile.name).slice(1), summary:latest.summary || '', extracted:latest
       }).select('id').single();
       if (result.error) throw result.error;
-      msg.textContent = 'Saved import batch #' + result.data.id + '. Your source trades remain unchanged.';
+      const account = el.querySelector('#account').value;
+      const valid = latest.trades.filter(t => t.date && t.symbol && Number(t.quantity) > 0 &&
+        Number.isFinite(Number(t.entry_price)) && Number.isFinite(Number(t.exit_price)) &&
+        ['high','medium'].includes(t.confidence) && ['intraday','scalp','options','swing'].includes(t.trade_type));
+      let imported = 0, skipped = latest.trades.length - valid.length;
+      for (const t of valid) {
+        const ticker = String(t.symbol).trim().toUpperCase();
+        const date = String(t.date).slice(0,10);
+        const common = { ticker, account, date };
+        if (t.trade_type === 'swing' || t.trade_type === 'options') {
+          const kind = t.trade_type;
+          const dup = await supabase.from('plans').select('id').eq('kind',kind).eq('ticker',ticker)
+            .eq('account',account).eq('plan_date',date).eq('actual_entry',Number(t.entry_price))
+            .eq('actual_exit',Number(t.exit_price)).eq('qty',Number(t.quantity)).limit(1);
+          if (dup.error) throw dup.error;
+          if (dup.data.length) { skipped++; continue; }
+          const ins = await supabase.from('plans').insert({
+            kind, account, ticker, status:'closed', plan_date:date, entry_date:date, exit_date:date,
+            direction:t.side === 'short' || t.side === 'sell' ? 'short' : 'long',
+            actual_entry:Number(t.entry_price), actual_exit:Number(t.exit_price), qty:Number(t.quantity),
+            realized_pl:t.net_pnl == null ? null : Number(t.net_pnl), fees:Number(t.fees || 0),
+            notes:'Imported from ' + latestFile.name + (t.notes ? ' — ' + t.notes : '')
+          });
+          if (ins.error) throw ins.error;
+        } else {
+          const dup = await supabase.from('scalp_trades').select('id').eq('date',date).eq('ticker',ticker)
+            .eq('account',account).eq('entry_price',Number(t.entry_price)).eq('avg_exit',Number(t.exit_price))
+            .eq('shares',Number(t.quantity)).limit(1);
+          if (dup.error) throw dup.error;
+          if (dup.data.length) { skipped++; continue; }
+          const ins = await supabase.from('scalp_trades').insert({
+            ...common, entry_price:Number(t.entry_price), avg_exit:Number(t.exit_price),
+            shares:Number(t.quantity), net_pnl:t.net_pnl == null ? null : Number(t.net_pnl),
+            commission:Number(t.fees || 0), review_status:'draft',
+            notes:'Imported from ' + latestFile.name + (t.notes ? ' — ' + t.notes : '')
+          });
+          if (ins.error) throw ins.error;
+        }
+        imported++;
+      }
+      msg.textContent = 'Import batch #' + result.data.id + ' saved. Added ' + imported +
+        ' trade(s) to your journal; skipped ' + skipped + ' duplicate, uncertain or incomplete row(s). Check Intraday / Swing and Graphs.';
     } catch (err) {
       msg.textContent = 'Could not save: ' + (err.message || String(err)) + '. Check that the ai_import_batches migration has been run.';
       btn.disabled = false;
