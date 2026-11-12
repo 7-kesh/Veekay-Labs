@@ -32,8 +32,8 @@ function renderTrades(trades) {
 }
 export async function render(_params, el) {
   el.innerHTML = '<div class="head"><h1>KeshavTrades AI Import <small>Upload broker exports, statements or screenshots</small></h1></div>' +
-    '<section class="card"><h2>Import trading data</h2>' +
-    '<p class="muted">Upload a Zerodha, Groww or generic broker CSV/Excel export, PDF statement, or trade screenshot. OpenAI extracts a structured preview; nothing is added to your trading statistics until you review and save the import batch.</p>' +
+    '<section class="card"><h2>Import trades and investments</h2>' +
+    '<p class="muted">Upload a Zerodha, Groww or generic broker CSV/Excel export, contract note, mutual fund statement, PDF or screenshot. OpenAI separates completed trades from stock, mutual fund and ETF transactions. Review the extracted rows before saving the import batch.</p>' +
     '<form id="aiImportForm"><div class="cells">' +
     '<div class="fld f-md"><label for="broker">Broker</label><select id="broker"><option>Auto-detect</option><option>Zerodha</option><option>Groww</option><option>Other</option></select></div>' +
     '<div class="fld f-md"><label for="account">Account type</label><select id="account"><option value="live">Live</option><option value="paper">Paper</option></select></div>' +
