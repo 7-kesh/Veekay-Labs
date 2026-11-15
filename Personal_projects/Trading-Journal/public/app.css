@@ -747,3 +747,17 @@ html[data-theme="dark"] .card.watch{background:linear-gradient(90deg,var(--warn)
  .gcal-mobile-count{display:block;font-size:9px;color:var(--muted);line-height:1.1;text-align:center}
  .gcal-agenda{padding:12px}
 }
+
+/* Daily Market news desk */
+.dm-pulse{display:flex;justify-content:space-between;gap:24px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(115deg,color-mix(in srgb,#4777E8 17%,var(--card)),var(--card));margin:16px 0}
+.dm-kicker{font-size:10px;font-weight:800;letter-spacing:.13em;color:var(--sec)}
+.dm-pulse h2{font-size:21px;margin:7px 0}.dm-pulse p{margin:0;color:var(--muted);font-size:13px}
+.dm-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:230px}.dm-checks span{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:11px;background:var(--card)}
+.dm-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0 8px}.dm-tab{border:1px solid var(--line);background:var(--card);color:var(--muted);padding:8px 13px;border-radius:20px;font:inherit;font-size:12px;cursor:pointer}.dm-tab.active{background:var(--sec);border-color:var(--sec);color:white}
+.dm-status{font-size:11px;margin:10px 0}.dm-feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dm-article{min-width:0;padding:15px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.dm-meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:10px;margin-bottom:8px}.dm-headline{display:block;color:var(--ink);font-size:14px;font-weight:700;line-height:1.4;text-decoration:none}.dm-headline:hover{text-decoration:underline}.dm-article p{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 0 12px}
+.dm-tags{display:flex;gap:5px;flex-wrap:wrap}.dm-tag{font-size:9px;letter-spacing:.04em;padding:4px 7px;border-radius:5px;background:var(--field);color:var(--muted)}.dm-intraday{border-left:2px solid #6488F5}.dm-swing{border-left:2px solid #22A889}.dm-investing{border-left:2px solid #A477E8}
+.dm-sources{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 0;margin-top:18px;border-top:1px solid var(--line)}.dm-sources h3{width:100%;font-size:13px;margin:0}.dm-sources a{font-size:12px;color:var(--sec)}
+.dm-disclaimer{font-size:11px;line-height:1.5;margin-top:12px}.dm-refresh:disabled{opacity:.5}
+@media(max-width:700px){.dm-pulse{display:block;padding:16px}.dm-checks{margin-top:14px;min-width:0}.dm-feed{grid-template-columns:1fr}.dm-meta{font-size:9px}}
