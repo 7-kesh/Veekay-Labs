@@ -17,6 +17,7 @@ import * as statsPortfolio from './views/stats-portfolio.js';
 import * as analyticsView from './views/analytics.js';
 import * as portfolioRemindersView from './views/portfolio-reminders.js';
 import * as portfolioActivityView from './views/portfolio-activity.js';
+import * as dailyMarketView from './views/daily-market.js';
 import * as graphsView from './views/graphs.js';
 import * as wrapupImport from './views/wrapup-import.js';
 import * as journalView from './views/journal.js';
@@ -56,6 +57,7 @@ register('stats', async (p, el) => { navigate('stats/portfolio'); await dispatch
 register('stats/portfolio', analyticsView.render);
 register('stats/portfolio/reminders', portfolioRemindersView.render);
 register('stats/portfolio/activity', portfolioActivityView.render);
+register('daily-market', dailyMarketView.render);
 register('graphs', graphsView.render);
 register('stats/intraday', (p, el) => statsKind.render('scalp', p, el));
 register('stats/swing', (p, el) => statsKind.render('swing', p, el));
