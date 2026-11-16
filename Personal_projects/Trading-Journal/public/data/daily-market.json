@@ -1,13 +1,187 @@
 {
-  "updated_at": "",
-  "market_date": "",
-  "market_summary": "Daily market preparation will appear here after the first successful pre-market publication.",
-  "global_cues": [],
+  "updated_at": "2026-11-16T08:26:38+05:30",
+  "market_date": "2026-11-16",
+  "market_summary": "Pre-open snapshot (08:26 IST): GIFT Nifty was near 25,225 at 08:22, around 54 points above the prior Nifty-futures settlement, indicating a firmer opening bias but not guaranteeing a gap-up. Friday's cash close was weak: Nifty 50 25,144.30 (-0.61%), Sensex 81,592.45 (-0.39%) and Bank Nifty 61,034.10 (-0.79%); banking, IT and auto shares led declines, while mid- and small-cap indices slipped about 0.2%. Asian markets are mildly lower; Brent remains near $96/bbl, USD/INR is expected around 94.22–94.28 and the US 10-year yield is above 5.1%. Friday's provisional cash flows showed FII buying partly offset by DII selling. India's October CPI rose to 6.09%, above the RBI's 6% upper tolerance. The latest accessible portfolio snapshot is dated 12 Nov: Tata Steel has a fresh NINL merger/capex update below; no material post-Friday company-specific catalyst surfaced in this scan for HDFC Bank, HUL, ITC, SJVN, SBI Cards, Manappuram Finance or Vodafone Idea. Facts and market interpretation are separated in each item.",
+  "global_cues": [
+    {
+      "title": "GIFT Nifty points to a firmer start",
+      "detail": "NDTV Profit's 08:22 IST update placed GIFT Nifty near 25,225, about 54 points above the prior Nifty-futures close. This is an indicative futures signal, not a confirmed cash-market opening level.",
+      "source": "NDTV Profit (updated 16 Nov 2026, 08:22 IST)",
+      "url": "https://www.ndtvprofit.com/markets/stock-market-today-all-you-need-to-know-going-into-trade-on-nov-16-12330847"
+    },
+    {
+      "title": "Asia is softer; US index futures are modestly higher",
+      "detail": "Reuters reported the Nikkei down 0.6%, South Korea's index down 0.2% and MSCI Asia-Pacific ex-Japan down 0.1% in Monday trade; S&P 500 futures were up 0.3% and Nasdaq futures up 0.5%.",
+      "source": "Reuters (16 Nov 2026, early Asia trade)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-16/"
+    },
+    {
+      "title": "Wall Street ended Friday mixed",
+      "detail": "On 13 Nov, the Dow rose 0.10%, while the S&P 500 fell 0.40%, Nasdaq Composite fell 0.91% and Russell 2000 fell 0.31%. All four major US indexes nevertheless finished the week higher; technology weakness weighed on the Nasdaq.",
+      "source": "Associated Press (13 Nov 2026 US close)",
+      "url": "https://apnews.com/article/12c1e8155fb85c3c7b09e058ed6d3c74"
+    },
+    {
+      "title": "AI and Fed events could drive global risk appetite this week",
+      "detail": "Reuters says Nvidia's results are due Tuesday 17 Nov, trading in Anthropic is scheduled to begin Thursday, and the Federal Reserve's October meeting minutes are due Wednesday. Investors are watching whether Nvidia can sustain its outlook after the reported CEO departure and whether Fed commentary validates tighter-rate expectations.",
+      "source": "Reuters (16 Nov 2026)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-16/"
+    },
+    {
+      "title": "Oil remains elevated amid US-Iran tensions",
+      "detail": "Reuters' Monday snapshot showed Brent at $95.69/bbl and WTI at $88.68/bbl, broadly steady after a two-week decline. Uncertainty around US-Iran escalation and shipping/supply risks remains a source of volatility.",
+      "source": "Reuters (16 Nov 2026, early trade)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-16/"
+    },
+    {
+      "title": "Dollar strength and higher US yields remain an EM headwind",
+      "detail": "Reuters reported the US 10-year Treasury yield around 5.1433% and the dollar index at 103.42. The dollar had gained 1.1% against major peers over the prior week.",
+      "source": "Reuters (16 Nov 2026, early trade)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-16/"
+    }
+  ],
   "sections": {
-    "intraday": [],
-    "swing": [],
-    "investing": []
+    "intraday": [
+      {
+        "ticker": "BEL",
+        "company": "Bharat Electronics Limited",
+        "headline": "BEL discloses ₹619 crore of additional orders since 6 November",
+        "published_at": "2026-11-13T18:28:41+05:30",
+        "what_changed": "The company's NSE-filed 13 November press release says it secured additional orders worth ₹619 crore across communication equipment, drones, electro-optics, laser range finders, components, upgrades, spares and services.",
+        "why_it_matters": "Fresh order inflow can support near-term order-book visibility and keep defence electronics in focus. The disclosed value alone does not establish execution timing or margin contribution.",
+        "bias": "bullish",
+        "confidence": "medium",
+        "risk": "Order execution, delivery schedules, margin mix and working-capital needs remain unknown; a positive order announcement does not remove broader market risk.",
+        "source": "NSE filing – BEL press release dated 13 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/BEL_13112026182841_Lettersigned.pdf"
+      },
+      {
+        "ticker": "KAYNES",
+        "company": "Kaynes Technology India Limited",
+        "headline": "Q2 revenue grew 4.4%, while consolidated profit for the period fell 65.6%; TFT-module JV approved",
+        "published_at": "2026-11-15T00:15:18+05:30",
+        "what_changed": "The NSE-filed consolidated results show Q2 FY27 revenue from operations of ₹952.52 crore versus ₹912.13 crore a year earlier, while profit for the period was ₹39.80 crore versus ₹115.71 crore. The board also approved a JV with Toyokawa Techno for TFT modules and proposed a voluntary strike-off of its 60%-held Kaynes Embedded Systems subsidiary, subject to statutory formalities.",
+        "why_it_matters": "Modest sales growth alongside a steep decline in reported consolidated profit may dominate the near-term reaction; the JV is a longer-dated opportunity rather than immediate earnings support.",
+        "bias": "bearish",
+        "confidence": "medium",
+        "risk": "The filing contains restated comparative figures and separate owner-attributable profit figures; track cash conversion, working capital, margins and JV execution before drawing longer-term conclusions.",
+        "source": "NSE filing – board outcome and Q2 FY27 results dated 14 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/KAYNESTECH_15112026001518_SEBI_Q2_2027_Final.pdf"
+      },
+      {
+        "ticker": "TMPV",
+        "company": "Tata Motors Passenger Vehicles Limited",
+        "headline": "Q2 revenue rose 34%, but shareholder-attributable loss was ₹5,531 crore",
+        "published_at": "2026-11-13T16:11:23+05:30",
+        "what_changed": "The NSE/BSE-filed Q2 FY27 outcome reports consolidated revenue from operations of ₹96,920 crore, up 34% year on year, and a loss attributable to shareholders of ₹5,531 crore. The quarter included ₹6,738 crore of exceptional loss. JLR revenue rose 20.3% to £5.9 billion with a 6.6% EBITDA margin; Tata passenger-vehicle revenue rose 50.9%, but its EBITDA margin was 4.0%, down 180 basis points.",
+        "why_it_matters": "The headline loss and exceptional item may dominate initial sentiment, while JLR's recovery and domestic revenue growth provide a counterweight. Segment-level margins and commodity costs remain important.",
+        "bias": "mixed",
+        "confidence": "medium",
+        "risk": "Exceptional items, JLR's prior-year cyber-incident base effect, commodity costs, foreign exchange and segment margins can make headline year-on-year comparisons misleading.",
+        "source": "NSE/BSE filing – board outcome and Q2 FY27 results dated 13 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/TATAMOTORSSJS_13112026161123_NSEBSEOutcome.pdf"
+      },
+      {
+        "ticker": "YESBANK",
+        "company": "YES Bank Limited",
+        "headline": "YES Bank denies alleged ₹32 crore cyber-fraud loss involving government accounts",
+        "published_at": "2026-11-14T00:03:00+05:30",
+        "what_changed": "In a clarification issued on 13 November, the bank said its systems had not been compromised, no government accounts had been affected and it had incurred no financial loss from the alleged incident. It described the report as factually incorrect and said it had sought a retraction.",
+        "why_it_matters": "The bank's denial counters a specific alleged-loss claim, but the dispute may keep cybersecurity and reputational risk in focus until independently clarified.",
+        "bias": "unclear",
+        "confidence": "medium",
+        "risk": "This item is based on media reporting of the bank's clarification; no independent technical investigation or public-authority confirmation was located in this scan.",
+        "source": "Moneycontrol (14 Nov 2026, 00:03 IST), reporting the bank's 13 Nov clarification",
+        "url": "https://www.moneycontrol.com/news/business/companies/yes-bank-denies-3-4-million-cyber-fraud-loss-calls-report-factually-incorrect-14079859.html"
+      },
+      {
+        "ticker": "TTL",
+        "company": "T.T. Limited",
+        "headline": "Board meeting today to consider and evaluate a buyback proposal",
+        "published_at": "2026-11-03T14:01:09+05:30",
+        "what_changed": "The NSE-hosted 3 November intimation schedules a 16 November board meeting to consider and evaluate a buyback of fully paid ₹1 face-value shares. It is only a proposal for consideration; no buyback has been approved and no size, price, method or record date has been announced.",
+        "why_it_matters": "The board outcome may create an event-driven move, but the meeting notice itself is not confirmation of a transaction.",
+        "bias": "unclear",
+        "confidence": "high",
+        "risk": "The board may reject or alter the proposal; terms are unknown and small-cap liquidity can amplify price moves.",
+        "source": "NSE filing – T.T. Limited prior intimation dated 3 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/TTL_03112026140109_PRIOR_INTIMATION_TO_NSE_AND_BSE__1_.pdf"
+      }
+    ],
+    "swing": [
+      {
+        "ticker": "WABAG",
+        "company": "VA Tech Wabag Limited",
+        "headline": "Saudi Water Authority cancels 300 MLD Yanbu desalination tender worth about ₹2,332 crore",
+        "published_at": "2026-11-14T08:22:46+05:30",
+        "what_changed": "In its 14 November NSE/BSE disclosure, WABAG said the Saudi Water Authority cancelled the tender for a 300 million-litre-per-day seawater desalination plant, citing internal reasons attributable to the customer. WABAG had completed its formalities and signed the contract, but had sent it for the customer's countersignature and formal commencement. The company said it was approaching the customer for clarification and next steps.",
+        "why_it_matters": "The cancellation removes a sizeable prospective project from the near-term pipeline unless the decision is reversed or resolved; the filing does not quantify the final order-book or earnings impact.",
+        "bias": "bearish",
+        "confidence": "medium",
+        "risk": "The contract had not been countersigned by the customer or formally commenced; do not assume the full project value was recognised as executable backlog. Further customer discussions could change the outcome.",
+        "source": "NSE/BSE filing – WABAG update on Yanbu tender cancellation dated 14 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/VATECH_14112026082246_SI_YanbuCancellation_14Nov2026_sd.pdf"
+      }
+    ],
+    "investing": [
+      {
+        "ticker": "TATASTEEL",
+        "company": "Tata Steel Limited",
+        "headline": "Management targets NINL merger completion in FY27; proposed ₹40,000 crore expansion awaits approvals",
+        "published_at": "2026-11-15T10:55:00+05:30",
+        "what_changed": "Tata Steel CFO Koushik Chatterjee said the amalgamation of Neelachal Ispat Nigam Limited remains on track for completion in the current financial year, subject to final NCLT approval expected to be heard later this month. The proposed NINL plan would add around 5 million tonnes of capacity and has been described by management as a roughly ₹40,000 crore project.",
+        "why_it_matters": "For a recorded portfolio holding, the update adds long-term integration and capacity-expansion context, but the merger and investment remain conditional rather than completed.",
+        "bias": "mixed",
+        "confidence": "medium",
+        "risk": "NCLT approval and timing, project financing, capital intensity, construction execution, steel demand and spreads will determine whether the proposed expansion creates value.",
+        "source": "Business Standard / PTI (15 Nov 2026, 10:55 IST), reporting Tata Steel CFO comments",
+        "url": "https://www.business-standard.com/companies/news/tata-steel-targets-ninl-amalgamation-by-fy27-cfo-koushik-chatterjee-126111500120_1.html"
+      }
+    ]
   },
-  "macro": [],
-  "no_material_updates": true
+  "macro": [
+    {
+      "name": "Nifty 50 / Sensex / Bank Nifty – Friday close",
+      "value": "25,144.30 (-0.61%) / 81,592.45 (-0.39%) / 61,034.10 (-0.79%)",
+      "context": "13 Nov 2026 close. Banking, IT and auto shares led the declines; Nifty Midcap 100 and Smallcap 100 each slipped about 0.2%.",
+      "source": "NDTV Profit (16 Nov 2026 pre-market review)",
+      "url": "https://www.ndtvprofit.com/markets/stock-market-today-all-you-need-to-know-going-into-trade-on-nov-16-12330847"
+    },
+    {
+      "name": "FII / DII cash flows",
+      "value": "FII +₹5,736.55 crore; DII -₹2,253.58 crore",
+      "context": "13 Nov 2026, NSE provisional cash-market figures. Positive combined net flow of about ₹3,482.97 crore; provisional figures may be revised.",
+      "source": "Jivani Markets, reporting NSE provisional data",
+      "url": "https://www.jivanimarkets.com/markets/fii-dii"
+    },
+    {
+      "name": "India CPI inflation – October 2026",
+      "value": "6.09% year on year; food inflation 8.94%",
+      "context": "NSO provisional CPI release dated 12 Nov 2026. Headline CPI is above the RBI's 6% upper tolerance level; food inflation is materially higher.",
+      "source": "Ministry of Statistics and Programme Implementation / National Statistics Office",
+      "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1794480048335-Press%20Release%20of%20CPI%20for%20October%202026%20.pdf"
+    },
+    {
+      "name": "USD/INR",
+      "value": "Expected open 94.22–94.28 per US dollar; Friday settlement 94.24",
+      "context": "Reuters trader survey for 16 Nov. Higher US yields and a stronger dollar are rupee headwinds; nearly $9 billion of foreign equity inflows month-to-date is a partial offset.",
+      "source": "Reuters (16 Nov 2026, 02:18 UTC)",
+      "url": "https://www.reuters.com/world/india/indian-rupee-caught-between-external-pressures-foreign-inflows-2026-11-16/"
+    },
+    {
+      "name": "Crude oil",
+      "value": "Brent $95.69/bbl; WTI $88.68/bbl",
+      "context": "Reuters' Monday early-trade snapshot. Prices were broadly steady after a 2.5% weekly Brent decline, while Middle East escalation risk remains a source of volatility for India's import bill.",
+      "source": "Reuters (16 Nov 2026, early trade)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-16/"
+    },
+    {
+      "name": "US 10-year Treasury yield / US dollar index",
+      "value": "10-year yield 5.1433%; DXY 103.42",
+      "context": "Reuters' Monday snapshot. Elevated yields and a stronger dollar can tighten global financial conditions and complicate emerging-market currency flows.",
+      "source": "Reuters (16 Nov 2026, early trade)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-16/"
+    }
+  ],
+  "no_material_updates": false
 }
