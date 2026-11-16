@@ -764,3 +764,17 @@ html[data-theme="dark"] .card.watch{background:linear-gradient(90deg,var(--warn)
 
 .dm-cues{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}.dm-cues h3{grid-column:1/-1;font-size:13px;margin:4px 0}.dm-cue{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px}.dm-cue b{font-size:12px}.dm-cue p{font-size:11px;color:var(--muted);line-height:1.45}.dm-cue a{font-size:10px;color:var(--sec)}.dm-risk{font-size:11px!important}.dm-article p{margin:8px 0}.dm-article p b{color:var(--ink)}
 @media(max-width:700px){.dm-cues{grid-template-columns:1fr}}
+
+/* Stock Recommendation & Future Bets */
+.fb-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;margin-top:16px}.fb-panel{min-width:0;padding:18px}
+.fb-sectionhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}.fb-sectionhead h2{font-size:17px;margin:0 0 3px}.fb-sectionhead p{font-size:12px;margin:0}
+.fb-count,.fb-rating{font-size:10px;font-weight:750;padding:5px 8px;border-radius:20px;background:color-mix(in srgb,var(--sec) 10%,var(--card));color:var(--sec);white-space:nowrap}
+.fb-form{padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--field);margin-bottom:14px}.fb-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fb-fields label{display:grid;gap:5px;font-size:11px;font-weight:700;color:var(--muted)}.fb-fields input,.fb-fields select,.fb-fields textarea{width:100%;min-width:0;font:inherit;font-size:12px;padding:9px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink)}
+.fb-fields .fb-wide{grid-column:1/-1}.fb-list{display:grid;gap:9px}.fb-card{border:1px solid var(--line);border-radius:10px;padding:13px;background:var(--card);min-width:0}
+.fb-cardtop{display:flex;justify-content:space-between;gap:10px;align-items:center}.fb-cardtop>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.fb-cardtop b{font-size:14px}
+.fb-symbol{font-size:10px;color:var(--muted);font-weight:700;background:var(--field);padding:3px 7px;border-radius:5px}.fb-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;color:var(--muted);font-size:10px}
+.fb-card p{font-size:12px;color:var(--muted);line-height:1.5;margin:9px 0}.fb-recgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}
+.fb-recgrid>div{display:grid;gap:4px;padding:8px;border-radius:7px;background:var(--field);min-width:0}.fb-recgrid small{font-size:9px;color:var(--muted)}.fb-recgrid b{font-size:11px;overflow-wrap:anywhere}
+.fb-card>a{font-size:11px}.fb-note,.fb-disclaimer{font-size:11px;line-height:1.5;color:var(--muted)}.fb-empty{padding:18px;border:1px dashed var(--line);border-radius:9px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:850px){.fb-columns{grid-template-columns:1fr}}@media(max-width:520px){.fb-fields{grid-template-columns:1fr}.fb-fields .fb-wide{grid-column:auto}.fb-recgrid{grid-template-columns:1fr 1fr}}
