@@ -1,6 +1,33 @@
 {
-  "updated_at": "",
-  "market_date": "",
-  "recommendations": [],
-  "note": "Recommendations will be published after source-verified research. No stocks or price targets are prefilled."
+  "updated_at": "2026-11-16T10:20:00+05:30",
+  "market_date": "2026-11-16",
+  "recommendations": [
+    {
+      "ticker": "M&M",
+      "company": "Mahindra & Mahindra",
+      "horizon": "1–3 years",
+      "view": "Watch",
+      "conviction": "Medium",
+      "thesis": "Q2 FY27 consolidated revenue and PAT both grew 25% year on year to ₹57,553 crore and ₹4,588 crore. The auto business reported 55% PAT growth and the company reported 21% annualised consolidated ROE. This gives the group a credible multi-business growth profile; the farm segment was weaker, so monitor whether the auto strength remains broad-based.",
+      "catalyst": "Sustained SUV and electric-SUV execution, continued market-share gains, and recovery in farm-equipment demand.",
+      "risk": "Auto demand and competitive intensity, EV investment and execution, farm cyclicality, and valuation risk if strong growth is already priced in.",
+      "invalidation": "Several quarters of slowing auto volumes or market-share loss, sustained margin deterioration, or a material deterioration in group cash generation / returns.",
+      "source": "Mahindra & Mahindra Q2 FY27 results (5 Nov 2026)",
+      "url": "https://www.mahindra.com/news-room/press-release/en/m-and-m-results-q2-F27"
+    },
+    {
+      "ticker": "SBIN",
+      "company": "State Bank of India",
+      "horizon": "1–3 years",
+      "view": "Watch",
+      "conviction": "Medium",
+      "thesis": "Q2 FY27 net profit rose 14.28% year on year to ₹23,038 crore and net interest income rose 14.69%. Advances grew 17.84%; gross NPA was 1.39% and net NPA 0.36%. The combination of loan growth and reported asset-quality improvement supports a medium-term watchlist case, subject to tracking deposit costs and margins.",
+      "catalyst": "Continued domestic credit growth, operating leverage, and stable or improving asset quality.",
+      "risk": "Deposit competition and funding costs, NIM compression, unsecured / corporate credit slippage, and broader economic or credit-cycle deterioration.",
+      "invalidation": "A sustained rise in slippages and credit costs, weakening deposit mobilisation, or repeated NIM compression that undermines earnings growth.",
+      "source": "State Bank of India Q2 FY27 results (3 Nov 2026)",
+      "url": "https://sbi.bank.in/documents/17836/0/SBI%2BPress%2BRelease%2BQ2FY27_03112026.pdf/576f87c8-635a-4099-6ece-db72ac2bed23?t=1793695786986"
+    }
+  ],
+  "note": "Initial research shortlist as of 16 Nov 2026. These are watchlist candidates, not instructions to buy at the current market price. Recheck valuation, price action, liquidity and the latest exchange filings before acting."
 }
