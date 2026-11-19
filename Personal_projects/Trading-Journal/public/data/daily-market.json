@@ -1,107 +1,148 @@
 {
-  "updated_at": "2026-11-18T09:36:00+05:30",
-  "market_date": "2026-11-18",
-  "market_summary": "Pre-market snapshot as of 07:10 IST (latest sourced pre-open update): GIFT Nifty was quoted at 25,304.50, below Tuesday's Nifty close of 25,387.40, indicating a cautious opening bias; this is an indicative futures quote, not the cash opening print. On 17 Nov, Nifty 50 closed at 25,387.40 (+0.38%) and Sensex at 82,532.19 (+0.52%), both at their highest levels since late February. Banks and private banks reached record highs; small-caps fell 0.2% while mid-caps rose about 0.3%. Overnight, Wall Street's technology-led decline was followed by a recovery in Asian equities after Nvidia's better-than-expected sales forecast; Brent was around $93/bbl. The rupee settled at 93.47 per US dollar on Tuesday, supported by foreign equity inflows and lower oil. NSE provisional cash data showed FII net buying of ₹4,195.38 crore and DII net buying of ₹196.93 crore on 17 Nov. For the accessible portfolio, HDFC Bank disclosed a routine employee stock-option/RSU grant; no newly verified material issuer-specific development was found in this scan for HUL, ITC, SJVN, Tata Steel, SBI Cards, Manappuram Finance, Vodafone Idea or the recorded funds/ETFs. Verified facts are separated from interpretation below; no directional outcome is assured.",
+  "updated_at": "2026-11-19T08:32:22+05:30",
+  "market_date": "2026-11-19",
+  "market_summary": "Pre-market brief as of 08:32 IST, Thursday 19 Nov 2026. Verified prior close (18 Nov): Nifty 50 25,227.95 (-159.45, -0.63%) and Sensex 82,031.81 (-500.38, -0.61%). Thirteen of 16 major sectors fell; consumer durables (-3.08%), metals (-2.46%), auto (-1.35%) and IT (-1.24%) were weak, while PSU banks (+0.59%) were a relative pocket of strength. Nifty Midcap 100 fell 1.22% and Smallcap 100 fell 0.35%. Reuters' GIFT Nifty snapshot at 07:47 IST was 25,161.5, about 0.26% below the cash close and indicative of a softer start, not a cash-market opening print. Offsetting factors: Brent was near $92.12/bbl after the prior session's decline, and 18 Nov provisional cash flows showed FII buying of ₹5,866.78 crore versus DII selling of ₹3,159.90 crore. Main risk: hawkish Fed minutes, a firm dollar and elevated US yields may keep risk appetite cautious. No account holdings were accessible in this run, so stock items are prioritized by verified catalyst materiality rather than portfolio weight. Verified facts are separated from interpretation in each item; this is not a forecast or investment advice.",
   "global_cues": [
     {
-      "title": "Asian equities rebounded after Nvidia's sales outlook",
-      "detail": "Reuters reported MSCI Asia-Pacific ex-Japan up 0.9%, South Korea's KOSPI up as much as 3.3%, Japan's Nikkei up 0.6% and S&P 500 e-mini futures up 0.5% in early Wednesday trade. Nvidia rose 4.7% after hours following quarterly revenue above forecasts. The regional rebound followed four losing sessions, but market breadth and individual country moves varied.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC / 07:16 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "title": "GIFT Nifty points to a softer start",
+      "detail": "Reuters quoted GIFT Nifty at 25,161.5 at 07:47 IST on 19 Nov, versus the Nifty 50 cash close of 25,227.95 on 18 Nov (an indicative gap of about -0.26%). Futures indications can change before the cash pre-open and are not the official opening level.",
+      "source": "Reuters (19 Nov 2026, 07:47 IST)",
+      "url": "https://www.reuters.com/world/india/indian-shares-set-open-lower-hawkish-fed-minutes-weigh-2026-11-19/"
     },
     {
-      "title": "Wall Street fell for a fourth consecutive session before Nvidia's report",
-      "detail": "Reuters said the S&P 500 fell 1% on Tuesday, its fourth straight daily decline, before Nvidia reported. The subsequent after-hours Nvidia move improved sentiment toward AI hardware suppliers, but does not erase the preceding risk-off session.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC / 07:16 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "title": "Fed minutes revive the risk of further US rate increases",
+      "detail": "Minutes of the Fed's October meeting showed policymakers focused on inflation risks; some considered a 50-basis-point increase if incoming inflation data were unfavorable. Reuters reported markets were pricing a near-certain 25-basis-point December hike. Higher US rates could support the dollar and Treasuries and make emerging-market assets less attractive.",
+      "source": "Reuters (18 Nov 2026)",
+      "url": "https://www.reuters.com/business/nasdaq-futures-jump-nvidia-forecast-lifts-ai-trade-ahead-anthropic-pricing-2026-11-18/"
     },
     {
-      "title": "Anthropic IPO pricing is another AI sentiment test",
-      "detail": "Reuters reported that Anthropic was due to price its shares later on Wednesday ahead of a market debut that could value the company at up to $1.4 trillion. The pricing and investor response may influence sentiment toward high-valuation AI businesses; the valuation is a reported potential figure, not a completed market capitalisation.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC / 07:16 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "title": "Wall Street finished mixed after Nvidia results and Fed minutes",
+      "detail": "On 18 Nov, the Dow fell 1.12% to 50,193.03 and the S&P 500 fell 0.24% to 7,322.53, while the Nasdaq rose 0.39% to 24,429.89. Nvidia shares fell despite better-than-expected results and guidance, underscoring uncertainty around AI valuations and leadership.",
+      "source": "Reuters (18 Nov 2026 US close)",
+      "url": "https://www.reuters.com/business/nasdaq-futures-jump-nvidia-forecast-lifts-ai-trade-ahead-anthropic-pricing-2026-11-18/"
     },
     {
-      "title": "Dollar and US Treasury yields remain firm",
-      "detail": "Reuters reported the US dollar index at 103.66 and the US 10-year Treasury yield at 5.123%. A St. Louis Fed official said several rate hikes may be needed to bring inflation under control. A firm dollar and elevated yields can remain headwinds for emerging-market currencies and valuation-sensitive equities.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC / 07:16 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "title": "Crude remained lower after a larger US inventory build",
+      "detail": "At 02:37 GMT on 19 Nov, Brent traded at $92.12/bbl and WTI at $83.17/bbl after falling 1.3% and 3.2%, respectively, in the previous session. US crude inventories rose 3.4 million barrels to 417.8 million for the week ended 13 Nov, versus a Reuters poll expectation of a 58,000-barrel increase. Shipping risks in the Strait of Hormuz remain a countervailing supply risk.",
+      "source": "Reuters (19 Nov 2026, 02:47 UTC)",
+      "url": "https://www.reuters.com/business/energy/oil-prices-steady-supply-surplus-softens-sentiment-though-gulf-war-supports-2026-11-19/"
     },
     {
-      "title": "Oil held near $93 amid supply and shipping risks",
-      "detail": "Brent was around $93 per barrel in early Asian trade, down about 0.2% in Reuters' snapshot. Traders weighed a projected supply surplus and recovering Middle East exports against continued tanker attacks in the Strait of Hormuz and US crude inventory expectations.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC / 07:16 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "title": "Japan opened modestly higher, but broader regional signals were mixed",
+      "detail": "At 00:25 GMT on 19 Nov, Japan's Nikkei was up 0.2% at 59,159.40 while the broader Topix was down 0.4% at 3,809.53. Chip and retail gains offset weakness in metals, energy and banks.",
+      "source": "The Wall Street Journal (19 Nov 2026, 00:25 GMT)",
+      "url": "https://www.wsj.com/finance/stocks/nikkei-rises-0-2-led-by-chip-retail-stocks-fd10cf06"
     }
   ],
   "sections": {
-    "intraday": [],
-    "swing": [],
+    "intraday": [
+      {
+        "ticker": "CIPLA",
+        "company": "Cipla Limited",
+        "headline": "InvaGen's New York facility receives USFDA 'No Action Indicated' classification",
+        "published_at": "2026-11-17T23:14:32+05:30",
+        "what_changed": "Cipla's exchange filing says the USFDA communicated on 17 Nov that its inspection of wholly owned subsidiary InvaGen Pharmaceuticals' Hauppauge, New York facility (conducted 19-22 Oct 2026) was classified as No Action Indicated (NAI).",
+        "why_it_matters": "The NAI outcome removes a near-term regulatory overhang for this specific facility and is a positive compliance signal. It does not establish the regulatory status of Cipla's other facilities or guarantee any revenue change.",
+        "bias": "bullish",
+        "confidence": "high",
+        "risk": "The outcome applies only to the inspected InvaGen site; no direct financial impact or incremental product approvals were quantified in the filing.",
+        "source": "Cipla disclosure to NSE and BSE under Regulation 30 (17 Nov 2026)",
+        "url": "https://nsearchives.nseindia.com/corporate/CIPLA_17112026231432_SEIntimationUSFDAInvagenNAI17112026signed.pdf"
+      },
+      {
+        "ticker": "CIPLA",
+        "company": "Cipla Limited",
+        "headline": "DRI search at Vikhroli office and Bhiwandi depot over imported-product classification",
+        "published_at": "2026-11-16T23:54:49+05:30",
+        "what_changed": "Cipla disclosed that the Directorate of Revenue Intelligence's Mumbai zonal unit searched its Vikhroli office and Bhiwandi depot on 16 Nov under Section 105 of the Customs Act. The filing says the matter relates to classification or exemption of an imported finished pharmaceutical product; Cipla said it cooperated. The company separately stated there was no material impact on financials, operations or other activities.",
+        "why_it_matters": "This is a regulatory and customs headline to monitor alongside the positive InvaGen NAI outcome. The filing does not identify the product or quantify any duty exposure, and a search by itself does not establish wrongdoing.",
+        "bias": "mixed",
+        "confidence": "high",
+        "risk": "The underlying product classification or exemption question remains unspecified; any subsequent demand, penalty or further regulatory action is unknown.",
+        "source": "Cipla disclosure to NSE and BSE under Regulation 30 (16 Nov 2026)",
+        "url": "https://nsearchives.nseindia.com/corporate/CIPLA_16112026235449_Action_by_Authority_SE_20261116_Customs_v2_Signed.pdf"
+      }
+    ],
+    "swing": [
+      {
+        "ticker": "BLSPOLY",
+        "company": "BLS Polymers Limited",
+        "headline": "Q2 FY27 press release reports strong year-on-year growth in revenue, EBITDA and PAT",
+        "published_at": "2026-11-18T19:05:49+05:30",
+        "what_changed": "The 18 Nov company press release reports Q2 FY27 operating revenue of ₹125.56 crore (+28.92% YoY), EBITDA of ₹17.31 crore (+92.98%) and PAT of ₹10.54 crore (+130.63%). H1 FY27 revenue was reported at ₹232.59 crore (+35.63%) and PAT at ₹20.77 crore (+51.16%). Important disclosure nuance: the exchange-cover letter describes the results as standalone, while the press-release footnote labels the figures consolidated; confirm the basis against the detailed results before making period comparisons.",
+        "why_it_matters": "The reported EBITDA and PAT growth suggest improved operating leverage and stronger profitability, which may keep the result in focus. The conflicting standalone/consolidated description lowers confidence in like-for-like interpretation.",
+        "bias": "mixed",
+        "confidence": "medium",
+        "risk": "Newly listed small-cap with limited trading history and potential liquidity/volatility risk; result-basis discrepancy should be reconciled with the detailed financial statements. No valuation conclusion is implied.",
+        "source": "BLS Polymers press release filed with NSE and BSE (18 Nov 2026)",
+        "url": "https://nsearchives.nseindia.com/corporate/BLSPOLYMERS_18112026190549_Press_Release.pdf"
+      }
+    ],
     "investing": [
       {
-        "ticker": "HDFCBANK",
-        "company": "HDFC Bank Limited",
-        "headline": "HDFC Bank grants 1,86,031 stock options and 41,377 restricted stock units under employee schemes",
-        "published_at": "2026-11-17T15:53:59+05:30",
-        "what_changed": "The bank's NSE-filed disclosure dated 17 Nov says its Governance, Nomination and Remuneration Committee granted 1,86,031 equity stock options under ESOS Plan H-2024 and 41,377 restricted stock units under its Employees' Stock Incentive Master Scheme 2022. The filing sets out a staged vesting schedule over 48 months.",
-        "why_it_matters": "This is a routine employee-retention and incentive action for a recorded portfolio holding, rather than a new operating or earnings catalyst. The long vesting schedule spreads potential equity issuance over time.",
-        "bias": "unclear",
+        "ticker": "NATIONALUM",
+        "company": "National Aluminium Company Limited",
+        "headline": "NALCO signs MoU with RUSAL to explore scandium recovery from red mud",
+        "published_at": "2026-11-18T17:36:19+05:30",
+        "what_changed": "NALCO's 18 Nov exchange-filed press release confirms an MoU with RUSAL for collaboration on recovery of scandium from red mud, signed on the sidelines of the 44th ICSOBA conference in Bengaluru on 17 Nov. The stated scope is knowledge exchange and evaluation of viable recovery pathways.",
+        "why_it_matters": "Scandium is a critical mineral used in advanced industrial and clean-energy applications; successful recovery could create longer-term value from an alumina-refining by-product and add strategic-minerals optionality. The announcement is an early-stage collaboration, not a disclosed commercial project.",
+        "bias": "mixed",
         "confidence": "high",
-        "risk": "The eventual share impact depends on vesting and exercise conditions; this grant alone does not indicate a change in asset quality, earnings, deposit growth or loan demand.",
-        "source": "HDFC Bank NSE filing – grant of stock options and restricted stock units, 17 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/HDFCBANK3_17112026155359_SE_Intimation_grant_of_ESOP_17112026.pdf"
+        "risk": "No recovery volumes, capex, project timetable, binding offtake, commercial terms or earnings contribution were disclosed; technical and economic feasibility remain unproven.",
+        "source": "National Aluminium Company disclosure to NSE and BSE under Regulation 30 (18 Nov 2026)",
+        "url": "https://nsearchives.nseindia.com/corporate/bharatsahu_18112026173619_seletterpr.pdf"
       }
     ]
   },
   "macro": [
     {
-      "name": "Nifty 50 / Sensex – 17 Nov close",
-      "value": "Nifty 50 25,387.40 (+0.38%); Sensex 82,532.19 (+0.52%)",
-      "context": "Both benchmarks closed at their highest levels since late February. They were up about 10.1% and 10.8%, respectively, month to date according to Reuters.",
-      "source": "Reuters (17 Nov 2026, 02:42 UTC)",
-      "url": "https://www.reuters.com/world/india/indian-shares-track-muted-start-global-cues-weaken-2026-11-17/"
+      "name": "Nifty 50 and Sensex — 18 Nov close",
+      "value": "Nifty 50 25,227.95 (-159.45; -0.63%); Sensex 82,031.81 (-500.38; -0.61%)",
+      "context": "Both benchmarks snapped a two-session advance. Reuters reported 13 of 16 major sectors declined; the pullback followed a strong November rally and profit-taking near recent highs.",
+      "source": "Reuters (18 Nov 2026)",
+      "url": "https://www.reuters.com/world/india/indian-shares-set-lower-open-foreign-inflows-easing-crude-lend-support-2026-11-18/"
     },
     {
-      "name": "Sector and broader-market performance",
-      "value": "Banks +1.1%; private banks +0.9%; financials +0.6%; PSU banks +2.0%; small-caps -0.2%; mid-caps +0.3%",
-      "context": "17 Nov close. Eleven of 16 major sectors advanced; banks and private banks reached record highs. This indicates leadership from financials alongside weaker small-cap breadth.",
-      "source": "Reuters (17 Nov 2026)",
-      "url": "https://www.reuters.com/world/india/indian-shares-track-muted-start-global-cues-weaken-2026-11-17/"
+      "name": "Sector and broader-market performance — 18 Nov close",
+      "value": "Consumer Durables -3.08%; Metal -2.46%; Auto -1.35%; IT -1.24%; PSU Bank +0.59%; Nifty Midcap 100 -1.22%; Nifty Smallcap 100 -0.35%",
+      "context": "Consumer durables and metals led the weakness; PSU banks were a relative outperformer. Sector figures are reported close-to-close changes, not a forecast for the next session.",
+      "source": "India Today (18 Nov 2026, updated 15:47 IST)",
+      "url": "https://www.indiatoday.in/amp/business/market/story/sensex-falls-500-points-nifty-settles-at-25228-titan-sinks-over-4-3041463-2026-11-18"
     },
     {
-      "name": "GIFT Nifty",
-      "value": "25,304.50 in early trade on 18 Nov",
-      "context": "Moneycontrol's 07:10 IST pre-market update said the futures indication was lower than Tuesday's Nifty cash close of 25,387.40, suggesting a cautious start. This is an indicative futures quote, not the NSE opening level.",
-      "source": "Moneycontrol (18 Nov 2026, 07:10 IST)",
-      "url": "https://www.moneycontrol.com/news/business/stocks/first-tick-top-global-cues-to-watch-in-todays-trade-38-14082390.html"
-    },
-    {
-      "name": "FII / DII cash-market flows",
-      "value": "FII net buying ₹4,195.38 crore; DII net buying ₹196.93 crore",
-      "context": "17 Nov 2026, NSE provisional cash-market data. Combined net buying was ₹4,392.31 crore. Provisional figures may be revised; FII cash buying does not by itself describe derivatives positioning.",
-      "source": "Jivani Markets, reporting NSE provisional data (17 Nov 2026)",
+      "name": "FII / DII cash-market flows — 18 Nov",
+      "value": "FII/FPI net buying ₹5,866.78 crore; DII net selling ₹3,159.90 crore",
+      "context": "NSE provisional cash-market figures. Combined net buying was ₹2,706.88 crore. Provisional flow data can be revised and does not represent derivatives positioning.",
+      "source": "Jivani Markets, citing NSE provisional data (18 Nov 2026)",
       "url": "https://www.jivanimarkets.com/markets/fii-dii"
     },
     {
-      "name": "USD/INR",
-      "value": "Rupee settled at 93.47 per US dollar on 17 Nov",
-      "context": "Reuters reported the rupee at a more than seven-month high, up about 1.5% this month. Foreign equity inflows and a more favourable oil-price environment were cited as supports; RBI intervention remains a factor to watch.",
+      "name": "USD/INR and US Dollar Index — 18 Nov close",
+      "value": "Rupee ₹93.44 per US dollar; DXY 103.8",
+      "context": "Reuters reported the rupee ended almost unchanged after reaching a seven-month intraday high of 93.2550; a firmer dollar offset foreign-flow support. DXY was reported up 0.2% to 103.8.",
       "source": "Reuters (18 Nov 2026)",
       "url": "https://www.reuters.com/world/india/indian-rupee-poised-extend-outperformance-swelling-inflows-break-key-level-2026-11-18/"
     },
     {
-      "name": "Brent crude",
-      "value": "Around $93 per barrel in early Asian trade",
-      "context": "Reuters' 18 Nov snapshot showed Brent down about 0.2%. Supply-surplus expectations and recovering exports are counterbalanced by shipping-security concerns around the Strait of Hormuz. Lower crude is generally supportive for India's import bill, all else equal.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "name": "Brent and WTI crude — 19 Nov, 02:37 GMT",
+      "value": "Brent $92.12/bbl (+0.18%); WTI $83.17/bbl (-0.11%)",
+      "context": "Prices were little changed after declines in the previous session. The EIA reported US crude stocks up 3.4 million barrels to 417.8 million for the week ended 13 Nov, substantially above the Reuters poll expectation of +58,000 barrels. Lower crude can ease India's import bill, but Gulf shipping risks remain.",
+      "source": "Reuters (19 Nov 2026, 02:47 UTC)",
+      "url": "https://www.reuters.com/business/energy/oil-prices-steady-supply-surplus-softens-sentiment-though-gulf-war-supports-2026-11-19/"
     },
     {
-      "name": "US dollar index / US 10-year Treasury yield",
-      "value": "DXY 103.66; US 10-year yield 5.123%",
-      "context": "Reuters early Wednesday snapshot. Firm dollar and elevated Treasury yields may tighten global financial conditions and weigh on emerging-market currency and equity valuations.",
-      "source": "Reuters (18 Nov 2026, 01:46 UTC)",
-      "url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-11-18/"
+      "name": "US 10-year Treasury yield — 18 Nov close",
+      "value": "5.06%",
+      "context": "AP reported the yield eased from 5.10% late Tuesday as oil prices fell. The level remains elevated and may matter for global discount rates and emerging-market risk appetite.",
+      "source": "Associated Press (18 Nov 2026)",
+      "url": "https://apnews.com/article/stock-markets-ai-earnings-oil-apec-shenzhen-dad5715bc91b4aba23a567a40e22b1fc"
+    },
+    {
+      "name": "NSE corporate actions with ex-date 19 Nov",
+      "value": "INGERRAND interim dividend ₹20/share; VGCL ₹1/share; NATCOPHARM ₹1.25/share",
+      "context": "NSE's corporate-actions panel lists these interim dividends with 19 Nov 2026 ex-dates. Prices may adjust around the ex-date; confirm the applicable record-date and eligibility details from the issuer/exchange before acting.",
+      "source": "NSE corporate filings and corporate-actions dashboard (accessed 19 Nov 2026)",
+      "url": "https://betanseapi.nseindia.com/companies-listing/corporate-filings-application"
     }
   ],
   "no_material_updates": false
