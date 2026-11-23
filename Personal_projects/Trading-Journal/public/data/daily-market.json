@@ -1,173 +1,60 @@
 {
-  "updated_at": "2026-11-20T08:32:18+05:30",
-  "market_date": "2026-11-20",
-  "market_summary": "As of 08:32 IST, 20 Nov 2026. Verified facts: on 19 Nov, Nifty 50 closed at 25,514.30 (+1.14%) and Sensex at 83,021.75 (+1.21%); autos led with more than 4% sector gain, banks and consumer durables were firm, while Nifty IT fell 1.11%. NSE-provisional cash flows showed FII net buying of ₹7,411.41 crore and DII net selling of ₹1,356.57 crore. Before the open, GIFT Nifty was 25,352 at 07:57 IST, around 162 points below the prior Nifty close; Wall Street fell 2.0%–2.3% and Asian benchmarks sold off sharply. USD/INR settled at 93.29 on Thursday; Brent was $92.22/bbl and WTI $83.40/bbl in early Friday trade. Post-close filings include an Atul US customs investigation notice, cancellation of Ashoka Buildcon's Saudi project, Paytm's proposed Funding Societies investment, Voltas' compressor JV, a Dilip Buildcon metro LOA, NLC Renewables' proposed IPO filing and Coal India's rare-earth magnet facility LoI. Interpretation: domestic momentum and foreign inflows are supportive, but the overnight global risk-off move and negative GIFT Nifty indication raise near-term gap/volatility risk; the rupee has so far been cushioned by inflows. Portfolio context: the repository's stock-recommendations file lists M&M and SBIN as Watch candidates, not confirmed holdings; no holdings register was found. These are dated snapshots and verified disclosures, not live quotes or investment advice.",
+  "updated_at": "2026-11-23T10:18:00+05:30",
+  "market_date": "2026-11-23",
+  "market_summary": "Updated 10:18 IST, Monday 23 Nov 2026 (after the open; not a pre-market note). Friday's close: Nifty 50 25,800.60 (+1.12%) and Sensex 83,919.71 (+1.08%). Reuters reported at 09:15 IST that Nifty was up 0.5% at 25,929.15 and Sensex up 0.6% at 84,421.97; 15 of 16 major sectors advanced at the open. Foreign investors bought ₹103.08 billion of Indian shares on Friday, according to Reuters. The global backdrop remains mixed: US technology-led selling and weaker Asian markets, while lower oil prices offer some support. Reuters reported Brent at $92.29/bbl and WTI at $83.26 on Monday. Tata Sons governance/listing discussions are a major group-level watch item ahead of the scheduled 26 Nov board meeting; Tata Sons itself is unlisted, so this is not a direct listed-stock trade signal. No new individual listed-company trade idea is promoted here without a verified exchange filing and a clear listed-security impact. These are dated snapshots, not live quotes or investment advice.",
   "global_cues": [
     {
-      "title": "Wall Street extends AI-led selloff; S&P 500 posts sixth consecutive decline",
-      "detail": "Verified: at the 19 Nov US close, the S&P 500 fell 2.0% to 7,175.83, the Dow lost 2.2% to 49,097.06 and the Nasdaq dropped 2.3% to 23,879.20; more than 90% of S&P 500 constituents declined. Anthropic closed its first trading day at $97.17, up 17.1% from its $83 IPO price, but the debut did not reverse broad AI-stock weakness. Interpretation: concerns about AI valuations, data-centre returns, regulation and high interest rates are weighing on global risk appetite. AP's page did not display an exact publication time.",
-      "source": "Associated Press, report on 19 Nov 2026 US market close (publication time not displayed)",
-      "url": "https://apnews.com/article/stocks-markets-ai-us-anthropic-206c84045137824feabe052a29ff6140"
+      "title": "Indian benchmarks opened higher as foreign inflows continued",
+      "detail": "Reuters reported at 09:15 IST on 23 Nov that Nifty 50 was up 0.5% at 25,929.15 and Sensex up 0.6% at 84,421.97. Fifteen of 16 major sectors advanced at the open. Reuters said foreign investors bought a net ₹103.08 billion in Indian shares on Friday. Interpretation: domestic breadth and inflows are supportive at the open, but this does not remove the risk from the ongoing global technology-led selloff.",
+      "source": "Reuters, 23 Nov 2026",
+      "url": "https://www.reuters.com/world/india/indian-shares-set-open-higher-foreign-inflows-ai-selloff-persists-2026-11-23/"
     },
     {
-      "title": "Asian selloff deepens; GIFT Nifty points to a weaker Indian open",
-      "detail": "Verified: Reuters reported at 08:04 IST on 20 Nov that GIFT Nifty stood at 25,352 at 07:57 IST, versus Thursday's Nifty close of 25,514.30. MSCI Asia-Pacific shares were down 2.5%; Japan's Nikkei fell 4.1% and South Korea's KOSPI 4.7%. Interpretation: the futures discount implies a negative opening indication, not a guaranteed spot-market gap or direction for the full session.",
-      "source": "Reuters, 20 Nov 2026 02:34 UTC (08:04 IST)",
-      "url": "https://www.reuters.com/world/india/indian-stocks-seen-falling-nine-month-highs-asia-market-rout-deepens-2026-11-20/"
+      "title": "Global technology-led selloff and weaker Asian markets remain a risk",
+      "detail": "The 20 Nov US close saw the S&P 500 at 6,910.39 (-3.70%) and Nasdaq Composite at 22,617.73 (-5.28%); Japan's Nikkei was down 5.06% on Friday. These are dated prior-session closes, not Monday live readings. Interpretation: volatility in AI/technology valuations can spill over into global risk appetite even while Indian equities attract flows.",
+      "source": "FinMinutes, 23 Nov 2026 morning brief (prior-session closes)",
+      "url": "https://finminutes.com/market-open/2026-11-23/"
     },
     {
-      "title": "Rupee holds near 93.29 as foreign inflows offset global risk aversion",
-      "detail": "Verified: USD/INR settled at 93.29 on 19 Nov; traders expected a 93.28–93.34 opening range on 20 Nov. Reuters reported that foreign investors bought more than $800 million of Indian shares on Thursday and monthly net purchases had crossed $12 billion; the rupee was up 1.75% in November. Interpretation: strong flows are currently cushioning the currency, but Reuters cautioned that a deeper global sentiment deterioration could overwhelm that support.",
-      "source": "Reuters, 20 Nov 2026 02:55 UTC (08:25 IST)",
-      "url": "https://www.reuters.com/world/india/global-risk-jitters-bolster-rupee-investors-turn-indian-assets-2026-11-20/"
-    },
-    {
-      "title": "Crude edges higher on Gulf shipping risks but remains set for a weekly decline",
-      "detail": "Verified: Brent rose 0.3% to $92.22/bbl and December WTI rose 0.2% to $83.40/bbl at 01:18 GMT on 20 Nov. Brent was still set for a 3.5% weekly fall and December WTI for a 6% decline. Reuters cited Houthi attacks on Riyadh and reports of tanker disruptions in the Strait of Hormuz as supply-risk factors, against expectations of a global surplus. Interpretation: lower weekly crude prices remain a relative macro cushion for India, while renewed shipping disruption is an upside risk to import costs.",
-      "source": "Reuters, 20 Nov 2026 02:00 UTC (07:30 IST)",
-      "url": "https://www.reuters.com/business/energy/oil-prices-edge-higher-houthi-attacks-riyadh-raise-supply-concerns-2026-11-20/"
-    },
-    {
-      "title": "Potential US rate hike expectations add to dollar and emerging-market pressure",
-      "detail": "Verified: Reuters' 20 Nov pre-market report said firmer odds of a possible US rate hike next month were supporting the dollar. AP also cited high interest rates among the pressures on AI-related equities. Interpretation: higher-for-longer US rates can tighten global financial conditions and create volatility for emerging-market equities, even while current foreign flows into India remain strong.",
-      "source": "Reuters, 20 Nov 2026 02:34 UTC (08:04 IST); Associated Press, 19 Nov US close (publication time not displayed)",
-      "url": "https://www.reuters.com/world/india/indian-stocks-seen-falling-nine-month-highs-asia-market-rout-deepens-2026-11-20/"
+      "title": "Oil prices eased, but Gulf supply risks remain",
+      "detail": "Reuters reported on Monday that Brent fell 0.30% to $92.29/bbl and WTI fell 0.18% to $83.26/bbl. Attacks affecting Gulf shipping and regional infrastructure remain an upside supply-risk factor. Interpretation: softer crude is a relative macro support for India, but geopolitical disruption could reverse the move.",
+      "source": "Reuters, 23 Nov 2026",
+      "url": "https://www.reuters.com/business/energy/oil-prices-fall-amid-equity-selloff-though-iran-war-attacks-limit-losses-2026-11-23/"
     }
   ],
   "sections": {
-    "intraday": [
-      {
-        "ticker": "ATUL",
-        "company": "Atul Limited",
-        "headline": "Atul USA receives US CBP investigation notice over alleged antidumping and countervailing-duty evasion",
-        "published_at": "2026-11-19T16:38:19+05:30",
-        "what_changed": "Verified filing: Atul disclosed that its wholly owned subsidiary Atul USA Inc. received a US Customs and Border Protection notice under the EAPA concerning alleged evasion of antidumping and countervailing duties on Chinese 2,4-D and derivatives allegedly transhipped through India. CBP suspended liquidation of covered unliquidated entries entering the US after 11 Aug 2026. Atul said it prima facie denies the allegation and has engaged US counsel; the financial impact is uncertain.",
-        "why_it_matters": "Interpretation: the notice introduces regulatory and potential trade-cost uncertainty for the US subsidiary and could affect covered shipments while the investigation proceeds. The allegation is not an adjudicated finding.",
-        "bias": "bearish",
-        "confidence": "medium",
-        "risk": "The company has not quantified any duty exposure or financial impact; the scope and duration of the investigation and any further CBP measures are unknown.",
-        "source": "NSE Regulation 30 filing, 19 Nov 2026 16:38:19 IST",
-        "url": "https://nsearchives.nseindia.com/corporate/ATUL1_19112026163819_Intimation.pdf"
-      },
-      {
-        "ticker": "ASHOKA",
-        "company": "Ashoka Buildcon Limited",
-        "headline": "Diriyah Company cancels Ashoka's Saudi hotel construction project valued at ₹846.38 crore for its JV share",
-        "published_at": "2026-11-19T16:29:25+05:30",
-        "what_changed": "Verified filing: the employer notified the joint venture that the Main Construction Works of Diriyah II – Delivery Partner for One Hotel project had been cancelled for internal reasons attributable to the employer. The accepted price for Ashoka's SPV share of work was SAR 351,372,308.67, stated by the company as ₹846.38 crore. Ashoka said it was approaching the employer to understand the reasons and next steps.",
-        "why_it_matters": "Interpretation: the cancellation removes a sizeable overseas project from the disclosed execution pipeline. Any recovery, termination compensation or redeployment benefit is not established by this filing.",
-        "bias": "bearish",
-        "confidence": "high",
-        "risk": "The filing does not quantify lost margin, sunk costs, compensation or cash-flow impact; discussions with the employer and any contractual remedies remain unresolved.",
-        "source": "NSE/BSE Regulation 30 filing, 19 Nov 2026 16:29:25 IST",
-        "url": "https://nsearchives.nseindia.com/corporate/ASHOKA_19112026162925_519_ABL_BSE_NSE_Announcement_Saudi_191126.pdf"
-      },
-      {
-        "ticker": "PAYTM",
-        "company": "One 97 Communications Limited",
-        "headline": "Paytm Singapore proposes up to ₹200 crore investment in Funding Societies units and a technology partnership",
-        "published_at": "2026-11-19T18:22:00+05:30",
-        "what_changed": "Verified filing: Paytm Singapore, a step-down wholly owned subsidiary, approved a proposed investment of up to ₹200 crore in Funding Societies subsidiaries. The initial approximately ₹162 crore would acquire a 19.1% stake in CardUp; up to approximately ₹38 crore may go to an affiliate. Paytm will also provide payments and lending technology to CardUp for technology fees and revenue share. The proposed investment is subject to confirmatory due diligence, corporate approvals, definitive documents and regulatory approvals.",
-        "why_it_matters": "Interpretation: the partnership extends Paytm's partner-operated international payments strategy and could add fee/revenue-share opportunities, but the economics and contribution to group earnings are not yet established.",
-        "bias": "mixed",
-        "confidence": "high",
-        "risk": "The investment is proposed rather than completed; diligence, approvals, final documentation, execution and the returns from CardUp remain uncertain.",
-        "source": "One 97 Communications Regulation 30 filing, 19 Nov 2026 18:22 IST",
-        "url": "https://paytm.com/document/ir/stock-exchange-submissions/fy2026-27/nov/Disclosure_under_Reg_30_LODR_19_Nov_2026.pdf"
-      }
-    ],
-    "swing": [
-      {
-        "ticker": "VOLTAS",
-        "company": "Voltas Limited",
-        "headline": "Voltas executes 50:50 Atomberg JV agreement for room air-conditioner compressors",
-        "published_at": "2026-11-19T19:58:00+05:30",
-        "what_changed": "Verified filing: Voltas executed a joint venture agreement with Atomberg Innovation for development, manufacture and commercialisation of room AC compressors and related parts in India. Voltas will acquire 50% of Atomberg Airtech on closing; the parties will each hold 50%, while Voltas can nominate four directors and Atomberg one. Each party's maximum funding commitment is ₹100 crore, subject to the agreement's conditions precedent.",
-        "why_it_matters": "Interpretation: the venture could give Voltas greater control over an upstream compressor capability and support longer-term product/supply-chain strategy. The filing does not yet establish production capacity, launch timing or earnings contribution.",
-        "bias": "mixed",
-        "confidence": "medium",
-        "risk": "Closing conditions, plant location, capacity, commercialisation schedule, customer demand, unit economics and actual funding deployment remain unspecified.",
-        "source": "BSE/NSE Regulation 30 filing, 19 Nov 2026 19:58 IST",
-        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/8ef1fd96-8307-482d-a31f-e60e8caf7ffc.pdf"
-      },
-      {
-        "ticker": "DBL",
-        "company": "Dilip Buildcon Limited",
-        "headline": "Receives ₹419.47 crore Letter of Acceptance for Gurugram Metro depot-cum-workshop",
-        "published_at": "2026-11-19T17:39:13+05:30",
-        "what_changed": "Verified filing: Dilip Buildcon received a Letter of Acceptance from Gurugram Metro Rail Limited for construction of a depot-cum-workshop, including civil, architectural and E&M works, at Sector 33, Gurugram. The stated project cost is ₹419.47 crore including GST, with a 21-month completion period.",
-        "why_it_matters": "Interpretation: the LOA adds a defined domestic metro project and execution visibility. Revenue and margin realisation will depend on mobilisation, milestone execution and working-capital discipline.",
-        "bias": "bullish",
-        "confidence": "high",
-        "risk": "The filing does not disclose project margin, payment milestones or mobilisation requirements; execution delays, cost overruns and working-capital absorption remain risks.",
-        "source": "NSE/BSE Regulation 30 filing, 19 Nov 2026 17:39:13 IST",
-        "url": "https://nsearchives.nseindia.com/corporate/DBL_19112026173913_intimationLOA.pdf"
-      }
-    ],
+    "intraday": [],
+    "swing": [],
     "investing": [
       {
-        "ticker": "NLCINDIA",
-        "company": "NLC India Limited",
-        "headline": "NLC India Renewables files DRHP for proposed IPO with fresh issue up to ₹3,300 crore and OFS up to 10 crore shares",
-        "published_at": "2026-11-19T15:32:29+05:30",
-        "what_changed": "Verified filing: NLC India disclosed that its wholly owned subsidiary NLC India Renewables Limited filed a draft red herring prospectus with SEBI, BSE and NSE on 19 Nov. The proposed IPO comprises a fresh issue of equity shares aggregating up to ₹33,000 million (₹3,300 crore) and an offer for sale of up to 10,00,00,000 shares held by NLC India. The offer remains subject to approvals, market conditions and other considerations.",
-        "why_it_matters": "Interpretation: a separate listing could provide a valuation reference for the renewables subsidiary and the fresh issue could fund its growth; the OFS component would monetise part of the parent's holding rather than raise proceeds for the subsidiary.",
-        "bias": "mixed",
-        "confidence": "high",
-        "risk": "The DRHP is not an approval or final offer; pricing, final issue size, valuation, dilution, use of fresh-issue proceeds and listing timing are not settled.",
-        "source": "NLC India Regulation 30 filing, 19 Nov 2026 15:32:29 IST",
-        "url": "https://nsearchives.nseindia.com/corporate/NLCINDIA_19112026153229_SE_Intimation_DRHP_19_11_2026_Signed.pdf"
-      },
-      {
-        "ticker": "COALINDIA",
-        "company": "Coal India Limited",
-        "headline": "Coal India-led consortium receives LoI for 1,200 TPA rare-earth permanent-magnet facility",
-        "published_at": "2026-11-19T16:37:35+05:30",
-        "what_changed": "Verified filing: the Ministry of Heavy Industries issued a Letter of Intent dated 19 Nov for a sintered NdFeB rare-earth permanent-magnet manufacturing facility. Coal India is lead member of a consortium with NFTDC and is described in the filing as the L2 bidder. The stated capacity is 1,200 tonnes per annum, with a seven-year schedule comprising two years of pre-construction and five years of operations; no monetary contract value is stated.",
-        "why_it_matters": "Interpretation: the proposal offers long-term diversification into strategic-material manufacturing and a potential role in domestic magnet supply chains, but it is a long-gestation project rather than a near-term earnings catalyst.",
-        "bias": "mixed",
-        "confidence": "high",
-        "risk": "The filing gives no monetary consideration, capex, funding structure, expected returns or commercial start date; the L2-bidder status and SPV/project execution are important conditions to monitor.",
-        "source": "NSE/BSE Regulation 30 filing, 19 Nov 2026 16:37:35 IST",
-        "url": "https://nsearchives.nseindia.in/corporate/COALINDIA_19112026163735_magnet.pdf"
+        "ticker": "TATA GROUP (GOVERNANCE WATCH; NOT A LISTED SECURITY)",
+        "company": "Tata Sons / Tata Group",
+        "headline": "Tata Sons board meeting and proposed listing discussion face procedural and governance uncertainty",
+        "published_at": "2026-11-23T07:30:00+05:30",
+        "what_changed": "Business Standard reported on 23 Nov that Noel Tata sought more time before the 26 Nov Tata Sons board meeting, which is expected to discuss the holding company's listing and alternative restructuring proposal. Economic Times separately reported that Tata Sons planned to postpone the meeting after concerns about late circulation of agenda papers. Tata Sons is unlisted.",
+        "why_it_matters": "This is a group-level governance and potential capital-structure development, not a direct buy/sell signal for listed Tata group companies. Any read-through to individual listed companies would be speculative without a specific disclosure.",
+        "bias": "unclear",
+        "confidence": "medium",
+        "risk": "Meeting timing, board decisions, regulatory outcome and any implications for listed group companies remain uncertain. Do not map this directly to Tata Motors, TCS or other listed entities.",
+        "source": "Business Standard, 23 Nov 2026; Economic Times, 23 Nov 2026",
+        "url": "https://www.business-standard.com/companies/news/tata-sons-board-meeting-november-26-deferred-noel-tata-listing-dispute-126112300080_1.html"
       }
     ]
   },
   "macro": [
     {
-      "name": "Nifty, Sensex and sector performance — 19 Nov close",
-      "value": "Nifty 50: 25,514.30 (+286.35; +1.14%); Sensex: 83,021.75 (+989.94; +1.21%); Nifty Auto: more than +4%; Nifty IT: -1.11%; Nifty Bank intraday high: 63,063; Nifty Midcap 100: +1.06%; Nifty Smallcap 100: +0.71%.",
-      "context": "Verified prior-session closing data. Interpretation: the rebound was led by autos, banks and consumer-facing sectors, while IT lagged; these are 19 Nov closes, not live 20 Nov prices.",
-      "source": "Business Standard live market update, 19 Nov 2026 15:54 IST (first published 07:59 IST)",
-      "url": "https://www.business-standard.com/markets/news/stock-market-live-november-19-nse-bse-sensex-today-nifty50-gift-nifty-crude-oil-prices-mahanadi-coalfields-ipo-today-126111900101_1.html"
+      "name": "Brent crude",
+      "value": "$92.29/bbl",
+      "context": "Reuters-reported Monday move: -0.30%; softer crude is a relative support for India's import bill, but Gulf shipping risks remain.",
+      "source": "Reuters, 23 Nov 2026",
+      "url": "https://www.reuters.com/business/energy/oil-prices-fall-amid-equity-selloff-though-iran-war-attacks-limit-losses-2026-11-23/"
     },
     {
-      "name": "FII/DII cash flows — 19 Nov, NSE provisional",
-      "value": "FII/FPI net +₹7,411.41 crore; DII net -₹1,356.57 crore; combined net +₹6,054.84 crore.",
-      "context": "Reported NSE-provisional cash-market figures for 19 Nov. Interpretation: foreign net buying outweighed domestic institutional net selling; provisional figures can be revised and do not represent derivatives positioning.",
-      "source": "Jivani Markets, reporting NSE provisional data for 19 Nov 2026 (page does not display an exact publication time)",
-      "url": "https://www.jivanimarkets.com/markets/fii-dii"
-    },
-    {
-      "name": "GIFT Nifty — 20 Nov pre-open indication",
-      "value": "25,352 at 07:57 IST, approximately 162 points below the 19 Nov Nifty 50 close of 25,514.30.",
-      "context": "Reuters reported the futures level at 08:04 IST on 20 Nov. Interpretation: it indicated a weaker opening bias; GIFT Nifty is a futures reference, not the cash-market opening print.",
-      "source": "Reuters, 20 Nov 2026 02:34 UTC (08:04 IST)",
-      "url": "https://www.reuters.com/world/india/indian-stocks-seen-falling-nine-month-highs-asia-market-rout-deepens-2026-11-20/"
-    },
-    {
-      "name": "USD/INR — 19 Nov close and 20 Nov expected opening range",
-      "value": "USD/INR settled at 93.29 on 19 Nov; traders expected 93.28–93.34 on 20 Nov.",
-      "context": "Reuters update at 08:25 IST on 20 Nov. Foreign investors bought more than $800 million of Indian shares on Thursday and November net purchases crossed $12 billion; the rupee had gained 1.75% this month. Interpretation: inflows are supporting the rupee, but a sharper deterioration in global risk sentiment could reverse that cushion.",
-      "source": "Reuters, 20 Nov 2026 02:55 UTC (08:25 IST)",
-      "url": "https://www.reuters.com/world/india/global-risk-jitters-bolster-rupee-investors-turn-indian-assets-2026-11-20/"
-    },
-    {
-      "name": "Crude oil — early 20 Nov trade",
-      "value": "Brent: $92.22/bbl (+0.3%); WTI December: $83.40/bbl (+0.2%) at 01:18 GMT (06:48 IST).",
-      "context": "Reuters update at 07:30 IST on 20 Nov. Despite the early uptick, Brent was set for a 3.5% weekly decline and December WTI for a 6% decline. Interpretation: the weekly easing is supportive for India's import bill, but Gulf shipping risks remain a supply-price upside risk.",
-      "source": "Reuters, 20 Nov 2026 02:00 UTC (07:30 IST)",
-      "url": "https://www.reuters.com/business/energy/oil-prices-edge-higher-houthi-attacks-riyadh-raise-supply-concerns-2026-11-20/"
+      "name": "WTI crude",
+      "value": "$83.26/bbl",
+      "context": "Reuters-reported Monday move: -0.18%; regional supply disruption remains an upside risk.",
+      "source": "Reuters, 23 Nov 2026",
+      "url": "https://www.reuters.com/business/energy/oil-prices-fall-amid-equity-selloff-though-iran-war-attacks-limit-losses-2026-11-23/"
     }
   ],
   "no_material_updates": false
