@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-11-24T08:25:14+05:30",
+  "updated_at": "2026-11-24T08:32:40+05:30",
   "market_date": "2026-11-24",
-  "market_summary": "Holiday edition — as of 08:25 IST on Tuesday, 24 Nov 2026. NSE/BSE equity cash and equity-derivatives markets are closed for Prakash Gurpurb Sri Guru Nanak Dev; regular trading resumes Wednesday, 25 Nov. Last Indian session (Mon 23 Nov): Nifty 50 closed at 25,349.65 (-1.75%) and Sensex at 82,435.99 (-1.77%). Fourteen of 16 major sectors fell; banks, private banks, financials and PSU lenders declined 2.4%–3.3%, metals fell 3.7%, mid-caps 1.0% and small-caps 0.7%. NSE-provisional cash flows showed FII/FPI net buying of ₹5,673 crore while DIIs net sold ₹2,760 crore. Overnight, US and Asian equities rebounded sharply after Nvidia surged 31.5%, but higher US Treasury yields and stronger Fed-hike pricing keep the cross-asset signal mixed. Brent was $89.50/bbl in Reuters' early-Tuesday snapshot. There is no Indian intraday session today; prepare for the next session on 25 Nov. I'm not a financial advisor; this is factual market context and scenario analysis, not personalized investment advice.",
+  "market_summary": "Holiday edition — as of 08:32 IST on Tuesday, 24 Nov 2026. NSE/BSE equity cash and equity-derivatives markets are closed for Prakash Gurpurb Sri Guru Nanak Dev; regular trading resumes Wednesday, 25 Nov. Last Indian session (Mon 23 Nov): Nifty 50 closed at 25,349.65 (-1.75%) and Sensex at 82,435.99 (-1.77%). Fourteen of 16 major sectors fell; banks, private banks, financials and PSU lenders declined 2.4%–3.3%, metals fell 3.7%, mid-caps 1.0% and small-caps 0.7%. NSE-provisional cash flows showed FII/FPI net buying of ₹5,673 crore while DIIs net sold ₹2,760 crore. The key corporate event is Tata Steel's proposed acquisition of 26.38% of APL Apollo on a fully diluted basis, a 26% open offer and a linked ₹28,000 crore downstream-asset transfer; Reuters reported APL Apollo fell 21.3% and Tata Steel 8.5% on Monday, with funding concerns highlighted for APL Apollo. Overnight, US and Asian equities rebounded sharply after Nvidia surged 31.5%, but higher US Treasury yields and stronger Fed-hike pricing keep the cross-asset signal mixed. Brent was $89.50/bbl in Reuters' early-Tuesday snapshot. There is no Indian intraday session today; prepare for the next session on 25 Nov. I'm not a financial advisor; this is factual market context and scenario analysis, not personalized investment advice.",
   "global_cues": [
     {
       "title": "NSE capital-market holiday: no equity session on 24 November",
@@ -38,6 +38,30 @@
       "detail": "Reuters' 23 Nov macro calendar lists October PCE and core PCE inflation for 25 Nov at 19:00 IST. The release is a key input into rate expectations ahead of the Federal Reserve's 9 Dec meeting; a material surprise could move yields, the dollar and global equity risk appetite.",
       "source": "Reuters, 23 Nov 2026, 07:03 IST",
       "url": "https://www.reuters.com/world/india/foreign-inflows-lend-support-rupee-bonds-oil-focus-2026-11-23/"
+    },
+    {
+      "title": "Tata Steel's NSE/BSE board-outcome filing sets out the acquisition and open-offer terms",
+      "detail": "Primary filing: Tata Steel's board-outcome disclosure dated 23 Nov 2026 (archive filename timestamp 07:30:27 IST) records an agreement to acquire up to 7,38,60,062 APL Apollo shares, 26.38% of expanded voting share capital on a fully diluted basis, for up to ₹15,510.61 crore in three tranches at ₹2,100/share. It also approves a mandatory open offer for up to 26% at ₹2,301.40/share, up to ₹16,755.66 crore. The filing states the first tranche is structured as an on-market block deal and later tranches are conditional on approvals.",
+      "source": "Tata Steel NSE/BSE filing, Ref SEC/1504/2026-27, 23 Nov 2026",
+      "url": "https://nsearchives.nseindia.com/corporate/NIDHIFADNAVIS_23112026073027_BSENSE.pdf"
+    },
+    {
+      "title": "APL Apollo's NSE/BSE filing confirms the control transition is conditional on closing",
+      "detail": "Primary filing: APL Apollo's board disclosure dated 23 Nov 2026 (archive filename timestamp 07:58:31 IST) says the company joined the share-purchase agreement, but no consideration is payable to or by APL Apollo under that share-purchase agreement. It states there is no change in management or control until closing; upon closing, Tata Steel is expected to acquire control and be classified as promoter.",
+      "source": "APL Apollo NSE/BSE filing, 23 Nov 2026",
+      "url": "https://nsearchives.nseindia.com/corporate/APLAPOLLO_23112026075831_SE_Disclosure.pdf"
+    },
+    {
+      "title": "Tata Steel's official release details the separate ₹28,000 crore asset transfer",
+      "detail": "Tata Steel's 23 Nov 2026 press release says APL Apollo will acquire Tata Steel's steel-tubes business and its entire stake in Tata Steel Colors for a combined ₹28,000 crore. The release says APL Apollo plans to use acquisition financing initially and subsequently replace the debt with long-term capitalisation; all linked transactions remain subject to regulatory approvals.",
+      "source": "Tata Steel official press release, 23 Nov 2026",
+      "url": "https://www.tatasteel.com/newsroom/press-releases/india/2026/tata-steel-and-promoters-of-apl-apollo-enter-into-a-comprehensive-agreement-to-build-an-indian-steel-tubes-and-colour-coated-products-powerhouse-targeting-155-million-tonnes-of-capacity/"
+    },
+    {
+      "title": "Tata Steel and APL Apollo saw sharp share-price reactions on 23 November",
+      "detail": "Reuters reported APL Apollo fell 21.3% and Tata Steel 8.5% on Monday after the linked transactions were announced. Reuters cited concerns about funding the asset acquisition as a key driver of APL Apollo's decline; analysts said Tata Steel's asset-sale proceeds should largely offset its stake-purchase costs. These are historical 23 Nov moves, not live quotes.",
+      "source": "Reuters, 23 Nov 2026",
+      "url": "https://www.reuters.com/world/india/indias-tata-steel-buy-264-apl-apollo-167-billion-2026-11-23/"
     }
   ],
   "sections": {
@@ -46,28 +70,28 @@
       {
         "ticker": "TATASTEEL",
         "company": "Tata Steel Limited",
-        "headline": "Tata Steel announces linked APL Apollo stake purchase and downstream asset sale",
-        "published_at": "2026-11-23",
-        "what_changed": "Verified company disclosure (23 Nov; exact publication time not stated): Tata Steel agreed to acquire the 26.6% promoter stake in APL Apollo at ₹2,100 per share for ₹15,510 crore and make an open offer for a further 26% at ₹2,301.40 per share, valued at ₹16,756 crore. APL Apollo is to acquire Tata Steel's tubes business and Tata Steel's entire stake in Tata Steel Colors for a combined ₹28,000 crore. All transactions are subject to regulatory approvals; Tata Steel expects completion within FY2027.",
-        "why_it_matters": "Interpretation: the linked transactions materially reshape Tata Steel's downstream exposure and place the tubes/colour-coated businesses within APL Apollo. Asset-sale proceeds may offset the promoter-stake purchase, but the net cash, leverage and earnings effects depend on approvals, funding and completion; no synergy or earnings uplift is guaranteed.",
+        "headline": "Tata Steel files proposed APL Apollo control acquisition and mandatory open offer",
+        "published_at": "2026-11-23T07:30:27+05:30",
+        "what_changed": "Verified NSE/BSE board-outcome filing (Ref SEC/1504/2026-27; archive filename timestamp 07:30:27 IST): Tata Steel agreed to acquire up to 7,38,60,062 APL Apollo shares, 26.38% of expanded voting share capital on a fully diluted basis, for up to ₹15,510.61 crore in three tranches at ₹2,100 per share. The first tranche is structured as an on-market block deal; later tranches are conditional on the share-purchase agreement and regulatory approvals. Tata Steel also approved a mandatory open offer for up to 26% at ₹2,301.40 per share, up to ₹16,755.66 crore. Separately, Tata Steel's official 23 Nov release says APL Apollo will acquire its steel-tubes business and entire stake in Tata Steel Colors for ₹28,000 crore. The filing's annexure reports APL Apollo consolidated PAT of ₹1,203 crore in FY26, ₹757 crore in FY25 and ₹732 crore in FY24.",
+        "why_it_matters": "Interpretation: the linked transactions reshape Tata Steel's downstream portfolio; the filing says downstream integration could rise from about 35% to about 53%. Asset-sale proceeds may offset the stake-purchase cost, but the net cash, leverage and earnings effects depend on approvals, funding and completion. No synergy or earnings uplift is guaranteed.",
         "bias": "mixed",
         "confidence": "high",
-        "risk": "Regulatory approvals, open-offer completion, asset-transfer conditions, acquisition financing and integration remain unresolved. The announced terms are not a live price or a guaranteed catalyst.",
-        "source": "Tata Steel official press release, 23 Nov 2026 (time not stated)",
-        "url": "https://www.tatasteel.com/newsroom/press-releases/india/2026/tata-steel-and-promoters-of-apl-apollo-enter-into-a-comprehensive-agreement-to-build-an-indian-steel-tubes-and-colour-coated-products-powerhouse-targeting-155-million-tonnes-of-capacity/"
+        "risk": "Regulatory approvals, open-offer completion, block-deal settlement, tranche conditions, asset-transfer terms and integration remain unresolved. The deal is not yet fully closed and no price target is implied.",
+        "source": "Tata Steel NSE/BSE filing, Ref SEC/1504/2026-27, 23 Nov 2026; Tata Steel official press release, 23 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/NIDHIFADNAVIS_23112026073027_BSENSE.pdf"
       },
       {
         "ticker": "APLAPOLLO",
         "company": "APL Apollo Tubes Limited",
-        "headline": "Funding and execution risk dominate APL Apollo's proposed acquisition of Tata Steel assets",
-        "published_at": "2026-11-23",
-        "what_changed": "Verified: APL Apollo is to acquire Tata Steel's tubes business and its entire stake in Tata Steel Colors for ₹28,000 crore. Tata Steel's 23 Nov release says APL Apollo plans to use acquisition financing initially and subsequently replace that debt with long-term capitalisation. Reuters reported APL Apollo shares fell 21.3% on 23 Nov and cited analyst concerns about funding the acquisition.",
-        "why_it_matters": "Interpretation: the assets could expand capacity and product mix, but near-term leverage, financing terms and the ability to refinance are the key swing variables. The transaction remains subject to regulatory approvals and has not closed.",
+        "headline": "APL Apollo filing confirms conditional promoter and control transition to Tata Steel",
+        "published_at": "2026-11-23T07:58:31+05:30",
+        "what_changed": "Verified NSE/BSE filing (23 Nov 2026; archive filename timestamp 07:58:31 IST): APL Apollo's board meeting from 07:00 to 07:25 IST approved the company's participation in the share-purchase agreement under which the promoter-group seller will transfer 7,38,60,062 shares, representing 26.38% on a fully diluted basis, to Tata Steel in three tranches. APL Apollo states it is not the seller or purchaser of those shares and no consideration is payable to or by it under that share-purchase agreement. The filing says there is no change in management or control until closing; on closing, Tata Steel is expected to acquire control and become promoter. Separately, Tata Steel's official release says APL Apollo will acquire the tubes business and Tata Steel Colors for ₹28,000 crore, initially using acquisition financing and subsequently long-term capitalisation.",
+        "why_it_matters": "Interpretation: the share-purchase agreement creates a conditional control transition, while the separate asset acquisition could expand APL Apollo's scale but introduces financing, leverage and integration questions. The ₹28,000 crore asset consideration is distinct from the share-purchase consideration and is not an equity issue by APL Apollo.",
         "bias": "bearish",
         "confidence": "high",
-        "risk": "Acquisition debt, refinancing, regulatory approvals, open-offer mechanics and execution risk; the reported 23 Nov share-price move is historical, not a live quote.",
-        "source": "Reuters, 23 Nov 2026; Tata Steel official release, 23 Nov 2026",
-        "url": "https://www.reuters.com/world/india/indian-shares-set-open-higher-foreign-inflows-ai-selloff-persists-2026-11-23/"
+        "risk": "Acquisition financing, long-term capitalisation, regulatory approvals, open-offer mechanics and integration remain key risks. No change in management or control occurs until closing; reported 23 Nov price action is historical, not a live quote.",
+        "source": "APL Apollo NSE/BSE filing, 23 Nov 2026; Tata Steel official press release, 23 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/APLAPOLLO_23112026075831_SE_Disclosure.pdf"
       },
       {
         "ticker": "HDFCBANK",
