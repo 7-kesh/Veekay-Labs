@@ -1,176 +1,133 @@
 {
-  "updated_at": "2026-11-24T08:32:40+05:30",
-  "market_date": "2026-11-24",
-  "market_summary": "Holiday edition — as of 08:32 IST on Tuesday, 24 Nov 2026. NSE/BSE equity cash and equity-derivatives markets are closed for Prakash Gurpurb Sri Guru Nanak Dev; regular trading resumes Wednesday, 25 Nov. Last Indian session (Mon 23 Nov): Nifty 50 closed at 25,349.65 (-1.75%) and Sensex at 82,435.99 (-1.77%). Fourteen of 16 major sectors fell; banks, private banks, financials and PSU lenders declined 2.4%–3.3%, metals fell 3.7%, mid-caps 1.0% and small-caps 0.7%. NSE-provisional cash flows showed FII/FPI net buying of ₹5,673 crore while DIIs net sold ₹2,760 crore. The key corporate event is Tata Steel's proposed acquisition of 26.38% of APL Apollo on a fully diluted basis, a 26% open offer and a linked ₹28,000 crore downstream-asset transfer; Reuters reported APL Apollo fell 21.3% and Tata Steel 8.5% on Monday, with funding concerns highlighted for APL Apollo. Overnight, US and Asian equities rebounded sharply after Nvidia surged 31.5%, but higher US Treasury yields and stronger Fed-hike pricing keep the cross-asset signal mixed. Brent was $89.50/bbl in Reuters' early-Tuesday snapshot. There is no Indian intraday session today; prepare for the next session on 25 Nov. I'm not a financial advisor; this is factual market context and scenario analysis, not personalized investment advice.",
+  "updated_at": "2026-11-25T08:30:42+05:30",
+  "market_date": "2026-11-25",
+  "market_summary": "Pre-market, Wednesday 25 Nov 2026 (as of 08:30 IST). NSE/BSE resume after Tuesday's Guru Nanak Jayanti holiday. Last cash session, Monday 23 Nov: Nifty 50 closed at 25,349.65 (-1.75%) and Sensex at 82,435.99 (-1.77%). The decline was broad: 14 of 16 major sectors fell; banks and financials lost 2.4%-3.3%, metals fell 3.7%, while IT was the relative leader. Reuters' 07:43 IST GIFT Nifty snapshot at 25,738 indicated a positive opening setup, but the overnight risk tone weakened: US indices were mixed on 24 Nov and Asian technology markets fell sharply as the AI rebound faded and renewed US tariff concerns emerged. Provisional cash flows for 23 Nov showed FII/FPI net buying of ₹5,673 crore and DII net selling of ₹2,760 crore. Brent was around $90.80/bbl and Reuters-trader indications put USD/INR's expected open at ₹92.70-92.75 versus Monday's ₹92.91 close. Watch opening breadth, banks/metals, tariff headlines and US GDP/Personal Income and Outlays data due later Wednesday. No portfolio-holdings file was found in the accessible repository search, so the stock list is market-wide rather than holding-prioritised. Facts are source-linked below; bias fields are interpretation only. No guaranteed calls or financial advice.",
   "global_cues": [
     {
-      "title": "NSE capital-market holiday: no equity session on 24 November",
-      "detail": "Verified schedule: NSE circular NSE/CMTR/71775 dated 12 Dec 2025 lists Tuesday, 24 Nov 2026 as a trading holiday for the capital-market segment on account of Prakash Gurpurb Sri Guru Nanak Dev. The next listed regular session is Wednesday, 25 Nov.",
-      "source": "National Stock Exchange of India, Circular NSE/CMTR/71775 (12 Dec 2025)",
-      "url": "https://nsearchives.nseindia.com/content/circulars/CMTR71775.pdf"
+      "title": "GIFT Nifty points to a positive opening indication",
+      "detail": "Reuters recorded GIFT Nifty at 25,738 at 07:43 IST on 25 Nov, versus the Nifty 50's previous cash close of 25,349.65 on 23 Nov. This is a futures snapshot and an opening indication, not a live cash-market quote or a guaranteed opening level.",
+      "source": "Reuters, 25 Nov 2026, 02:17 UTC (07:47 IST)",
+      "url": "https://www.reuters.com/world/india/indian-shares-may-open-higher-foreign-inflows-lower-oil-prices-aid-sentiment-2026-11-25/"
     },
     {
-      "title": "BSE and NSE equity markets are closed today",
-      "detail": "Livemint reported at 06:40 IST on 24 Nov that both exchanges have suspended equity trading for Guru Nanak Jayanti; regular trading resumes Wednesday, 25 Nov. No Indian cash-market or equity-derivatives setup is actionable today.",
-      "source": "Livemint, 24 Nov 2026, 06:40 IST",
-      "url": "https://www.livemint.com/market/stock-market-news/stock-market-open-today-or-not-bse-nse-closed-on-24-nov-for-guru-nanak-jayanti-check-holiday-calendar-11795480929821.html"
+      "title": "Wall Street was mixed as the AI rebound faded",
+      "detail": "On 24 Nov, the S&P 500 fell 0.5% and Nasdaq Composite fell 1.5%, while the Dow gained 0.9% and Russell 2000 rose 0.6%. Nvidia fell 5.9% after surrendering part of Monday's sharp rebound. Interpretation: the tech-led global risk impulse is less supportive than the prior session's rally.",
+      "source": "Reuters, 25 Nov 2026, 01:50 UTC (07:20 IST)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-25/"
     },
     {
-      "title": "Wall Street and Asian equities rebound sharply on AI relief",
-      "detail": "Reuters reported at 06:59 IST on 24 Nov that the S&P 500 rose 4.7% and Nasdaq Composite 6.5% on Monday, while Nvidia gained 31.5%. In early Tuesday trade, MSCI Asia-Pacific ex-Japan was up 4.6%, Japan's Nikkei 4.5%, South Korea's KOSPI 7.5% and Taiwan's Taiex 9.1%. Interpretation: the rebound improves the external risk tone for India's next session, but it follows a volatile AI-led selloff and is not a domestic-market opening signal today.",
-      "source": "Reuters, 24 Nov 2026, 06:59 IST",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-24/"
+      "title": "Asian technology markets sold off sharply",
+      "detail": "Early Wednesday, MSCI Asia-Pacific ex-Japan was down 2.3%; South Korea's KOSPI fell as much as 5.3%, Taiwan's market 5.1% and Japan's Nikkei 225 2.9%. Chip-heavy markets led the decline as the AI rally faded and fresh US tariff concerns hit sentiment.",
+      "source": "Reuters, 25 Nov 2026, 01:50 UTC (07:20 IST)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-25/"
     },
     {
-      "title": "Fed tightening expectations lift US yields and the dollar",
-      "detail": "Reuters reported at 06:59 IST on 24 Nov that futures markets had priced a December Fed rate increase as certain, versus 89% odds on Friday; the US 10-year Treasury yield was 4.94% and the 2-year 4.69%. Interpretation: higher US yields and a firmer dollar can offset some of the positive equity-risk impulse for emerging markets.",
-      "source": "Reuters, 24 Nov 2026, 06:59 IST",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-24/"
+      "title": "US excess-capacity tariff probe includes India",
+      "detail": "Reuters reported on 24 Nov that the US administration was preparing findings from a Section 301 probe covering 16 trading partners, including India, China, Japan, South Korea and the EU. New import duties were expected to be proposed, but country-specific rates and final measures were not yet confirmed. This is a policy risk, not an announced tariff schedule.",
+      "source": "Reuters, 24 Nov 2026, 16:19 UTC (21:49 IST)",
+      "url": "https://www.reuters.com/world/us/trump-administration-set-unveil-new-tariffs-after-probe-on-excess-factory-2026-11-24/"
     },
     {
-      "title": "Brent crude remains near a three-month low after a sharp fall",
-      "detail": "Reuters reported at 06:59 IST on 24 Nov that Brent was around $89.50/bbl early Tuesday after settling at $89.37/bbl on Monday, down 3.5%, as higher Middle East supply offset regional shipping and refinery risks. Interpretation: lower crude is relatively supportive for India's import bill, but the geopolitical supply-risk premium can return quickly.",
-      "source": "Reuters, 24 Nov 2026, 06:59 IST",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-24/"
+      "title": "Brent eases as supply-surplus concerns offset Middle East risk",
+      "detail": "Reuters reported Brent at $90.80/bbl, down 0.7%, in its 07:47 IST India-market snapshot. Supply recovery and the prospect of a fourth-quarter surplus are weighing on prices, while vessel incidents near the Strait of Hormuz keep supply-disruption risk elevated. Lower crude is relatively supportive for India's import bill.",
+      "source": "Reuters, 25 Nov 2026, 02:17 UTC (07:47 IST)",
+      "url": "https://www.reuters.com/world/india/indian-shares-may-open-higher-foreign-inflows-lower-oil-prices-aid-sentiment-2026-11-25/"
     },
     {
-      "title": "US October PCE inflation is due on Wednesday",
-      "detail": "Reuters' 23 Nov macro calendar lists October PCE and core PCE inflation for 25 Nov at 19:00 IST. The release is a key input into rate expectations ahead of the Federal Reserve's 9 Dec meeting; a material surprise could move yields, the dollar and global equity risk appetite.",
-      "source": "Reuters, 23 Nov 2026, 07:03 IST",
-      "url": "https://www.reuters.com/world/india/foreign-inflows-lend-support-rupee-bonds-oil-focus-2026-11-23/"
-    },
-    {
-      "title": "Tata Steel's NSE/BSE board-outcome filing sets out the acquisition and open-offer terms",
-      "detail": "Primary filing: Tata Steel's board-outcome disclosure dated 23 Nov 2026 (archive filename timestamp 07:30:27 IST) records an agreement to acquire up to 7,38,60,062 APL Apollo shares, 26.38% of expanded voting share capital on a fully diluted basis, for up to ₹15,510.61 crore in three tranches at ₹2,100/share. It also approves a mandatory open offer for up to 26% at ₹2,301.40/share, up to ₹16,755.66 crore. The filing states the first tranche is structured as an on-market block deal and later tranches are conditional on approvals.",
-      "source": "Tata Steel NSE/BSE filing, Ref SEC/1504/2026-27, 23 Nov 2026",
-      "url": "https://nsearchives.nseindia.com/corporate/NIDHIFADNAVIS_23112026073027_BSENSE.pdf"
-    },
-    {
-      "title": "APL Apollo's NSE/BSE filing confirms the control transition is conditional on closing",
-      "detail": "Primary filing: APL Apollo's board disclosure dated 23 Nov 2026 (archive filename timestamp 07:58:31 IST) says the company joined the share-purchase agreement, but no consideration is payable to or by APL Apollo under that share-purchase agreement. It states there is no change in management or control until closing; upon closing, Tata Steel is expected to acquire control and be classified as promoter.",
-      "source": "APL Apollo NSE/BSE filing, 23 Nov 2026",
-      "url": "https://nsearchives.nseindia.com/corporate/APLAPOLLO_23112026075831_SE_Disclosure.pdf"
-    },
-    {
-      "title": "Tata Steel's official release details the separate ₹28,000 crore asset transfer",
-      "detail": "Tata Steel's 23 Nov 2026 press release says APL Apollo will acquire Tata Steel's steel-tubes business and its entire stake in Tata Steel Colors for a combined ₹28,000 crore. The release says APL Apollo plans to use acquisition financing initially and subsequently replace the debt with long-term capitalisation; all linked transactions remain subject to regulatory approvals.",
-      "source": "Tata Steel official press release, 23 Nov 2026",
-      "url": "https://www.tatasteel.com/newsroom/press-releases/india/2026/tata-steel-and-promoters-of-apl-apollo-enter-into-a-comprehensive-agreement-to-build-an-indian-steel-tubes-and-colour-coated-products-powerhouse-targeting-155-million-tonnes-of-capacity/"
-    },
-    {
-      "title": "Tata Steel and APL Apollo saw sharp share-price reactions on 23 November",
-      "detail": "Reuters reported APL Apollo fell 21.3% and Tata Steel 8.5% on Monday after the linked transactions were announced. Reuters cited concerns about funding the asset acquisition as a key driver of APL Apollo's decline; analysts said Tata Steel's asset-sale proceeds should largely offset its stake-purchase costs. These are historical 23 Nov moves, not live quotes.",
-      "source": "Reuters, 23 Nov 2026",
-      "url": "https://www.reuters.com/world/india/indias-tata-steel-buy-264-apl-apollo-167-billion-2026-11-23/"
+      "title": "US GDP and October personal-income data are due later Wednesday",
+      "detail": "The US Bureau of Economic Analysis schedules the Q3 2026 GDP second estimate and October 2026 Personal Income and Outlays release for 08:30 ET on 25 Nov. The latter includes the PCE price indexes watched by the Federal Reserve. No release value was available as of this pre-market update.",
+      "source": "US Bureau of Economic Analysis, 2026 release schedule",
+      "url": "https://www.bea.gov/news/schedule"
     }
   ],
   "sections": {
-    "intraday": [],
-    "swing": [
+    "intraday": [
       {
-        "ticker": "TATASTEEL",
-        "company": "Tata Steel Limited",
-        "headline": "Tata Steel files proposed APL Apollo control acquisition and mandatory open offer",
-        "published_at": "2026-11-23T07:30:27+05:30",
-        "what_changed": "Verified NSE/BSE board-outcome filing (Ref SEC/1504/2026-27; archive filename timestamp 07:30:27 IST): Tata Steel agreed to acquire up to 7,38,60,062 APL Apollo shares, 26.38% of expanded voting share capital on a fully diluted basis, for up to ₹15,510.61 crore in three tranches at ₹2,100 per share. The first tranche is structured as an on-market block deal; later tranches are conditional on the share-purchase agreement and regulatory approvals. Tata Steel also approved a mandatory open offer for up to 26% at ₹2,301.40 per share, up to ₹16,755.66 crore. Separately, Tata Steel's official 23 Nov release says APL Apollo will acquire its steel-tubes business and entire stake in Tata Steel Colors for ₹28,000 crore. The filing's annexure reports APL Apollo consolidated PAT of ₹1,203 crore in FY26, ₹757 crore in FY25 and ₹732 crore in FY24.",
-        "why_it_matters": "Interpretation: the linked transactions reshape Tata Steel's downstream portfolio; the filing says downstream integration could rise from about 35% to about 53%. Asset-sale proceeds may offset the stake-purchase cost, but the net cash, leverage and earnings effects depend on approvals, funding and completion. No synergy or earnings uplift is guaranteed.",
+        "ticker": "JWL",
+        "company": "Jupiter Wagons Limited",
+        "headline": "Framework agreement with Korea's Woojin targets metro coaches and rail propulsion systems",
+        "published_at": "2026-11-23T15:46:33+05:30",
+        "what_changed": "Verified NSE filing under Regulation 30, also addressed to BSE: Jupiter Wagons executed a framework agreement with Woojin Industrial Systems to pursue Indian rolling-stock opportunities through a consortium and proposed JV. The proposed JV shareholding is 80% Jupiter Wagons and 20% Woojin. The scope includes jointly bidding for metro tenders and manufacturing coaches in India, with technology transfer for propulsion systems, EMUs, train-control systems and related railway products. Jupiter Wagons will lead the consortium, fund JV establishment and operations, and manage local execution. The filing reports no current shareholding in the proposed JV; it does not disclose a committed order value, capital budget or formation date.",
+        "why_it_matters": "Interpretation: the agreement could broaden Jupiter Wagons from freight rolling stock into metro coaches and propulsion technology, creating access to a larger tender pipeline. It remains a framework-stage opportunity rather than booked revenue or a confirmed order.",
         "bias": "mixed",
         "confidence": "high",
-        "risk": "Regulatory approvals, open-offer completion, block-deal settlement, tranche conditions, asset-transfer terms and integration remain unresolved. The deal is not yet fully closed and no price target is implied.",
-        "source": "Tata Steel NSE/BSE filing, Ref SEC/1504/2026-27, 23 Nov 2026; Tata Steel official press release, 23 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/NIDHIFADNAVIS_23112026073027_BSENSE.pdf"
+        "risk": "Jupiter Wagons is responsible for funding the proposed JV's land, plant, machinery and working capital. JV formation, capital requirement, tender wins, technology transfer and execution timing remain uncertain; no earnings or price target is implied.",
+        "source": "Jupiter Wagons Limited, NSE/BSE Regulation 30 filing, 23 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/CEBBCO_23112026154633_reg30_Woojin.pdf"
       },
       {
-        "ticker": "APLAPOLLO",
-        "company": "APL Apollo Tubes Limited",
-        "headline": "APL Apollo filing confirms conditional promoter and control transition to Tata Steel",
-        "published_at": "2026-11-23T07:58:31+05:30",
-        "what_changed": "Verified NSE/BSE filing (23 Nov 2026; archive filename timestamp 07:58:31 IST): APL Apollo's board meeting from 07:00 to 07:25 IST approved the company's participation in the share-purchase agreement under which the promoter-group seller will transfer 7,38,60,062 shares, representing 26.38% on a fully diluted basis, to Tata Steel in three tranches. APL Apollo states it is not the seller or purchaser of those shares and no consideration is payable to or by it under that share-purchase agreement. The filing says there is no change in management or control until closing; on closing, Tata Steel is expected to acquire control and become promoter. Separately, Tata Steel's official release says APL Apollo will acquire the tubes business and Tata Steel Colors for ₹28,000 crore, initially using acquisition financing and subsequently long-term capitalisation.",
-        "why_it_matters": "Interpretation: the share-purchase agreement creates a conditional control transition, while the separate asset acquisition could expand APL Apollo's scale but introduces financing, leverage and integration questions. The ₹28,000 crore asset consideration is distinct from the share-purchase consideration and is not an equity issue by APL Apollo.",
-        "bias": "bearish",
+        "ticker": "CENTUM",
+        "company": "Centum Electronics Limited",
+        "headline": "Centum signs exploratory MoU with Pixxel for satellite payload and miniaturised SAR electronics",
+        "published_at": "2026-11-24T20:06:06+05:30",
+        "what_changed": "Verified NSE/BSE Regulation 30 filing dated 24 Nov: Centum entered an MoU with SpacePixxel Technologies to explore joint development of advanced satellite payloads, including miniaturised Synthetic Aperture Radar electronics and related subsystems. The parties also intend to explore technical knowledge exchange and satellite applications. The filing describes an exploratory collaboration and does not disclose an order value, committed revenue, capex or delivery timetable.",
+        "why_it_matters": "Interpretation: the collaboration aligns Centum's high-reliability space-electronics capability with Pixxel's Earth-observation satellite systems and could create future payload-development opportunities. It is not a firm purchase order or quantified earnings catalyst.",
+        "bias": "mixed",
         "confidence": "high",
-        "risk": "Acquisition financing, long-term capitalisation, regulatory approvals, open-offer mechanics and integration remain key risks. No change in management or control occurs until closing; reported 23 Nov price action is historical, not a live quote.",
-        "source": "APL Apollo NSE/BSE filing, 23 Nov 2026; Tata Steel official press release, 23 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/APLAPOLLO_23112026075831_SE_Disclosure.pdf"
-      },
+        "risk": "The MoU is exploratory; commercial conversion, programme scope, customer funding, pricing and delivery schedules are not disclosed. Avoid treating the announcement as booked orders or near-term revenue.",
+        "source": "Centum Electronics Limited, NSE/BSE Regulation 30 filing, 24 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/CENTUME_24112026200606_PixxelMOUIntimation.pdf"
+      }
+    ],
+    "swing": [
       {
-        "ticker": "HDFCBANK",
-        "company": "HDFC Bank Limited",
-        "headline": "HDFC Bank fell with broad financial-sector profit-taking on 23 November",
-        "published_at": "2026-11-23",
-        "what_changed": "Reuters reported HDFC Bank lost 3.3% on Monday as banks, private banks, financials and PSU lenders declined 2.4%–3.3% after rising 18%–22.5% over the prior four weeks. Reuters attributed the broad market pullback to profit-taking, positioning ahead of weekly derivatives expiry and the Tuesday market holiday; the report did not identify an HDFC Bank-specific catalyst.",
-        "why_it_matters": "Interpretation: the decline is best treated as sector and market-tape weakness rather than evidence of a new company-specific impairment. Banking-sector breadth and price stabilisation are the relevant checks when trading resumes on 25 Nov.",
-        "bias": "bearish",
-        "confidence": "medium",
-        "risk": "No company-specific trigger was identified in the cited report; sector weakness may reverse after the global risk rebound. The 3.3% move is a 23 Nov historical observation, not a live quote.",
-        "source": "Reuters, 23 Nov 2026",
-        "url": "https://www.reuters.com/world/india/indian-shares-set-open-higher-foreign-inflows-ai-selloff-persists-2026-11-23/"
+        "ticker": "MKJEWELS",
+        "company": "M. K. Sons Fine Jewels Limited",
+        "headline": "Q2 and H1 FY27 unaudited results report strong year-on-year revenue and profit growth",
+        "published_at": "2026-11-24T23:14:12+05:30",
+        "what_changed": "The board approved unaudited standalone results for the quarter and half year ended 30 Sep 2026. Q2 revenue from operations was ₹161.96 crore versus ₹108.61 crore a year earlier; Q2 profit for the period was ₹15.76 crore versus ₹9.14 crore. H1 revenue was ₹263.40 crore versus ₹182.06 crore and H1 profit was ₹30.78 crore versus ₹16.64 crore. The filing includes the statutory auditor's limited-review report; the auditor noted that the comparative results for the corresponding prior-year period had been prepared by management and were not independently reviewed or audited.",
+        "why_it_matters": "Interpretation: the reported Q2 and H1 growth is a positive operating signal, but investors should assess margin durability, working-capital conversion and the post-IPO share base before extrapolating the growth rate.",
+        "bias": "bullish",
+        "confidence": "high",
+        "risk": "Small-cap and recently listed-stock liquidity can amplify volatility. Results are unaudited; the auditor's review is not an audit opinion, and prior-year comparative figures were not reviewed. No forward guidance or price target is inferred.",
+        "source": "M. K. Sons Fine Jewels Limited, NSE results filing and limited-review report, 24 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/MK123_24112026231412_MK_Results_300926_S_261124_225324.pdf"
       }
     ],
     "investing": [
       {
-        "ticker": "SHRIRAMFIN",
-        "company": "Shriram Finance Limited",
-        "headline": "Scheduled addition to the BSE Sensex effective 21 December 2026",
-        "published_at": "2026-11-20",
-        "what_changed": "Verified BSE Index Services reconstitution release dated 20 Nov 2026 lists Shriram Finance as an addition to the BSE Sensex, effective at the open on Monday, 21 Dec 2026. The release does not state a publication time.",
-        "why_it_matters": "Interpretation: Sensex-tracking funds may need to add exposure around the rebalance, potentially affecting flows and liquidity. Index inclusion is a benchmark event, not a change in the company's operating fundamentals.",
-        "bias": "bullish",
-        "confidence": "medium",
-        "risk": "Passive-flow size and timing are uncertain; the announcement may already be reflected in the price and does not guarantee outperformance.",
-        "source": "BSE Index Services, official reconstitution release, 20 Nov 2026 (time not stated)",
-        "url": "https://www.bseindices.com/Downloads/MediaRelease/Reconstitutionofindices20112026_20262011.pdf"
-      },
-      {
-        "ticker": "TRENT",
-        "company": "Trent Limited",
-        "headline": "Scheduled removal from the BSE Sensex effective 21 December 2026",
-        "published_at": "2026-11-20",
-        "what_changed": "Verified BSE Index Services reconstitution release dated 20 Nov 2026 lists Trent as a deletion from the BSE Sensex, effective at the open on Monday, 21 Dec 2026. The release does not state a publication time.",
-        "why_it_matters": "Interpretation: Sensex-tracking funds may reduce exposure around the rebalance, which can affect near-term flows. Index deletion alone does not establish deterioration in Trent's operating fundamentals.",
-        "bias": "bearish",
-        "confidence": "medium",
-        "risk": "Passive-flow effects are uncertain and may already be priced in; this is not a fundamental earnings signal or a guaranteed price direction.",
-        "source": "BSE Index Services, official reconstitution release, 20 Nov 2026 (time not stated)",
-        "url": "https://www.bseindices.com/Downloads/MediaRelease/Reconstitutionofindices20112026_20262011.pdf"
+        "ticker": "ZEEL",
+        "company": "Zee Entertainment Enterprises Limited",
+        "headline": "25 November is the record date for the announced ₹600 crore tender-offer buyback",
+        "published_at": "2026-11-12T16:48:04+05:30",
+        "what_changed": "The board-approved buyback covers up to 6,59,34,065 equity shares, representing up to 6.86% of existing paid-up capital, at ₹91 per share for an aggregate amount up to ₹600 crore through the tender-offer route. The company fixed Wednesday, 25 Nov 2026 as the record date for determining eligible shareholders. The filing states that promoters and promoter-group members intend not to participate; the detailed public announcement and process timelines were to follow.",
+        "why_it_matters": "Verified corporate-action fact: 25 Nov is the eligibility record date. The announced ₹91 is the buyback price, not a market-price target; actual participation and acceptance depend on the final offer documents and tender mechanics.",
+        "bias": "mixed",
+        "confidence": "high",
+        "risk": "Eligibility depends on the record-date position and depository records. Final offer timelines, tender ratio, acceptance and settlement remain relevant; the buyback does not guarantee acceptance of all tendered shares.",
+        "source": "Zee Entertainment Enterprises Limited, NSE/BSE board-outcome filing, 12 Nov 2026",
+        "url": "https://nsearchives.nseindia.com/corporate/ZEEL_12112026164804_SEIntimationBMOutcome13NovBBsigned.pdf"
       }
     ]
   },
   "macro": [
     {
       "name": "FII/FPI and DII cash-market flows",
-      "value": "FII/FPI +₹5,673 crore; DII -₹2,760 crore",
-      "context": "NSE-provisional cash-market figures for 23 Nov 2026. Foreign investors were net buyers while domestic institutions were net sellers despite the Nifty's 1.75% decline. Provisional figures can be revised.",
-      "source": "FinMinutes, reporting NSE provisional data, 23 Nov 2026",
-      "url": "https://finminutes.com/fii-dii-data/2026-11-23/"
+      "value": "FII/FPI net +₹5,673 crore; DII net -₹2,760 crore",
+      "context": "Provisional cash-market figures for Monday 23 Nov 2026, the latest Indian trading session before the 24 Nov holiday. Foreign investors were net buyers while domestic institutions were net sellers; provisional exchange figures may be revised.",
+      "source": "Quantsapp, NSE end-of-day FII/DII data for 23 Nov 2026; FII net buying also reported by Reuters",
+      "url": "https://www.quantsapp.com/fii-dii"
     },
     {
-      "name": "USD/INR spot",
-      "value": "₹92.91 per US dollar (23 Nov close)",
-      "context": "Reuters reported the rupee weakened 0.26% from ₹92.67 at the previous close after reaching an intraday high of ₹92.44. This is the latest reported spot close available for this holiday edition, not a live 24 Nov quote.",
-      "source": "Reuters, 23 Nov 2026",
-      "url": "https://www.reuters.com/world/india/ai-rout-deepens-keeping-rupee-rally-alive-foreign-equity-buying-2026-11-23/"
+      "name": "USD/INR",
+      "value": "Expected open ₹92.70-₹92.75 per US dollar; Monday close ₹92.91",
+      "context": "Reuters' 25 Nov currency report cites trader indications for the expected Wednesday open. The rupee had settled at ₹92.91 on Monday after a pullback from a seven-month high of ₹92.43; these are reported expectations and the prior close, not a live 08:30 quote.",
+      "source": "Reuters, 25 Nov 2026, 02:29 UTC (07:59 IST)",
+      "url": "https://www.reuters.com/world/india/rupee-resume-rally-positive-flow-backdrop-turn-market-sentiment-2026-11-25/"
     },
     {
       "name": "Brent crude",
-      "value": "$89.50 per barrel (early 24 Nov snapshot)",
-      "context": "Reuters' 06:59 IST report showed Brent around $89.50 after Monday's settlement at $89.37, down 3.5%. Lower crude is relatively supportive for India's import bill, while geopolitical supply disruption remains a risk.",
-      "source": "Reuters, 24 Nov 2026, 06:59 IST",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-24/"
+      "value": "$90.80 per barrel, down 0.7% in Reuters' 07:47 IST snapshot",
+      "context": "Supply recovery and expectations of a global surplus are weighing on prices, while Middle East shipping incidents and the upcoming OPEC+ 29 Nov policy meeting remain sources of volatility.",
+      "source": "Reuters, 25 Nov 2026, 02:17 UTC (07:47 IST)",
+      "url": "https://www.reuters.com/world/india/indian-shares-may-open-higher-foreign-inflows-lower-oil-prices-aid-sentiment-2026-11-25/"
     },
     {
-      "name": "US 10-year Treasury yield",
-      "value": "4.94% (early 24 Nov Asia session)",
-      "context": "Reuters reported the yield had risen for a second day as markets strengthened bets on a December Fed rate increase. Higher US yields and a firmer dollar can tighten global financial conditions for emerging markets.",
-      "source": "Reuters, 24 Nov 2026, 06:59 IST",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-24/"
-    },
-    {
-      "name": "US October PCE and core PCE inflation",
-      "value": "Scheduled for 25 Nov 2026 at 19:00 IST",
-      "context": "Reuters' 23 Nov macro calendar lists the October PCE release for Wednesday evening. It is a key near-term input into Fed expectations ahead of the 9 Dec policy meeting.",
-      "source": "Reuters, 23 Nov 2026",
-      "url": "https://www.reuters.com/world/india/foreign-inflows-lend-support-rupee-bonds-oil-focus-2026-11-23/"
+      "name": "US Q3 GDP second estimate and October Personal Income and Outlays",
+      "value": "Scheduled for 25 Nov 2026 at 08:30 ET (19:00 IST)",
+      "context": "The BEA schedule lists both releases for Wednesday. October Personal Income and Outlays includes the PCE price indexes; the figures were not yet available at this pre-market timestamp.",
+      "source": "US Bureau of Economic Analysis, 2026 release schedule",
+      "url": "https://www.bea.gov/news/schedule"
     }
   ],
   "no_material_updates": false
