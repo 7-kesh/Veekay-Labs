@@ -1,133 +1,121 @@
 {
-  "updated_at": "2026-11-25T08:30:42+05:30",
-  "market_date": "2026-11-25",
-  "market_summary": "Pre-market, Wednesday 25 Nov 2026 (as of 08:30 IST). NSE/BSE resume after Tuesday's Guru Nanak Jayanti holiday. Last cash session, Monday 23 Nov: Nifty 50 closed at 25,349.65 (-1.75%) and Sensex at 82,435.99 (-1.77%). The decline was broad: 14 of 16 major sectors fell; banks and financials lost 2.4%-3.3%, metals fell 3.7%, while IT was the relative leader. Reuters' 07:43 IST GIFT Nifty snapshot at 25,738 indicated a positive opening setup, but the overnight risk tone weakened: US indices were mixed on 24 Nov and Asian technology markets fell sharply as the AI rebound faded and renewed US tariff concerns emerged. Provisional cash flows for 23 Nov showed FII/FPI net buying of ₹5,673 crore and DII net selling of ₹2,760 crore. Brent was around $90.80/bbl and Reuters-trader indications put USD/INR's expected open at ₹92.70-92.75 versus Monday's ₹92.91 close. Watch opening breadth, banks/metals, tariff headlines and US GDP/Personal Income and Outlays data due later Wednesday. No portfolio-holdings file was found in the accessible repository search, so the stock list is market-wide rather than holding-prioritised. Facts are source-linked below; bias fields are interpretation only. No guaranteed calls or financial advice.",
+  "updated_at": "2026-11-26T08:33:07+05:30",
+  "market_date": "2026-11-26",
+  "market_summary": "Pre-market, Thursday 26 November 2026 (as of 08:33 IST). In the previous cash session on Wednesday 25 November, the Nifty 50 rose 1.85% to 25,819.25 and the Sensex gained 1.82% to 83,938.28. Reuters reported gains in 14 of 16 major sectors; financials rose 2.2% and IT 1.1%, while mid-caps added 0.3% and small-caps fell 0.4%, pointing to a large-cap-led rebound rather than uniformly strong breadth. GIFT Nifty was 26,061.5 at 08:01 IST, indicating a firmer opening bias, with 26,000 identified by Reuters as an important near-term resistance area. Asian equities recovered modestly overnight, but AI/technology volatility and the proposed US tariff framework remain risks. Brent rose about 3.5% to $94.90/bbl, and traders expected USD/INR to open at 92.32–92.36 versus Wednesday's 92.23 close. Provisional 25 November cash flows showed FPI/FII net buying of ₹4,479.08 crore and DII net buying of ₹4,018.72 crore. US Q3 GDP was revised to 4.3% annualised; October core PCE inflation was 3.3% year on year. Portfolio check: the latest accessible holdings snapshot is dated 12 November 2026 and is not live; HDFC Bank is a recorded name and its 25 November director re-appointment filing is highlighted below. Facts are distinguished from interpretation in each item; no guaranteed calls or financial advice.",
   "global_cues": [
     {
-      "title": "GIFT Nifty points to a positive opening indication",
-      "detail": "Reuters recorded GIFT Nifty at 25,738 at 07:43 IST on 25 Nov, versus the Nifty 50's previous cash close of 25,349.65 on 23 Nov. This is a futures snapshot and an opening indication, not a live cash-market quote or a guaranteed opening level.",
-      "source": "Reuters, 25 Nov 2026, 02:17 UTC (07:47 IST)",
-      "url": "https://www.reuters.com/world/india/indian-shares-may-open-higher-foreign-inflows-lower-oil-prices-aid-sentiment-2026-11-25/"
+      "title": "GIFT Nifty indicates a firmer opening; 26,000 is a key test",
+      "detail": "Reuters recorded GIFT Nifty futures at 26,061.5 at 08:01 IST on 26 November, versus the Nifty 50 cash close of 25,819.25 on 25 November. Reuters cited 26,000 as a key resistance area. This is a futures indication, not a live cash-index price or a guaranteed opening level.",
+      "source": "Reuters, 26 Nov 2026, 02:41 UTC (08:11 IST)",
+      "url": "https://www.reuters.com/world/india/indian-shares-set-extend-gains-strong-foreign-flows-us-tariffs-focus-2026-11-26/"
     },
     {
-      "title": "Wall Street was mixed as the AI rebound faded",
-      "detail": "On 24 Nov, the S&P 500 fell 0.5% and Nasdaq Composite fell 1.5%, while the Dow gained 0.9% and Russell 2000 rose 0.6%. Nvidia fell 5.9% after surrendering part of Monday's sharp rebound. Interpretation: the tech-led global risk impulse is less supportive than the prior session's rally.",
-      "source": "Reuters, 25 Nov 2026, 01:50 UTC (07:20 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-25/"
+      "title": "Asian markets rebound, but risk appetite remains fragile",
+      "detail": "Reuters reported Japan's Nikkei up 1.6%, South Korea's main index up 1.9%, and Asia-Pacific shares outside Japan up 0.6% early Thursday after Wall Street recovered from steep intraday losses. Nvidia remained under pressure after S&P put its credit rating on watch for a possible downgrade. Interpretation: the regional bounce is constructive for sentiment, but does not remove technology and AI-investment volatility.",
+      "source": "Reuters, 26 Nov 2026, 01:35 UTC (07:05 IST)",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-26/"
     },
     {
-      "title": "Asian technology markets sold off sharply",
-      "detail": "Early Wednesday, MSCI Asia-Pacific ex-Japan was down 2.3%; South Korea's KOSPI fell as much as 5.3%, Taiwan's market 5.1% and Japan's Nikkei 225 2.9%. Chip-heavy markets led the decline as the AI rally faded and fresh US tariff concerns hit sentiment.",
-      "source": "Reuters, 25 Nov 2026, 01:50 UTC (07:20 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-25/"
+      "title": "Proposed US tariffs leave India facing a trade-negotiation risk",
+      "detail": "Reuters reported that the US administration proposed levies on imports from 14 trading partners. The US Trade Representative said the tariff on Indian imports would be capped at 17% if a trade deal is reached, or rise to 25% if talks fail. These are conditional policy outcomes, not a confirmed final tariff schedule.",
+      "source": "Reuters, 26 Nov 2026, 02:41 UTC (08:11 IST)",
+      "url": "https://www.reuters.com/world/india/indian-shares-set-extend-gains-strong-foreign-flows-us-tariffs-focus-2026-11-26/"
     },
     {
-      "title": "US excess-capacity tariff probe includes India",
-      "detail": "Reuters reported on 24 Nov that the US administration was preparing findings from a Section 301 probe covering 16 trading partners, including India, China, Japan, South Korea and the EU. New import duties were expected to be proposed, but country-specific rates and final measures were not yet confirmed. This is a policy risk, not an announced tariff schedule.",
-      "source": "Reuters, 24 Nov 2026, 16:19 UTC (21:49 IST)",
-      "url": "https://www.reuters.com/world/us/trump-administration-set-unveil-new-tariffs-after-probe-on-excess-factory-2026-11-24/"
+      "title": "US cash equity markets are closed for Thanksgiving",
+      "detail": "Nasdaq's official 2026 calendar lists 26 November as a full market closure and 27 November as an early close at 1:00 p.m. ET. The holiday removes the normal US cash-equity session as a fresh overnight signal for Indian markets.",
+      "source": "Nasdaq, 2026 US market holiday schedule",
+      "url": "https://www.nasdaq.com/market-activity/stock-market-holiday-schedule"
     },
     {
-      "title": "Brent eases as supply-surplus concerns offset Middle East risk",
-      "detail": "Reuters reported Brent at $90.80/bbl, down 0.7%, in its 07:47 IST India-market snapshot. Supply recovery and the prospect of a fourth-quarter surplus are weighing on prices, while vessel incidents near the Strait of Hormuz keep supply-disruption risk elevated. Lower crude is relatively supportive for India's import bill.",
-      "source": "Reuters, 25 Nov 2026, 02:17 UTC (07:47 IST)",
-      "url": "https://www.reuters.com/world/india/indian-shares-may-open-higher-foreign-inflows-lower-oil-prices-aid-sentiment-2026-11-25/"
-    },
-    {
-      "title": "US GDP and October personal-income data are due later Wednesday",
-      "detail": "The US Bureau of Economic Analysis schedules the Q3 2026 GDP second estimate and October 2026 Personal Income and Outlays release for 08:30 ET on 25 Nov. The latter includes the PCE price indexes watched by the Federal Reserve. No release value was available as of this pre-market update.",
-      "source": "US Bureau of Economic Analysis, 2026 release schedule",
-      "url": "https://www.bea.gov/news/schedule"
+      "title": "US growth data were strong while core inflation remained elevated",
+      "detail": "The US Bureau of Economic Analysis revised Q3 2026 real GDP growth to 4.3% annualised from the 3.4% advance estimate. Its October Personal Income and Outlays release showed core PCE prices up 0.3% month on month and 3.3% year on year. Interpretation: stronger growth is supportive for demand, while sticky core inflation can constrain the Federal Reserve's policy flexibility.",
+      "source": "US Bureau of Economic Analysis, releases dated 25 Nov 2026",
+      "url": "https://www.bea.gov/news/2026/gdp-second-estimate-and-corporate-profits-3rd-quarter-2026"
     }
   ],
   "sections": {
     "intraday": [
       {
-        "ticker": "JWL",
-        "company": "Jupiter Wagons Limited",
-        "headline": "Framework agreement with Korea's Woojin targets metro coaches and rail propulsion systems",
-        "published_at": "2026-11-23T15:46:33+05:30",
-        "what_changed": "Verified NSE filing under Regulation 30, also addressed to BSE: Jupiter Wagons executed a framework agreement with Woojin Industrial Systems to pursue Indian rolling-stock opportunities through a consortium and proposed JV. The proposed JV shareholding is 80% Jupiter Wagons and 20% Woojin. The scope includes jointly bidding for metro tenders and manufacturing coaches in India, with technology transfer for propulsion systems, EMUs, train-control systems and related railway products. Jupiter Wagons will lead the consortium, fund JV establishment and operations, and manage local execution. The filing reports no current shareholding in the proposed JV; it does not disclose a committed order value, capital budget or formation date.",
-        "why_it_matters": "Interpretation: the agreement could broaden Jupiter Wagons from freight rolling stock into metro coaches and propulsion technology, creating access to a larger tender pipeline. It remains a framework-stage opportunity rather than booked revenue or a confirmed order.",
+        "ticker": "WIPRO",
+        "company": "Wipro Limited",
+        "headline": "NSE filing discloses BP finance-operations partnership involving about 3,000 employee transfers",
+        "published_at": "2026-11-25T15:48:06+05:30",
+        "what_changed": "Verified fact: Wipro's Regulation 30 press release filed with NSE and BSE says BP selected Wipro as a strategic supplier to transform BP's core finance operations. Around 3,000 BP employees supporting finance operations in India, Hungary and Malaysia are expected to move to Wipro. The new operating model is expected to take effect in 2027, subject to applicable conditions. The filing does not disclose contract value or tenure; BP retains accountability for standards, controls, data and technology governance, with PwC providing controls oversight.",
+        "why_it_matters": "Interpretation: the arrangement could add scale to Wipro's finance and business-process services and create scope for AI- and automation-led transformation work. Without disclosed contract economics, the revenue, margin and earnings contribution cannot yet be quantified.",
         "bias": "mixed",
         "confidence": "high",
-        "risk": "Jupiter Wagons is responsible for funding the proposed JV's land, plant, machinery and working capital. JV formation, capital requirement, tender wins, technology transfer and execution timing remain uncertain; no earnings or price target is implied.",
-        "source": "Jupiter Wagons Limited, NSE/BSE Regulation 30 filing, 23 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/CEBBCO_23112026154633_reg30_Woojin.pdf"
-      },
-      {
-        "ticker": "CENTUM",
-        "company": "Centum Electronics Limited",
-        "headline": "Centum signs exploratory MoU with Pixxel for satellite payload and miniaturised SAR electronics",
-        "published_at": "2026-11-24T20:06:06+05:30",
-        "what_changed": "Verified NSE/BSE Regulation 30 filing dated 24 Nov: Centum entered an MoU with SpacePixxel Technologies to explore joint development of advanced satellite payloads, including miniaturised Synthetic Aperture Radar electronics and related subsystems. The parties also intend to explore technical knowledge exchange and satellite applications. The filing describes an exploratory collaboration and does not disclose an order value, committed revenue, capex or delivery timetable.",
-        "why_it_matters": "Interpretation: the collaboration aligns Centum's high-reliability space-electronics capability with Pixxel's Earth-observation satellite systems and could create future payload-development opportunities. It is not a firm purchase order or quantified earnings catalyst.",
-        "bias": "mixed",
-        "confidence": "high",
-        "risk": "The MoU is exploratory; commercial conversion, programme scope, customer funding, pricing and delivery schedules are not disclosed. Avoid treating the announcement as booked orders or near-term revenue.",
-        "source": "Centum Electronics Limited, NSE/BSE Regulation 30 filing, 24 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/CENTUME_24112026200606_PixxelMOUIntimation.pdf"
+        "risk": "No contract value, duration, country-wise employee split or detailed transition costs were disclosed. The operating model is conditional and starts in 2027; employee transfer and integration may affect near-term costs before benefits are realised.",
+        "source": "Wipro Limited, Regulation 30 press release filed with NSE/BSE, 25 Nov 2026, 15:48 IST",
+        "url": "https://nsearchives.nseindia.com/corporate/Wipro_Secretarial_25112026154806_PR.pdf"
       }
     ],
     "swing": [
       {
-        "ticker": "MKJEWELS",
-        "company": "M. K. Sons Fine Jewels Limited",
-        "headline": "Q2 and H1 FY27 unaudited results report strong year-on-year revenue and profit growth",
-        "published_at": "2026-11-24T23:14:12+05:30",
-        "what_changed": "The board approved unaudited standalone results for the quarter and half year ended 30 Sep 2026. Q2 revenue from operations was ₹161.96 crore versus ₹108.61 crore a year earlier; Q2 profit for the period was ₹15.76 crore versus ₹9.14 crore. H1 revenue was ₹263.40 crore versus ₹182.06 crore and H1 profit was ₹30.78 crore versus ₹16.64 crore. The filing includes the statutory auditor's limited-review report; the auditor noted that the comparative results for the corresponding prior-year period had been prepared by management and were not independently reviewed or audited.",
-        "why_it_matters": "Interpretation: the reported Q2 and H1 growth is a positive operating signal, but investors should assess margin durability, working-capital conversion and the post-IPO share base before extrapolating the growth rate.",
+        "ticker": "ENRIN",
+        "company": "Siemens Energy India Limited",
+        "headline": "FY2026 Q4 results show 81.5% PAT growth; board recommends ₹12 per-share dividend",
+        "published_at": "2026-11-25T20:19:00+05:30",
+        "what_changed": "Verified fact from the company's 25 November release: Q4 FY2026 new orders rose 92.1% year on year to ₹4,514 crore and order backlog increased 25.6% to ₹20,362 crore. Revenue from operations rose 30.4% to ₹3,453 crore; profit after tax rose 81.5% to ₹653 crore; EBIT margin improved to 22.6% from 16.9%. FY2026 revenue was ₹10,243 crore, up 30.9%. The board recommended a dividend of ₹12 per equity share of face value ₹2, subject to the applicable approval process.",
+        "why_it_matters": "Interpretation: strong order intake, a larger backlog and improved operating margin support near-term execution visibility and demonstrate operating leverage. The dividend recommendation adds a shareholder-return event, but it is not yet a completed payment.",
         "bias": "bullish",
         "confidence": "high",
-        "risk": "Small-cap and recently listed-stock liquidity can amplify volatility. Results are unaudited; the auditor's review is not an audit opinion, and prior-year comparative figures were not reviewed. No forward guidance or price target is inferred.",
-        "source": "M. K. Sons Fine Jewels Limited, NSE results filing and limited-review report, 24 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/MK123_24112026231412_MK_Results_300926_S_261124_225324.pdf"
+        "risk": "Backlog conversion, project execution, capacity expansion and working-capital needs remain key risks. The company also disclosed a ₹2,060 crore transformer-capacity investment plan; actual returns depend on timely execution and demand. Dividend remains subject to approval.",
+        "source": "Siemens Energy India Limited, official Q4 FY2026 press release, 25 Nov 2026 (NSE filing time reported as 20:19 IST)",
+        "url": "https://www.siemens-energy-india.com/pdf/Q4-FY2026-Press-Release_25112026_final.pdf"
       }
     ],
     "investing": [
       {
-        "ticker": "ZEEL",
-        "company": "Zee Entertainment Enterprises Limited",
-        "headline": "25 November is the record date for the announced ₹600 crore tender-offer buyback",
-        "published_at": "2026-11-12T16:48:04+05:30",
-        "what_changed": "The board-approved buyback covers up to 6,59,34,065 equity shares, representing up to 6.86% of existing paid-up capital, at ₹91 per share for an aggregate amount up to ₹600 crore through the tender-offer route. The company fixed Wednesday, 25 Nov 2026 as the record date for determining eligible shareholders. The filing states that promoters and promoter-group members intend not to participate; the detailed public announcement and process timelines were to follow.",
-        "why_it_matters": "Verified corporate-action fact: 25 Nov is the eligibility record date. The announced ₹91 is the buyback price, not a market-price target; actual participation and acceptance depend on the final offer documents and tender mechanics.",
+        "ticker": "HDFCBANK",
+        "company": "HDFC Bank Limited",
+        "headline": "Board approves five-year re-appointment of Harsh Kumar Bhanwala as independent director",
+        "published_at": "2026-11-25T18:01:04+05:30",
+        "what_changed": "Verified fact: HDFC Bank's Regulation 30 filing to NSE and BSE states that the board approved the re-appointment of Dr. Harsh Kumar Bhanwala as an independent director for five years, from 25 January 2027 through 24 January 2032, subject to shareholder approval. The filing notes that he is not related to other directors or key managerial personnel and is not debarred from holding office.",
+        "why_it_matters": "Interpretation: this is a governance-continuity update relevant to a tracked portfolio name, rather than a direct change to earnings, capital or asset quality. Bhanwala's disclosed experience includes leadership at NABARD and IIFCL.",
         "bias": "mixed",
         "confidence": "high",
-        "risk": "Eligibility depends on the record-date position and depository records. Final offer timelines, tender ratio, acceptance and settlement remain relevant; the buyback does not guarantee acceptance of all tendered shares.",
-        "source": "Zee Entertainment Enterprises Limited, NSE/BSE board-outcome filing, 12 Nov 2026",
-        "url": "https://nsearchives.nseindia.com/corporate/ZEEL_12112026164804_SEIntimationBMOutcome13NovBBsigned.pdf"
+        "risk": "Shareholder approval remains pending. The appointment announcement by itself does not establish a change in operating performance, credit quality or valuation.",
+        "source": "HDFC Bank Limited, Regulation 30 filing to NSE/BSE, 25 Nov 2026, 18:01 IST",
+        "url": "https://nsearchives.nseindia.com/corporate/HDFCBANK3_25112026180104_SE_intimation-_HKB.pdf"
       }
     ]
   },
   "macro": [
     {
-      "name": "FII/FPI and DII cash-market flows",
-      "value": "FII/FPI net +₹5,673 crore; DII net -₹2,760 crore",
-      "context": "Provisional cash-market figures for Monday 23 Nov 2026, the latest Indian trading session before the 24 Nov holiday. Foreign investors were net buyers while domestic institutions were net sellers; provisional exchange figures may be revised.",
-      "source": "Quantsapp, NSE end-of-day FII/DII data for 23 Nov 2026; FII net buying also reported by Reuters",
-      "url": "https://www.quantsapp.com/fii-dii"
-    },
-    {
-      "name": "USD/INR",
-      "value": "Expected open ₹92.70-₹92.75 per US dollar; Monday close ₹92.91",
-      "context": "Reuters' 25 Nov currency report cites trader indications for the expected Wednesday open. The rupee had settled at ₹92.91 on Monday after a pullback from a seven-month high of ₹92.43; these are reported expectations and the prior close, not a live 08:30 quote.",
-      "source": "Reuters, 25 Nov 2026, 02:29 UTC (07:59 IST)",
-      "url": "https://www.reuters.com/world/india/rupee-resume-rally-positive-flow-backdrop-turn-market-sentiment-2026-11-25/"
+      "name": "FPI/FII and DII cash-market flows",
+      "value": "FPI/FII net +₹4,479.08 crore; DII net +₹4,018.72 crore",
+      "context": "Provisional cash-market flows for Wednesday 25 November 2026. Both investor groups were net buyers; figures are provisional and may be revised. Reuters independently reported FPI net buying of ₹44.79 billion.",
+      "source": "Moneycontrol, 25 Nov 2026, 21:13 IST; Reuters, 26 Nov 2026",
+      "url": "https://www.moneycontrol.com/news/business/economy/diis-turn-net-buyers-for-only-a-second-time-in-nov-pick-up-rs-4-019-crore-while-fiis-buy-rs-4-479-crore-14089086.html"
     },
     {
       "name": "Brent crude",
-      "value": "$90.80 per barrel, down 0.7% in Reuters' 07:47 IST snapshot",
-      "context": "Supply recovery and expectations of a global surplus are weighing on prices, while Middle East shipping incidents and the upcoming OPEC+ 29 Nov policy meeting remain sources of volatility.",
-      "source": "Reuters, 25 Nov 2026, 02:17 UTC (07:47 IST)",
-      "url": "https://www.reuters.com/world/india/indian-shares-may-open-higher-foreign-inflows-lower-oil-prices-aid-sentiment-2026-11-25/"
+      "value": "About US$94.90 per barrel; up approximately 3.5%",
+      "context": "Reuters reported the overnight rise amid concerns about Middle East supply disruption following Houthi claims of an attack on Saudi Arabia's largest oil refinery. Higher crude is a headwind for India's import bill and fuel-sensitive sectors; the quote is an overnight reported level, not a live tick.",
+      "source": "Reuters, 26 Nov 2026, 02:38 UTC (08:08 IST)",
+      "url": "https://www.reuters.com/world/india/rupee-dip-oil-rise-ai-trade-finding-tentative-footing-2026-11-26/"
     },
     {
-      "name": "US Q3 GDP second estimate and October Personal Income and Outlays",
-      "value": "Scheduled for 25 Nov 2026 at 08:30 ET (19:00 IST)",
-      "context": "The BEA schedule lists both releases for Wednesday. October Personal Income and Outlays includes the PCE price indexes; the figures were not yet available at this pre-market timestamp.",
-      "source": "US Bureau of Economic Analysis, 2026 release schedule",
-      "url": "https://www.bea.gov/news/schedule"
+      "name": "USD/INR",
+      "value": "Expected open ₹92.32–₹92.36 per US dollar; Wednesday close ₹92.23",
+      "context": "Trader indications cited by Reuters point to a slightly weaker rupee open after Brent rose. This is an expected opening range, not a confirmed spot quote.",
+      "source": "Reuters, 26 Nov 2026, 02:38 UTC (08:08 IST)",
+      "url": "https://www.reuters.com/world/india/rupee-dip-oil-rise-ai-trade-finding-tentative-footing-2026-11-26/"
+    },
+    {
+      "name": "US Q3 2026 real GDP, second estimate",
+      "value": "+4.3% annualised, revised from the +3.4% advance estimate",
+      "context": "The BEA said growth accelerated from +2.2% in Q2 2026. The second estimate reflected upward revisions primarily to investment and consumer spending.",
+      "source": "US Bureau of Economic Analysis, 25 Nov 2026",
+      "url": "https://www.bea.gov/news/2026/gdp-second-estimate-and-corporate-profits-3rd-quarter-2026"
+    },
+    {
+      "name": "US October 2026 core PCE price index",
+      "value": "+0.3% month on month; +3.3% year on year",
+      "context": "The BEA reported the same 0.3% monthly rise for headline PCE prices, while headline PCE inflation was 3.8% year on year. Core inflation remains relevant to Federal Reserve rate expectations.",
+      "source": "US Bureau of Economic Analysis, Personal Income and Outlays, 25 Nov 2026",
+      "url": "https://bea.gov/news/2026/personal-income-and-outlays-october-2026"
     }
   ],
   "no_material_updates": false
