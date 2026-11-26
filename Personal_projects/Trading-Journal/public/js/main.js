@@ -28,6 +28,7 @@ import * as educationView from './views/education.js';
 import * as aiImportView from './views/ai-import.js';
 import * as intradayView from './views/intraday.js';
 import * as assetsView from './views/assets.js';
+import * as ipoInvestingView from './views/ipo-investing.js';
 
 const app = document.getElementById('app');
 const loginScreen = document.getElementById('loginScreen');
@@ -60,6 +61,7 @@ register('stats/portfolio/reminders', portfolioRemindersView.render);
 register('stats/portfolio/activity', portfolioActivityView.render);
 register('daily-market', dailyMarketView.render);
 register('stock-recommendations', stockBetsView.render);
+register('ipo-investing', ipoInvestingView.render);
 register('graphs', graphsView.render);
 register('stats/intraday', (p, el) => statsKind.render('scalp', p, el));
 register('stats/swing', (p, el) => statsKind.render('swing', p, el));
