@@ -1,121 +1,95 @@
 {
-  "updated_at": "2026-11-26T08:33:07+05:30",
-  "market_date": "2026-11-26",
-  "market_summary": "Pre-market, Thursday 26 November 2026 (as of 08:33 IST). In the previous cash session on Wednesday 25 November, the Nifty 50 rose 1.85% to 25,819.25 and the Sensex gained 1.82% to 83,938.28. Reuters reported gains in 14 of 16 major sectors; financials rose 2.2% and IT 1.1%, while mid-caps added 0.3% and small-caps fell 0.4%, pointing to a large-cap-led rebound rather than uniformly strong breadth. GIFT Nifty was 26,061.5 at 08:01 IST, indicating a firmer opening bias, with 26,000 identified by Reuters as an important near-term resistance area. Asian equities recovered modestly overnight, but AI/technology volatility and the proposed US tariff framework remain risks. Brent rose about 3.5% to $94.90/bbl, and traders expected USD/INR to open at 92.32–92.36 versus Wednesday's 92.23 close. Provisional 25 November cash flows showed FPI/FII net buying of ₹4,479.08 crore and DII net buying of ₹4,018.72 crore. US Q3 GDP was revised to 4.3% annualised; October core PCE inflation was 3.3% year on year. A material HDFC Bank governance filing from 25 November is highlighted below. Facts are distinguished from interpretation in each item; no guaranteed calls or financial advice.",
+  "updated_at": "2026-11-27T19:28:00+05:30",
+  "market_date": "2026-11-27",
+  "market_summary": "Post-market wrap for Friday 27 November 2026 (as of 19:28 IST; next Indian cash session is Monday 30 November). The Nifty 50 fell 277.30 points (-1.07%) to 25,607.20 and the Sensex fell 989.33 points (-1.17%) to 83,339.26, ending a two-day advance and snapping the four-week winning streak; both benchmarks lost about 0.7% for the week. Twelve of 16 major sectors declined, according to Reuters. IT was the weakest major sector (Nifty IT -1.88%), with auto (-1.48%), realty (-1.43%) and financials also under pressure; metals (+1.40%) and media (+0.53%) were relative gainers. Brent rose above $97/bbl amid Middle East supply concerns, while the rupee weakened 0.6% to ₹92.99 per US dollar. Provisional 27 November cash-market flows showed FII/FPI net buying of ₹1,634.33 crore and DII net selling of ₹556.42 crore; these are provisional third-party reproductions of NSE data, not final settled figures. Global equities rebounded across Asia and Europe after the US Thanksgiving holiday, and US index futures were higher, but this divergence did not prevent Indian equities from falling. A verified NSE filing confirmed Alivus Life Sciences completed the acquisition of a 76% stake in IQGEN-X; Eros International Media disclosed its CEO/Executive Director's resignation effective 30 November. The public portfolio data file lists M&M and SBIN as watchlist candidates, not actual holdings; no holdings ledger was accessible, so portfolio-specific exposure could not be verified. Facts and interpretation are separated below. No guaranteed calls or financial advice.",
   "global_cues": [
     {
-      "title": "GIFT Nifty indicates a firmer opening; 26,000 is a key test",
-      "detail": "Reuters recorded GIFT Nifty futures at 26,061.5 at 08:01 IST on 26 November, versus the Nifty 50 cash close of 25,819.25 on 25 November. Reuters cited 26,000 as a key resistance area. This is a futures indication, not a live cash-index price or a guaranteed opening level.",
-      "source": "Reuters, 26 Nov 2026, 02:41 UTC (08:11 IST)",
-      "url": "https://www.reuters.com/world/india/indian-shares-set-extend-gains-strong-foreign-flows-us-tariffs-focus-2026-11-26/"
+      "title": "Global equities rebounded after Thanksgiving, led by Asia and technology shares",
+      "detail": "Reuters reported Japan's Nikkei +2.1%, China's blue-chip market +4.2%, European shares +0.8%, Nasdaq futures +2.1% and S&P 500 futures +1.5% on Friday. Chinese shares rose after Beijing announced further capital-market support. US cash equities had been closed for Thanksgiving on Thursday and were scheduled for a shortened Friday session. Interpretation: the global risk rebound was a positive external cue, but Indian benchmarks sold off despite it; thin holiday liquidity and the durability of the AI-led recovery remain risks.",
+      "source": "Reuters, 27 Nov 2026",
+      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-27/"
     },
     {
-      "title": "Asian markets rebound, but risk appetite remains fragile",
-      "detail": "Reuters reported Japan's Nikkei up 1.6%, South Korea's main index up 1.9%, and Asia-Pacific shares outside Japan up 0.6% early Thursday after Wall Street recovered from steep intraday losses. Nvidia remained under pressure after S&P put its credit rating on watch for a possible downgrade. Interpretation: the regional bounce is constructive for sentiment, but does not remove technology and AI-investment volatility.",
-      "source": "Reuters, 26 Nov 2026, 01:35 UTC (07:05 IST)",
-      "url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-26/"
+      "title": "Oil climbed above $97 as Middle East supply concerns intensified",
+      "detail": "Reuters reported Brent above $96.50/bbl amid supply concerns and regional tensions. Separately, the Indian market close report put Brent at about $97.22/bbl. Interpretation: higher crude is a macro headwind for an oil-importing economy and can pressure the rupee, inflation expectations and fuel-sensitive sectors; the quoted levels are reported market observations, not live ticks.",
+      "source": "Reuters, 27 Nov 2026; DD India/PTI, 27 Nov 2026",
+      "url": "https://www.reuters.com/world/india/indian-shares-snap-blistering-rally-after-four-weeks-as-oil-prices-climb-2026-11-27/"
     },
     {
-      "title": "Proposed US tariffs leave India facing a trade-negotiation risk",
-      "detail": "Reuters reported that the US administration proposed levies on imports from 14 trading partners. The US Trade Representative said the tariff on Indian imports would be capped at 17% if a trade deal is reached, or rise to 25% if talks fail. These are conditional policy outcomes, not a confirmed final tariff schedule.",
-      "source": "Reuters, 26 Nov 2026, 02:41 UTC (08:11 IST)",
-      "url": "https://www.reuters.com/world/india/indian-shares-set-extend-gains-strong-foreign-flows-us-tariffs-focus-2026-11-26/"
-    },
-    {
-      "title": "US cash equity markets are closed for Thanksgiving",
-      "detail": "Nasdaq's official 2026 calendar lists 26 November as a full market closure and 27 November as an early close at 1:00 p.m. ET. The holiday removes the normal US cash-equity session as a fresh overnight signal for Indian markets.",
-      "source": "Nasdaq, 2026 US market holiday schedule",
-      "url": "https://www.nasdaq.com/market-activity/stock-market-holiday-schedule"
-    },
-    {
-      "title": "US growth data were strong while core inflation remained elevated",
-      "detail": "The US Bureau of Economic Analysis revised Q3 2026 real GDP growth to 4.3% annualised from the 3.4% advance estimate. Its October Personal Income and Outlays release showed core PCE prices up 0.3% month on month and 3.3% year on year. Interpretation: stronger growth is supportive for demand, while sticky core inflation can constrain the Federal Reserve's policy flexibility.",
-      "source": "US Bureau of Economic Analysis, releases dated 25 Nov 2026",
-      "url": "https://www.bea.gov/news/2026/gdp-second-estimate-and-corporate-profits-3rd-quarter-2026"
+      "title": "China policy support and the AI trade helped lift regional risk appetite",
+      "detail": "The Associated Press reported Shanghai's Composite +3.7%, South Korea's Kospi +4.3%, Japan's Nikkei +2.1% and Hong Kong's Hang Seng +2.1% on Friday. AP attributed the Chinese-market strength partly to authorities signalling stronger stock-market support. Interpretation: these moves support regional sentiment, but do not by themselves establish a direct earnings catalyst for Indian listed companies.",
+      "source": "Associated Press, 27 Nov 2026",
+      "url": "https://apnews.com/article/c7ef10c1dbc5fa09668bd4fe0729c613"
     }
   ],
   "sections": {
     "intraday": [
       {
-        "ticker": "WIPRO",
-        "company": "Wipro Limited",
-        "headline": "NSE filing discloses BP finance-operations partnership involving about 3,000 employee transfers",
-        "published_at": "2026-11-25T15:48:06+05:30",
-        "what_changed": "Verified fact: Wipro's Regulation 30 press release filed with NSE and BSE says BP selected Wipro as a strategic supplier to transform BP's core finance operations. Around 3,000 BP employees supporting finance operations in India, Hungary and Malaysia are expected to move to Wipro. The new operating model is expected to take effect in 2027, subject to applicable conditions. The filing does not disclose contract value or tenure; BP retains accountability for standards, controls, data and technology governance, with PwC providing controls oversight.",
-        "why_it_matters": "Interpretation: the arrangement could add scale to Wipro's finance and business-process services and create scope for AI- and automation-led transformation work. Without disclosed contract economics, the revenue, margin and earnings contribution cannot yet be quantified.",
-        "bias": "mixed",
+        "ticker": "EROSMEDIA",
+        "company": "Eros International Media Limited",
+        "headline": "CEO and Executive Director Pradeep Kumar Dwivedi resigns, effective 30 November",
+        "published_at": "2026-11-27T18:51:34+05:30",
+        "what_changed": "Verified fact: the company's Regulation 30 filing states that Pradeep Kumar Dwivedi tendered his resignation as CEO, Key Managerial Personnel and Executive Director on 27 November for personal reasons. The resignation takes effect at the close of business on 30 November 2026. The filing says he cited no other material reason.",
+        "why_it_matters": "Interpretation: the departure creates a near-term leadership transition at the company. Investors may look for a successor announcement and clarity on continuity of operating responsibilities; the filing itself does not quantify any financial impact.",
+        "bias": "bearish",
         "confidence": "high",
-        "risk": "No contract value, duration, country-wise employee split or detailed transition costs were disclosed. The operating model is conditional and starts in 2027; employee transfer and integration may affect near-term costs before benefits are realised.",
-        "source": "Wipro Limited, Regulation 30 press release filed with NSE/BSE, 25 Nov 2026, 15:48 IST",
-        "url": "https://nsearchives.nseindia.com/corporate/Wipro_Secretarial_25112026154806_PR.pdf"
+        "risk": "The stated reason is personal and no successor details are included in the filing. The impact depends on transition arrangements and subsequent company disclosures; avoid inferring operational disruption from the resignation alone.",
+        "source": "Eros International Media Limited, Regulation 30 filing to NSE/BSE, 27 Nov 2026; listed by NSE at 18:51:34 IST",
+        "url": "https://nsearchives.nseindia.in/corporate/EROSMEDIA_27112026185033_ResignationofCEOandDirector.pdf"
       }
     ],
     "swing": [
       {
-        "ticker": "ENRIN",
-        "company": "Siemens Energy India Limited",
-        "headline": "FY2026 Q4 results show 81.5% PAT growth; board recommends ₹12 per-share dividend",
-        "published_at": "2026-11-25T20:19:00+05:30",
-        "what_changed": "Verified fact from the company's 25 November release: Q4 FY2026 new orders rose 92.1% year on year to ₹4,514 crore and order backlog increased 25.6% to ₹20,362 crore. Revenue from operations rose 30.4% to ₹3,453 crore; profit after tax rose 81.5% to ₹653 crore; EBIT margin improved to 22.6% from 16.9%. FY2026 revenue was ₹10,243 crore, up 30.9%. The board recommended a dividend of ₹12 per equity share of face value ₹2, subject to the applicable approval process.",
-        "why_it_matters": "Interpretation: strong order intake, a larger backlog and improved operating margin support near-term execution visibility and demonstrate operating leverage. The dividend recommendation adds a shareholder-return event, but it is not yet a completed payment.",
-        "bias": "bullish",
-        "confidence": "high",
-        "risk": "Backlog conversion, project execution, capacity expansion and working-capital needs remain key risks. The company also disclosed a ₹2,060 crore transformer-capacity investment plan; actual returns depend on timely execution and demand. Dividend remains subject to approval.",
-        "source": "Siemens Energy India Limited, official Q4 FY2026 press release, 25 Nov 2026 (NSE filing time reported as 20:19 IST)",
-        "url": "https://www.siemens-energy-india.com/pdf/Q4-FY2026-Press-Release_25112026_final.pdf"
-      }
-    ],
-    "investing": [
-      {
-        "ticker": "HDFCBANK",
-        "company": "HDFC Bank Limited",
-        "headline": "Board approves five-year re-appointment of Harsh Kumar Bhanwala as independent director",
-        "published_at": "2026-11-25T18:01:04+05:30",
-        "what_changed": "Verified fact: HDFC Bank's Regulation 30 filing to NSE and BSE states that the board approved the re-appointment of Dr. Harsh Kumar Bhanwala as an independent director for five years, from 25 January 2027 through 24 January 2032, subject to shareholder approval. The filing notes that he is not related to other directors or key managerial personnel and is not debarred from holding office.",
-        "why_it_matters": "Interpretation: this is a governance-continuity update rather than a direct change to earnings, capital or asset quality. Bhanwala's disclosed experience includes leadership at NABARD and IIFCL.",
+        "ticker": "ALIVUS",
+        "company": "Alivus Life Sciences Limited",
+        "headline": "Completes acquisition of remaining 10.99% in IQGEN-X; total stake reaches 76%",
+        "published_at": "2026-11-27T18:51:42+05:30",
+        "what_changed": "Verified fact: Alivus's Regulation 30 filing says it completed the purchase of the remaining 1,24,493 equity shares, representing 10.99% of IQGEN-X Pharma Private Limited's issued and paid-up equity capital. The company states that closing under the share purchase agreement is complete and that its total stake in IQGEN-X is now 76%.",
+        "why_it_matters": "Interpretation: completion removes the execution uncertainty around this tranche and gives Alivus a controlling 76% interest in IQGEN-X. The filing does not disclose purchase consideration, IQGEN-X's financial contribution or expected synergies, so the earnings impact cannot yet be assessed.",
         "bias": "mixed",
         "confidence": "high",
-        "risk": "Shareholder approval remains pending. The appointment announcement by itself does not establish a change in operating performance, credit quality or valuation.",
-        "source": "HDFC Bank Limited, Regulation 30 filing to NSE/BSE, 25 Nov 2026, 18:01 IST",
-        "url": "https://nsearchives.nseindia.com/corporate/HDFCBANK3_25112026180104_SE_intimation-_HKB.pdf"
+        "risk": "Acquisition economics, integration requirements, funding impact and IQGEN-X's financial performance were not quantified in this filing. Control does not guarantee accretion or successful integration.",
+        "source": "Alivus Life Sciences Limited, Regulation 30 filing to NSE/BSE, 27 Nov 2026; listed by NSE at 18:51:42 IST",
+        "url": "https://nsearchives.nseindia.in/corporate/GLS_27112026185035_BSE_NSE_Closing2_Signed.pdf"
       }
-    ]
+    ],
+    "investing": []
   },
   "macro": [
     {
-      "name": "FPI/FII and DII cash-market flows",
-      "value": "FPI/FII net +₹4,479.08 crore; DII net +₹4,018.72 crore",
-      "context": "Provisional cash-market flows for Wednesday 25 November 2026. Both investor groups were net buyers; figures are provisional and may be revised. Reuters independently reported FPI net buying of ₹44.79 billion.",
-      "source": "Moneycontrol, 25 Nov 2026, 21:13 IST; Reuters, 26 Nov 2026",
-      "url": "https://www.moneycontrol.com/news/business/economy/diis-turn-net-buyers-for-only-a-second-time-in-nov-pick-up-rs-4-019-crore-while-fiis-buy-rs-4-479-crore-14089086.html"
+      "name": "Nifty 50 and Sensex closing levels",
+      "value": "Nifty 50: 25,607.20 (-1.07%); Sensex: 83,339.26 (-1.17%)",
+      "context": "Friday 27 November 2026 official-session close as reported by Moneycontrol and DD India/PTI. The weekly change was about -0.7% for both indices, ending a four-week winning streak. This is a completed-session close, not a live quote.",
+      "source": "Moneycontrol, 27 Nov 2026, 15:52 IST; DD India/PTI, 27 Nov 2026, 16:22 IST",
+      "url": "https://www.moneycontrol.com/news/business/markets/taking-stock-market-snaps-4-week-rally-nifty-below-25-650-sensex-sheds-989-pts-14090358.html"
     },
     {
-      "name": "Brent crude",
-      "value": "About US$94.90 per barrel; up approximately 3.5%",
-      "context": "Reuters reported the overnight rise amid concerns about Middle East supply disruption following Houthi claims of an attack on Saudi Arabia's largest oil refinery. Higher crude is a headwind for India's import bill and fuel-sensitive sectors; the quote is an overnight reported level, not a live tick.",
-      "source": "Reuters, 26 Nov 2026, 02:38 UTC (08:08 IST)",
-      "url": "https://www.reuters.com/world/india/rupee-dip-oil-rise-ai-trade-finding-tentative-footing-2026-11-26/"
+      "name": "FII/FPI and DII cash-market flows",
+      "value": "FII/FPI net +₹1,634.33 crore; DII net -₹556.42 crore",
+      "context": "Provisional figures for Friday 27 November, reproduced by a market-data service as NSE provisional cash-market data. Foreign institutions were net buyers while domestic institutions were net sellers. Treat as provisional and subject to exchange revision; the latest official daily exchange report was not independently fetched in this run.",
+      "source": "Strota, FII/DII data page, updated 27 Nov 2026; labels figures as NSE provisional",
+      "url": "https://strota.in/fii-dii-data"
     },
     {
       "name": "USD/INR",
-      "value": "Expected open ₹92.32–₹92.36 per US dollar; Wednesday close ₹92.23",
-      "context": "Trader indications cited by Reuters point to a slightly weaker rupee open after Brent rose. This is an expected opening range, not a confirmed spot quote.",
-      "source": "Reuters, 26 Nov 2026, 02:38 UTC (08:08 IST)",
-      "url": "https://www.reuters.com/world/india/rupee-dip-oil-rise-ai-trade-finding-tentative-footing-2026-11-26/"
+      "value": "₹92.99 per US dollar at Friday close; rupee down about 0.6%",
+      "context": "Reuters reported the rupee closed 0.6% weaker at 92.99 on 27 November, with a weekly loss of about 0.3%. Interpretation: a weaker rupee raises imported-cost pressure, especially when crude is also elevated.",
+      "source": "Reuters, 27 Nov 2026",
+      "url": "https://www.reuters.com/world/india/rupee-rally-faces-oil-test-inflows-positive-sentiment-provide-cushion-2026-11-27/"
     },
     {
-      "name": "US Q3 2026 real GDP, second estimate",
-      "value": "+4.3% annualised, revised from the +3.4% advance estimate",
-      "context": "The BEA said growth accelerated from +2.2% in Q2 2026. The second estimate reflected upward revisions primarily to investment and consumer spending.",
-      "source": "US Bureau of Economic Analysis, 25 Nov 2026",
-      "url": "https://www.bea.gov/news/2026/gdp-second-estimate-and-corporate-profits-3rd-quarter-2026"
+      "name": "Brent crude",
+      "value": "About US$97.22 per barrel in Friday market reporting",
+      "context": "DD India/PTI reported Brent at $97.22/bbl, up 0.76%, amid supply concerns. Reuters separately reported Brent above $96.50. The exact quote varies by timestamp and contract; this is a reported reference level, not a live price.",
+      "source": "DD India/PTI, 27 Nov 2026",
+      "url": "https://ddindia.co.in/2026/11/stock-markets-snap-2-day-rally-sensex-nifty-end-in-red-amid-profit-booking/"
     },
     {
-      "name": "US October 2026 core PCE price index",
-      "value": "+0.3% month on month; +3.3% year on year",
-      "context": "The BEA reported the same 0.3% monthly rise for headline PCE prices, while headline PCE inflation was 3.8% year on year. Core inflation remains relevant to Federal Reserve rate expectations.",
-      "source": "US Bureau of Economic Analysis, Personal Income and Outlays, 25 Nov 2026",
-      "url": "https://bea.gov/news/2026/personal-income-and-outlays-october-2026"
+      "name": "Indian market calendar",
+      "value": "Next regular cash-equity session: Monday 30 November 2026",
+      "context": "Friday was the final Indian cash session of the week; the next regular session is Monday. Saturday/Sunday pre-market automation runs will publish a dated weekend/no-session context rather than inventing market prices.",
+      "source": "Downstox NSE filings and market calendar read, 27 Nov 2026",
+      "url": "https://downstox.com/announcements"
     }
   ],
   "no_material_updates": false
